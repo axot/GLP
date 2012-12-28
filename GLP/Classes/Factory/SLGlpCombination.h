@@ -30,16 +30,16 @@
 
 template <class M, class G>
 class SLGlpCombination : public SLModelStrategy, public SLGraphMiningStrategy
-{
+{    
 public:
-    SLModel<M> model;
-    SLGraphMining<G> graphMining;
-    
-public:
-    bool train(MatrixXd& X, MatrixXd& Y, MatrixXd *Beta)   { return model.train(X, Y, Beta); }
+    bool train(MatrixXd& X, MatrixXd& Y, MatrixXd *Beta)    { return model.train(X, Y, Beta); }
     bool validate(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta) { return model.validate(X, Y, Beta); }
     bool classify(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta) { return model.classify(X, Y, Beta); }
     MatrixXd& search() { return graphMining.search(); }
+    
+private:
+    SLModel<M> model;
+    SLGraphMining<G> graphMining;
 };
 
 #endif /* defined(__GLP__SLGlpCombination__) */

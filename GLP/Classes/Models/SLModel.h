@@ -42,7 +42,7 @@ template <class AStrategy>
 class SLModel
 {
 public:    
-    bool train(MatrixXd& X, MatrixXd& Y, MatrixXd *Beta)   { return aStrategy.train(X, Y, Beta); }
+    bool train(MatrixXd& X, MatrixXd& Y, MatrixXd *Beta)    { return aStrategy.train(X, Y, Beta); }
     bool validate(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta) { return aStrategy.validate(X, Y, Beta); }
     bool classify(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta) { return aStrategy.classify(X, Y, Beta); }
 

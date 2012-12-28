@@ -1,5 +1,5 @@
 //
-//  main.cpp
+//  gspls.cpp
 //  GLP
 //
 //  Created by Zheng Shao on 12/20/12.

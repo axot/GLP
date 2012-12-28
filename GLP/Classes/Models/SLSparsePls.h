@@ -33,41 +33,8 @@
 class SLSparsePls : SLModelStrategy
 {
 public:    
-    /* Sparse PLS regression: Y = XB
-     *
-     * Input
-     *      X: X matrix
-     *      Y: Y matrix
-     *
-     * Output
-     *      Beta: the calculated Beta value
-     *
-     * return: true if sucessed.
-     */
-    bool train(MatrixXd& X, MatrixXd& Y, MatrixXd *Beta);
-    
-    /* Validate:
-     * Input
-     *      X: test X matrix
-     *      Y: test Y matrix
-     *
-     * Output
-     *      Beta: the calculated Beta value
-     *
-     * return: true if sucessed.
-     */
+    bool train(MatrixXd& X, MatrixXd& Y, MatrixXd *Beta);       // Sparse PLS regression: Y = XB
     bool validate(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta);
-    
-    /* Train:
-     * Input
-     *      X: X matrix
-     *      Y: Y matrix
-     *
-     * Output
-     *      Beta: the calculated Beta value
-     *
-     * return: true if sucessed.
-     */
     bool classify(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta);
 };
 
