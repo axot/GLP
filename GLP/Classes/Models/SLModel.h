@@ -38,7 +38,7 @@
 using namespace Eigen;
 
 // the Context of strategy pattern
-template <class AStrategy>
+template <typename AStrategy>
 class SLModel
 {
 public:    

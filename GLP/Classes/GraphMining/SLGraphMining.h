@@ -35,7 +35,7 @@
 
 #include "SLGraphMiningStrategy.h"
 
-template <class AStrategy>
+template <typename AStrategy>
 class SLGraphMining
 {
 public:

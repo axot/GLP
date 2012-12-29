@@ -31,7 +31,7 @@
 #include "Models/SLSparsePls.h"
 
 // Factories
-#include "Factory/SLGspanSparsePlsFactory.h"
+#include "Factory/SLGlpFactory.h"
 
 // Graph Mining
 #include "GraphMining/SLGspan.h"

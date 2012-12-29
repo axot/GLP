@@ -7,11 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		53578DFC168D6935002668D3 /* gspls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53578DFB168D6935002668D3 /* gspls.cpp */; };
 		53578E08168D69B9002668D3 /* MatrixExt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53578E06168D69B9002668D3 /* MatrixExt.cpp */; };
 		53832811168D7E4E00E3B48F /* SLSparsePls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53832810168D7E4E00E3B48F /* SLSparsePls.cpp */; };
 		53C09383168DBB5D00A0ADC1 /* SLGspan.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53C09381168DBB5D00A0ADC1 /* SLGspan.cpp */; };
-		53C09386168DC0DA00A0ADC1 /* SLGspanSparsePlsFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53C09385168DC0DA00A0ADC1 /* SLGspanSparsePlsFactory.cpp */; };
+		53C09388168DDEA500A0ADC1 /* gspls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53C09387168DDEA500A0ADC1 /* gspls.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -31,8 +30,6 @@
 		5331743B168D97B1005305C8 /* SLGlpCombination.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLGlpCombination.h; path = Classes/Factory/SLGlpCombination.h; sourceTree = "<group>"; };
 		5331743E168D9861005305C8 /* SLGraphMining.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLGraphMining.h; path = Classes/GraphMining/SLGraphMining.h; sourceTree = "<group>"; };
 		53317441168D987B005305C8 /* SLGraphMiningStrategy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLGraphMiningStrategy.h; path = Classes/GraphMining/SLGraphMiningStrategy.h; sourceTree = "<group>"; };
-		53317444168DA2E0005305C8 /* SLGspanSparsePlsFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLGspanSparsePlsFactory.h; path = Classes/Factory/SLGspanSparsePlsFactory.h; sourceTree = "<group>"; };
-		53578DFB168D6935002668D3 /* gspls.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = gspls.cpp; path = Test/gspls.cpp; sourceTree = "<group>"; };
 		53578E04168D69AD002668D3 /* SLModelStrategy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLModelStrategy.h; path = Classes/Models/SLModelStrategy.h; sourceTree = "<group>"; };
 		53578E05168D69AD002668D3 /* SLSparsePls.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLSparsePls.h; path = Classes/Models/SLSparsePls.h; sourceTree = "<group>"; };
 		53578E06168D69B9002668D3 /* MatrixExt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MatrixExt.cpp; path = Classes/Extensions/MatrixExt.cpp; sourceTree = "<group>"; };
@@ -45,7 +42,7 @@
 		53832810168D7E4E00E3B48F /* SLSparsePls.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SLSparsePls.cpp; path = Classes/Models/SLSparsePls.cpp; sourceTree = "<group>"; };
 		53C09381168DBB5D00A0ADC1 /* SLGspan.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SLGspan.cpp; path = Classes/GraphMining/SLGspan.cpp; sourceTree = "<group>"; };
 		53C09382168DBB5D00A0ADC1 /* SLGspan.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLGspan.h; path = Classes/GraphMining/SLGspan.h; sourceTree = "<group>"; };
-		53C09385168DC0DA00A0ADC1 /* SLGspanSparsePlsFactory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SLGspanSparsePlsFactory.cpp; path = Classes/Factory/SLGspanSparsePlsFactory.cpp; sourceTree = "<group>"; };
+		53C09387168DDEA500A0ADC1 /* gspls.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = gspls.cpp; path = Examples/gspls.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,19 +56,9 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		53317446168DA69D005305C8 /* Concrete */ = {
-			isa = PBXGroup;
-			children = (
-				53317444168DA2E0005305C8 /* SLGspanSparsePlsFactory.h */,
-				53C09385168DC0DA00A0ADC1 /* SLGspanSparsePlsFactory.cpp */,
-			);
-			name = Concrete;
-			sourceTree = "<group>";
-		};
 		53578DF5168D67FC002668D3 /* Factory */ = {
 			isa = PBXGroup;
 			children = (
-				53317446168DA69D005305C8 /* Concrete */,
 				53317438168D9764005305C8 /* SLGlpFactory.h */,
 				5331743B168D97B1005305C8 /* SLGlpCombination.h */,
 			);
@@ -91,12 +78,12 @@
 			name = Classes;
 			sourceTree = "<group>";
 		};
-		53578DFA168D6922002668D3 /* Test */ = {
+		53578DFA168D6922002668D3 /* Examples */ = {
 			isa = PBXGroup;
 			children = (
-				53578DFB168D6935002668D3 /* gspls.cpp */,
+				53C09387168DDEA500A0ADC1 /* gspls.cpp */,
 			);
-			name = Test;
+			name = Examples;
 			sourceTree = "<group>";
 		};
 		537123361683288A00B47D4E = {
@@ -120,7 +107,7 @@
 			isa = PBXGroup;
 			children = (
 				53578DF9168D691B002668D3 /* Classes */,
-				53578DFA168D6922002668D3 /* Test */,
+				53578DFA168D6922002668D3 /* Examples */,
 			);
 			path = GLP;
 			sourceTree = "<group>";
@@ -223,11 +210,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				53578DFC168D6935002668D3 /* gspls.cpp in Sources */,
 				53578E08168D69B9002668D3 /* MatrixExt.cpp in Sources */,
 				53832811168D7E4E00E3B48F /* SLSparsePls.cpp in Sources */,
 				53C09383168DBB5D00A0ADC1 /* SLGspan.cpp in Sources */,
-				53C09386168DC0DA00A0ADC1 /* SLGspanSparsePlsFactory.cpp in Sources */,
+				53C09388168DDEA500A0ADC1 /* gspls.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

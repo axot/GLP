@@ -105,8 +105,7 @@ int main(int argc, const char *argv[])
         return -2;
     }
     
-    SLGspanSparsePlsFactory gspanSparsePlsFactory;
-    SLGlpCombination<SLSparsePls, SLGspan>* gspls = gspanSparsePlsFactory.create();
+    auto gspls = SLGlpFactory<SLSparsePls, SLGspan>::create();
     
     MatrixXd X, Y, Beta;
     gspls->search();

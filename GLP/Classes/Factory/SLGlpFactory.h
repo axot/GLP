@@ -27,11 +27,14 @@
 #include <iostream>
 #include "SLGlpCombination.h"
 
-template <class M, class G>
+template <typename M, typename G>
 class SLGlpFactory
-{    
+{
+private:
+    SLGlpFactory();
+    
 public:
-    virtual SLGlpCombination<M,G>* create() = 0;
+    static SLGlpCombination<M,G>* create() { return new SLGlpCombination<M,G>; };
 };
 
 #endif /* defined(__GLP__SLGlpFactory__) */
