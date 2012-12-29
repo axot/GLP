@@ -25,13 +25,14 @@
 #define __GLP__SLGspan__
 
 #include <iostream>
-
 #include "SLGraphMiningStrategy.h"
 
 class SLGspan : public SLGraphMiningStrategy
 {
-public:    
+public:
+    // Implementation SLGraphMiningStrategy Protocol
     MatrixXd& search();
+    bool initParameters(SLGlpParameters& parameters);
 };
 
 #endif /* defined(__GLP__SLGspan__) */

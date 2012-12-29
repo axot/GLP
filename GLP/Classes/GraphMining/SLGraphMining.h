@@ -30,16 +30,15 @@
 #define __GLP__SLGraphMining__
 
 #include <iostream>
-
 #include <Eigen/Core>
-
 #include "SLGraphMiningStrategy.h"
 
 template <typename AStrategy>
 class SLGraphMining
 {
 public:
-    MatrixXd& search() { return aStrategy.search(); }
+    MatrixXd& search()                                          { return aStrategy.search(); }
+    bool initParameters(SLGlpParameters& graphMiningParameters) { return aStrategy.initParameters(graphMiningParameters); }
 
 private:
     AStrategy aStrategy;

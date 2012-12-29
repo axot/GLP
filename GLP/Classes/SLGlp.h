@@ -26,12 +26,12 @@
 #ifndef GLP_SLGlp_h
 #define GLP_SLGlp_h
 
+// Factories
+#include "Factory/SLGlpFactory.h"
+
 // Models
 #include "Models/SLModel.h"
 #include "Models/SLSparsePls.h"
-
-// Factories
-#include "Factory/SLGlpFactory.h"
 
 // Graph Mining
 #include "GraphMining/SLGspan.h"

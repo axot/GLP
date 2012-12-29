@@ -31,4 +31,10 @@
 #define Std(x)          sqrt( SSum(x.array()-x.mean()) / (x.size()-1) )
 #define AutoScale(x)    ( (x).array()-(x).mean() )
 
+#include <map>
+
+using namespace std;
+
+typedef map<string,string> SLGlpParameters;
+
 #endif

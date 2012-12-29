@@ -27,15 +27,26 @@
 #define GLP_SLSparsePls_h
 
 #include <iostream>
-
 #include "SLModelStrategy.h"
 
-class SLSparsePls : SLModelStrategy
+class SLSparsePls : public SLModelStrategy
 {
-public:    
-    bool train(MatrixXd& X, MatrixXd& Y, MatrixXd *Beta);       // Sparse PLS regression: Y = XB
+public:
+    SLSparsePls(): a(0), b(0) {}
+    
+    // Implementation SLModelStrategy protocol
+    bool train   (MatrixXd& X, MatrixXd& Y, MatrixXd *Beta);       // Sparse PLS regression: Y = XB
     bool validate(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta);
     bool classify(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta);
+    bool initParameters(SLGlpParameters& parameters);
+
+private:
+    /* Begin SLGlpParameters
+     * Only These private fields can be init when setting SLGlpParameters
+     */
+    int a;
+    int b;
+    /* End SLGlpParameters */
 };
 
 #endif

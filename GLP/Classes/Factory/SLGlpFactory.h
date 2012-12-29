@@ -25,7 +25,8 @@
 #define __GLP__SLGlpFactory__
 
 #include <iostream>
-#include "SLGlpCombination.h"
+#include "SLGlpProduct.h"
+#include "../SLUtility.h"
 
 template <typename M, typename G>
 class SLGlpFactory
@@ -34,7 +35,8 @@ private:
     SLGlpFactory();
     
 public:
-    static SLGlpCombination<M,G>* create() { return new SLGlpCombination<M,G>; };
+    static SLGlpProduct<M,G>* create(SLGlpParameters& modelParameters, SLGlpParameters& graphMiningParameters)
+        { return new SLGlpProduct<M,G>(modelParameters, graphMiningParameters); };
 };
 
 #endif /* defined(__GLP__SLGlpFactory__) */

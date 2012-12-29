@@ -1,5 +1,5 @@
 //
-//  SLGlpCombination.h
+//  SLGlpProduct.h
 //  GLP
 //
 //  Created by Zheng Shao on 12/28/12.
@@ -21,22 +21,34 @@
 //  02111-1307, USA
 //
 
-#ifndef __GLP__SLGlpCombination__
-#define __GLP__SLGlpCombination__
+#ifndef __GLP__SLGlpProduct__
+#define __GLP__SLGlpProduct__
 
 #include <iostream>
 #include "../Models/SLModel.h"
 #include "../GraphMining/SLGraphMining.h"
+#include "../SLUtility.h"
 
 template <typename M, typename G>
-class SLGlpCombination : public SLModelStrategy, public SLGraphMiningStrategy
+class SLGlpProduct : public SLModelStrategy, public SLGraphMiningStrategy
 {    
-public:
+public:    
+    SLGlpProduct (SLGlpParameters& modelParameters, SLGlpParameters& graphMiningParameters)
+    {
+        model.initParameters(modelParameters);
+        graphMining.initParameters(graphMiningParameters);
+    }
+    
+    // Implementation SLModelStrategy
     bool train(MatrixXd& X, MatrixXd& Y, MatrixXd *Beta)    { return model.train(X, Y, Beta); }
     bool validate(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta) { return model.validate(X, Y, Beta); }
     bool classify(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta) { return model.classify(X, Y, Beta); }
     
-    MatrixXd& search() { return graphMining.search(); }
+    // Implementation SLGraphMiningStrategy
+    MatrixXd& search()                                      { return graphMining.search(); }
+    
+    // Implementation in construct method not here
+    bool initParameters(SLGlpParameters& parameters)        { return false; }
     
 private:
     SLModel<M> model;

@@ -27,7 +27,7 @@
 
 /* Begin PBXFileReference section */
 		53317438168D9764005305C8 /* SLGlpFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLGlpFactory.h; path = Classes/Factory/SLGlpFactory.h; sourceTree = "<group>"; };
-		5331743B168D97B1005305C8 /* SLGlpCombination.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLGlpCombination.h; path = Classes/Factory/SLGlpCombination.h; sourceTree = "<group>"; };
+		5331743B168D97B1005305C8 /* SLGlpProduct.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLGlpProduct.h; path = Classes/Factory/SLGlpProduct.h; sourceTree = "<group>"; };
 		5331743E168D9861005305C8 /* SLGraphMining.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLGraphMining.h; path = Classes/GraphMining/SLGraphMining.h; sourceTree = "<group>"; };
 		53317441168D987B005305C8 /* SLGraphMiningStrategy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLGraphMiningStrategy.h; path = Classes/GraphMining/SLGraphMiningStrategy.h; sourceTree = "<group>"; };
 		53578E04168D69AD002668D3 /* SLModelStrategy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLModelStrategy.h; path = Classes/Models/SLModelStrategy.h; sourceTree = "<group>"; };
@@ -60,7 +60,7 @@
 			isa = PBXGroup;
 			children = (
 				53317438168D9764005305C8 /* SLGlpFactory.h */,
-				5331743B168D97B1005305C8 /* SLGlpCombination.h */,
+				5331743B168D97B1005305C8 /* SLGlpProduct.h */,
 			);
 			name = Factory;
 			sourceTree = "<group>";

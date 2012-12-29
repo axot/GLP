@@ -32,6 +32,7 @@
 #include <iostream>
 
 #include <Eigen/Core>
+#include "../SLUtility.h"
 
 using namespace Eigen;
 
@@ -39,6 +40,14 @@ class SLGraphMiningStrategy
 {    
 public:
     virtual MatrixXd& search() = 0;
+    
+    /* Init Parameters: Convert std::map<string, string> to real parameters
+     * Input
+     *      parameters: std::map parameters
+     *
+     * return: true if sucessed.
+     */
+    virtual bool initParameters(SLGlpParameters& parameters) = 0;
 };
 
 #endif /* defined(__GLP__SLGraphMiningStrategy__) */

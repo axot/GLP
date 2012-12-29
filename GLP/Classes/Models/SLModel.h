@@ -30,9 +30,7 @@
 #define __GLP__SLModel__
 
 #include <iostream>
-
 #include <Eigen/Core>
-
 #include "SLModelStrategy.h"
 
 using namespace Eigen;
@@ -41,11 +39,12 @@ using namespace Eigen;
 template <typename AStrategy>
 class SLModel
 {
-public:    
+public:
     bool train(MatrixXd& X, MatrixXd& Y, MatrixXd *Beta)    { return aStrategy.train(X, Y, Beta); }
     bool validate(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta) { return aStrategy.validate(X, Y, Beta); }
     bool classify(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta) { return aStrategy.classify(X, Y, Beta); }
-
+    bool initParameters(SLGlpParameters& modelParameters)   { return aStrategy.initParameters(modelParameters); }
+    
 private:
     AStrategy aStrategy;
 };

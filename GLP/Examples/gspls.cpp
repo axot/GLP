@@ -105,8 +105,13 @@ int main(int argc, const char *argv[])
         return -2;
     }
     
-    auto gspls = SLGlpFactory<SLSparsePls, SLGspan>::create();
+    SLGlpParameters mParam;
     
+    mParam["a"] = "100";
+    mParam["b"] = "10";
+
+    auto gspls = SLGlpFactory<SLSparsePls, SLGspan>::create(mParam, mParam);
+        
     MatrixXd X, Y, Beta;
     gspls->search();
     gspls->train(X, Y, &Beta);

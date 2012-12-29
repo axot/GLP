@@ -27,6 +27,7 @@
 #define GLP_SLModelStrategy_h
 
 #include <Eigen/Core>
+#include "../SLUtility.h"
 
 using namespace Eigen;
 
@@ -66,7 +67,7 @@ public:
      */
     virtual bool validate(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta) = 0;
     
-    /* Train:
+    /* Classify:
      * Input
      *      X: X matrix
      *      Y: Y matrix
@@ -77,11 +78,14 @@ public:
      * return: true if sucessed.
      */
     virtual bool classify(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta) = 0;
-    
-private:
-    MatrixXd X;
-    MatrixXd Y;
-    MatrixXd Beta;
+
+    /* Init Parameters: Convert std::map<string, string> to real parameters
+     * Input
+     *      parameters: std::map parameters
+     *
+     * return: true if sucessed.
+     */
+    virtual bool initParameters(SLGlpParameters& parameters) = 0;
 };
 
 #endif
