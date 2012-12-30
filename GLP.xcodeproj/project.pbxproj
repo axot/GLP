@@ -7,13 +7,24 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		53578E08168D69B9002668D3 /* MatrixExt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53578E06168D69B9002668D3 /* MatrixExt.cpp */; };
+		53388A341690B0FD00AF9E5E /* SparsePlsTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53388A231690B03000AF9E5E /* SparsePlsTest.cpp */; };
+		53388A351690B10000AF9E5E /* SLSparsePls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53832810168D7E4E00E3B48F /* SLSparsePls.cpp */; };
+		53388A361690B10300AF9E5E /* SLGspan.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53C09381168DBB5D00A0ADC1 /* SLGspan.cpp */; };
 		53832811168D7E4E00E3B48F /* SLSparsePls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53832810168D7E4E00E3B48F /* SLSparsePls.cpp */; };
 		53C09383168DBB5D00A0ADC1 /* SLGspan.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53C09381168DBB5D00A0ADC1 /* SLGspan.cpp */; };
 		53C09388168DDEA500A0ADC1 /* gspls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53C09387168DDEA500A0ADC1 /* gspls.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		53388A281690B0D500AF9E5E /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 		5371233F1683288A00B47D4E /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -30,9 +41,10 @@
 		5331743B168D97B1005305C8 /* SLGlpProduct.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLGlpProduct.h; path = Classes/Factory/SLGlpProduct.h; sourceTree = "<group>"; };
 		5331743E168D9861005305C8 /* SLGraphMining.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLGraphMining.h; path = Classes/GraphMining/SLGraphMining.h; sourceTree = "<group>"; };
 		53317441168D987B005305C8 /* SLGraphMiningStrategy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLGraphMiningStrategy.h; path = Classes/GraphMining/SLGraphMiningStrategy.h; sourceTree = "<group>"; };
+		53388A231690B03000AF9E5E /* SparsePlsTest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SparsePlsTest.cpp; path = Test/SparsePlsTest.cpp; sourceTree = "<group>"; };
+		53388A2A1690B0D500AF9E5E /* SparsePls */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SparsePls; sourceTree = BUILT_PRODUCTS_DIR; };
 		53578E04168D69AD002668D3 /* SLModelStrategy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLModelStrategy.h; path = Classes/Models/SLModelStrategy.h; sourceTree = "<group>"; };
 		53578E05168D69AD002668D3 /* SLSparsePls.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLSparsePls.h; path = Classes/Models/SLSparsePls.h; sourceTree = "<group>"; };
-		53578E06168D69B9002668D3 /* MatrixExt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MatrixExt.cpp; path = Classes/Extensions/MatrixExt.cpp; sourceTree = "<group>"; };
 		53578E07168D69B9002668D3 /* MatrixExt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MatrixExt.h; path = Classes/Extensions/MatrixExt.h; sourceTree = "<group>"; };
 		53578E09168D69CB002668D3 /* SLGlp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLGlp.h; path = Classes/SLGlp.h; sourceTree = "<group>"; };
 		537123411683288A00B47D4E /* gspls */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = gspls; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -46,6 +58,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		53388A271690B0D500AF9E5E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5371233E1683288A00B47D4E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -56,6 +75,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		53388A211690AFE600AF9E5E /* Test */ = {
+			isa = PBXGroup;
+			children = (
+				53388A231690B03000AF9E5E /* SparsePlsTest.cpp */,
+			);
+			name = Test;
+			sourceTree = "<group>";
+		};
 		53578DF5168D67FC002668D3 /* Factory */ = {
 			isa = PBXGroup;
 			children = (
@@ -99,6 +126,7 @@
 			isa = PBXGroup;
 			children = (
 				537123411683288A00B47D4E /* gspls */,
+				53388A2A1690B0D500AF9E5E /* SparsePls */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -108,6 +136,7 @@
 			children = (
 				53578DF9168D691B002668D3 /* Classes */,
 				53578DFA168D6922002668D3 /* Examples */,
+				53388A211690AFE600AF9E5E /* Test */,
 			);
 			path = GLP;
 			sourceTree = "<group>";
@@ -135,7 +164,6 @@
 		537123511683294D00B47D4E /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				53578E06168D69B9002668D3 /* MatrixExt.cpp */,
 				53578E07168D69B9002668D3 /* MatrixExt.h */,
 			);
 			name = Extensions;
@@ -162,6 +190,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		53388A291690B0D500AF9E5E /* SparsePls */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 53388A311690B0D500AF9E5E /* Build configuration list for PBXNativeTarget "SparsePls" */;
+			buildPhases = (
+				53388A261690B0D500AF9E5E /* Sources */,
+				53388A271690B0D500AF9E5E /* Frameworks */,
+				53388A281690B0D500AF9E5E /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SparsePls;
+			productName = SparsePls;
+			productReference = 53388A2A1690B0D500AF9E5E /* SparsePls */;
+			productType = "com.apple.product-type.tool";
+		};
 		537123401683288A00B47D4E /* gspls */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 5371234B1683288A00B47D4E /* Build configuration list for PBXNativeTarget "gspls" */;
@@ -201,16 +246,26 @@
 			projectRoot = "";
 			targets = (
 				537123401683288A00B47D4E /* gspls */,
+				53388A291690B0D500AF9E5E /* SparsePls */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
+		53388A261690B0D500AF9E5E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				53388A341690B0FD00AF9E5E /* SparsePlsTest.cpp in Sources */,
+				53388A351690B10000AF9E5E /* SLSparsePls.cpp in Sources */,
+				53388A361690B10300AF9E5E /* SLGspan.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5371233D1683288A00B47D4E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				53578E08168D69B9002668D3 /* MatrixExt.cpp in Sources */,
 				53832811168D7E4E00E3B48F /* SLSparsePls.cpp in Sources */,
 				53C09383168DBB5D00A0ADC1 /* SLGspan.cpp in Sources */,
 				53C09388168DDEA500A0ADC1 /* gspls.cpp in Sources */,
@@ -220,6 +275,28 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		53388A321690B0D500AF9E5E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				HEADER_SEARCH_PATHS = (
+					/usr/local/include,
+					/usr/local/include/eigen3,
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		53388A331690B0D500AF9E5E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				HEADER_SEARCH_PATHS = (
+					/usr/local/include,
+					/usr/local/include/eigen3,
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		537123491683288A00B47D4E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -262,6 +339,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
@@ -274,7 +352,6 @@
 		5371234C1683288A00B47D4E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = (
 					/usr/local/include,
 					/usr/local/include/eigen3,
@@ -286,8 +363,6 @@
 		5371234D1683288A00B47D4E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				GCC_OPTIMIZATION_LEVEL = 3;
-				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = (
 					/usr/local/include,
 					/usr/local/include/eigen3,
@@ -299,6 +374,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		53388A311690B0D500AF9E5E /* Build configuration list for PBXNativeTarget "SparsePls" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				53388A321690B0D500AF9E5E /* Debug */,
+				53388A331690B0D500AF9E5E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		5371233B1683288A00B47D4E /* Build configuration list for PBXProject "GLP" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

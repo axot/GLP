@@ -21,14 +21,86 @@
 //  02111-1307, USA
 //
 
+#include <Eigen/QR>
 #include "SLSparsePls.h"
 
 using namespace std;
 
-bool SLSparsePls::train(MatrixXd& X, MatrixXd& Y, MatrixXd* Beta)
+bool SLSparsePls::train(MatrixXd& appendedX, MatrixXd& theY, MatrixXd** outBeta)
 {
-    cout << "SLSparsePls::train:a: " << param.a << "\tb: " << param.b << endl;
-    return false;
+    if (Y.cols() == 0 || Y.rows() == 0)
+    {
+        Y = AutoScale(theY);
+        RES = Y;
+    }
+    
+    long appendedXRows = appendedX.rows();
+    long appendedXCols = appendedX.cols();
+    long oldXCols      = X.cols();
+    
+    long maxSquaredNormColumn;
+    SSum(RES).maxCoeff(&maxSquaredNormColumn);
+    
+    residual = RES.col(maxSquaredNormColumn);
+
+    X.conservativeResize(appendedXRows, oldXCols+appendedXCols);
+    X.rightCols(appendedXCols).setZero();
+    X << X.leftCols(oldXCols), appendedX;
+
+    W.conservativeResize(oldXCols+appendedXCols, W.cols()+1);
+    W.bottomRows(appendedXCols).setZero();
+    W.rightCols(1).setZero();
+    
+    W.rightCols(1) = X.transpose()*residual;
+    W.rightCols(1).normalize();
+        
+    T.conservativeResize(appendedXRows, T.cols()+1);
+    T.rightCols(1).setZero();
+    
+    if(T.cols() > 1)
+        T.rightCols(1) = (MatrixXd::Identity(X.rows(),X.rows()) - T.leftCols(T.cols()-1)*(T.leftCols(T.cols()-1).transpose())) * X * W.rightCols(1);
+    else
+        T.rightCols(1) = X * W.rightCols(1);
+    
+    T.rightCols(1).normalize();
+    
+    Beta = W*(W.transpose()*X.transpose()*X*W).householderQr().solve(W.transpose()*X.transpose()*Y);
+    
+    if (verbose)
+    {
+        LOG(Y);
+        LOG(X.rightCols(appendedXCols));
+        LOG(W);
+        LOG(residual);
+        LOG(Beta);
+        LOG(X*Beta.col(0));
+        getchar();
+    }
+    
+    RES = Y - X*Beta;
+    
+    if (outBeta != NULL)
+    {
+        *outBeta = &Beta;
+    }
+    
+    return true;
+}
+
+map<SLTRAINRESULTYPE, MatrixXd> SLSparsePls::getTrainResult(SLTRAINRESULTYPE type)
+{
+    ASSERT(!(type&SLTRAINRESULTYPEACC || type&SLTRAINRESULTYPEAUC), "Only support Q2 RSS for Sparse PLS.");
+    
+    map<SLTRAINRESULTYPE, MatrixXd> result;
+    if(type & SLTRAINRESULTYPEQ2)
+    {
+        result[SLTRAINRESULTYPEQ2] = MatrixXd::Ones(1, Y.cols()) - SSum(RES).cwiseQuotient(SSum(Y));
+    }
+    if(type & SLTRAINRESULTYPERSS)
+    {
+        result[SLTRAINRESULTYPERSS] = SSum(RES);
+    }
+    return result;
 }
 
 bool SLSparsePls::validate(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta)
@@ -43,6 +115,5 @@ bool SLSparsePls::classify(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta)
 
 bool SLSparsePls::initParameters(SLSparsePlsParameters parameters)
 {
-    param = parameters;
     return true;
 }

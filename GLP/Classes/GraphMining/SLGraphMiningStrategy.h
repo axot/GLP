@@ -43,7 +43,7 @@ public:
     
     /* Init Parameters:
      * Input
-     *      parameters: Graph Mining parameters
+     *      parameters: Graph Mining assignable parameters
      *
      * Return: true if sucessed.
      *

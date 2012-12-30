@@ -26,19 +26,12 @@
 #ifndef GLP_SLModelStrategy_h
 #define GLP_SLModelStrategy_h
 
+#include <map>
 #include <Eigen/Core>
 #include "../SLUtility.h"
 
+using namespace std;
 using namespace Eigen;
-
-enum{
-    Q2      = 0,
-    RSS     = 1 << 0,
-    AUC     = 1 << 1,
-    ACC     = 1 << 2
-};
-
-typedef unsigned int RESULTYPE;
 
 class SLModelStrategy
 {
@@ -53,8 +46,16 @@ public:
      *
      * Return: true if sucessed.
      */
-    virtual bool train(MatrixXd& X, MatrixXd& Y, MatrixXd* Beta) = 0;
+    virtual bool train(MatrixXd& X, MatrixXd& Y, MatrixXd** Beta) = 0;
     
+    /* getTrainResult:
+     * Input
+     *      type: type of results
+     *
+     * Return: the results stored in mapped structure
+     */
+    virtual map<SLTRAINRESULTYPE, MatrixXd> getTrainResult(SLTRAINRESULTYPE type) = 0;
+
     /* Validate:
      * Input
      *      X: test X matrix
@@ -81,7 +82,7 @@ public:
 
     /* Init Parameters:
      * Input
-     *      parameters: Model parameters
+     *      parameters: Model assignable parameters
      *
      * Return: true if sucessed.
      *

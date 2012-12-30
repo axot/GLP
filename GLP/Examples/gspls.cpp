@@ -59,10 +59,10 @@ int main(int argc, const char *argv[])
     size_t minsup = 1;
     size_t n = 10;
     size_t topk = 10;
-    char *yMatrixFile = NULL;
+    char *yfile = NULL;
     int verbose = 0;
 
-    if (argc < 1) {
+    if (argc < 2) {
         usage();
         return -1;
     }
@@ -85,7 +85,7 @@ int main(int argc, const char *argv[])
                 topk = atoi (optarg);
                 break;
             case 'y':
-                yMatrixFile = strdup(optarg);
+                yfile = strdup(optarg);
                 break;
             case 'v':
                 verbose = atoi (optarg);
@@ -102,20 +102,6 @@ int main(int argc, const char *argv[])
         usage();
         return -2;
     }
-    
-    SLSparsePls::SLSparsePlsParameters splsParam;
-    splsParam.a = 100;
-    
-    SLGspan::SLGspanParameters gspanParam;
-    gspanParam.a = 2;
-    
-    // for C++11
-    // auto gspls = SLGlpFactory<SLSparsePls, SLGspan>::create(splsParam, gspanParam);
-    SLGlpProduct<SLSparsePls, SLGspan>* gspls = SLGlpFactory<SLSparsePls, SLGspan>::create(splsParam, gspanParam);
-    
-    MatrixXd X, Y, Beta;
-    gspls->search();
-    gspls->train(X, Y, &Beta);
     
     return 0;
 }

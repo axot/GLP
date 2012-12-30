@@ -27,7 +27,10 @@
 #define GLP_SLSparsePls_h
 
 #include <iostream>
+#include <Eigen/Core>
 #include "SLModelStrategy.h"
+
+using namespace Eigen;
 
 class SLSparsePls : public SLModelStrategy
 {
@@ -35,28 +38,49 @@ public:
     class SLSparsePlsParameters
     {
     public:
-        SLSparsePlsParameters() : a(0), b(10) {}
+        SLSparsePlsParameters() {}
         
     public:
-        friend class SLSparsePls;
-        
-        // assignable parameters
-        int a;
-        
-    private:
-        // not assignable parameters
-        int b;
     };
     
 public:
-    // Implementation SLModelStrategy protocol
-    bool train   (MatrixXd& X, MatrixXd& Y, MatrixXd* Beta);       // Sparse PLS regression: Y = XB
+    SLSparsePls() : verbose(0) {}
+        
+    /* Train: Sparse PLS regression: Y = XB
+     * Input
+     *      X: the X matrix which need be appended
+     *      Y: only assign when the inside Y did not be initialized.
+     *
+     * Output
+     *      Beta: the calculated Beta value, if NULL passed, nothing will be assigned
+     *
+     * Return: true if sucessed.
+     */
+    bool train   (MatrixXd& X, MatrixXd& Y, MatrixXd** Beta);
     bool validate(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta);
     bool classify(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta);
     bool initParameters(SLSparsePlsParameters parameters);
     
+    /* getTrainResult:
+     * Input
+     *      type: type of results
+     *
+     * Return: the results stored in mapped structure, support Q2 and RSS.
+     */
+    map<SLTRAINRESULTYPE, MatrixXd> getTrainResult(SLTRAINRESULTYPE type);
+
 private:
-    SLSparsePlsParameters param;
+    // assignable parameters via initParameters() method
+    
+    // not assignable parameters
+    ssize_t verbose;
+    MatrixXd X;
+    MatrixXd Y;
+    MatrixXd T;
+    MatrixXd Beta;
+    MatrixXd RES;
+    VectorXd residual;
+    MatrixXd W;
 };
 
 #endif

@@ -27,9 +27,8 @@
 #define GLP_SLUtility_h
 
 #define LOG(x)          cout << #x << ":\n" << x << '\n' << endl;
-#define SSum(x)         (x).array().pow(2).sum()
-#define Std(x)          sqrt( SSum(x.array()-x.mean()) / (x.size()-1) )
-#define AutoScale(x)    ( (x).array()-(x).mean() )
+#define SSum(x)         x.colwise().squaredNorm()
+#define AutoScale(x)    (x - x.colwise().mean().replicate(x.rows(), 1))
 
 #define ASSERT(condition, message) \
 do { \
@@ -39,5 +38,14 @@ do { \
         std::exit(EXIT_FAILURE); \
     } \
 }while (false)
+
+enum{
+    SLTRAINRESULTYPEQ2      = 1,
+    SLTRAINRESULTYPERSS     = 1 << 1,
+    SLTRAINRESULTYPEAUC     = 1 << 2,
+    SLTRAINRESULTYPEACC     = 1 << 3
+};
+
+typedef unsigned int SLTRAINRESULTYPE;
 
 #endif

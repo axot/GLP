@@ -27,7 +27,6 @@ using namespace std;
 
 MatrixXd& SLGspan::search()
 {
-    cout << "SLGspan::search:a: " << param.a << "\tb: " << param.b << endl;
     static MatrixXd X;
     return X;
 }
