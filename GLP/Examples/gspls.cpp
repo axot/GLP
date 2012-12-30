@@ -103,5 +103,27 @@ int main(int argc, const char *argv[])
         return -2;
     }
     
+    SLSparsePls::SLSparsePlsParameters splsParam;
+    SLGspan::SLGspanParameters gspanParam;
+    
+    // for C++0x
+    auto gspls = SLGlpFactory<SLSparsePls, SLGspan>::create(splsParam, gspanParam);
+    //    SLGlpProduct<SLSparsePls, SLGspan>* gspls = SLGlpFactory<SLSparsePls, SLGspan>::create(splsParam, gspanParam);
+    
+    MatrixXd X(100,3), Y(100,5);
+    Y.setRandom();
+    
+    for (int i = 1; i <= 50; ++i)
+    {
+        MatrixXd* Beta = NULL;
+        X.setRandom();
+        gspls->train(X, Y, &Beta);
+        
+        auto result = gspls->getTrainResult(SLTRAINRESULTYPEQ2 | SLTRAINRESULTYPERSS);
+        cout << "Loop: "    << i << endl;
+        cout << "Q2:\n"     << result[SLTRAINRESULTYPEQ2]  << endl;
+        cout << "\nRSS:\n"  << result[SLTRAINRESULTYPERSS] << '\n' << endl;
+    }
+
     return 0;
 }
