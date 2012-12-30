@@ -25,18 +25,24 @@
 #define __GLP__SLGlpProduct__
 
 #include <iostream>
+#include <stdexcept>
 #include "../Models/SLModel.h"
 #include "../GraphMining/SLGraphMining.h"
 #include "../SLUtility.h"
 
+using namespace std;
+
 template <typename M, typename G>
 class SLGlpProduct : public SLModelStrategy, public SLGraphMiningStrategy
 {    
-public:    
-    SLGlpProduct (SLGlpParameters& modelParameters, SLGlpParameters& graphMiningParameters)
+public:
+    template <typename MP, typename GP>
+    SLGlpProduct (MP& modelParameters, GP& graphMiningParameters)
     {
-        model.initParameters(modelParameters);
-        graphMining.initParameters(graphMiningParameters);
+        if ( !model.initParameters(modelParameters) )
+            throw runtime_error("model.initParameters failed, did you override initParameters method?");
+        if ( !graphMining.initParameters(graphMiningParameters) )
+            throw runtime_error("graphMining.initParameters failed, did you override initParameters method?");
     }
     
     // Implementation SLModelStrategy
@@ -46,10 +52,7 @@ public:
     
     // Implementation SLGraphMiningStrategy
     MatrixXd& search()                                      { return graphMining.search(); }
-    
-    // Implementation in construct method not here
-    bool initParameters(SLGlpParameters& parameters)        { return false; }
-    
+        
 private:
     SLModel<M> model;
     SLGraphMining<G> graphMining;

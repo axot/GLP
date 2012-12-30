@@ -35,7 +35,8 @@ private:
     SLGlpFactory();
     
 public:
-    static SLGlpProduct<M,G>* create(SLGlpParameters& modelParameters, SLGlpParameters& graphMiningParameters)
+    template <typename MP, typename GP>
+    static SLGlpProduct<M,G>* create(MP& modelParameters, GP& graphMiningParameters)
         { return new SLGlpProduct<M,G>(modelParameters, graphMiningParameters); };
 };
 

@@ -32,21 +32,31 @@
 class SLSparsePls : public SLModelStrategy
 {
 public:
-    SLSparsePls(): a(0), b(0) {}
+    class SLSparsePlsParameters
+    {
+    public:
+        SLSparsePlsParameters() : a(0), b(10) {}
+        
+    public:
+        friend class SLSparsePls;
+        
+        // assignable parameters
+        int a;
+        
+    private:
+        // not assignable parameters
+        int b;
+    };
     
+public:
     // Implementation SLModelStrategy protocol
-    bool train   (MatrixXd& X, MatrixXd& Y, MatrixXd *Beta);       // Sparse PLS regression: Y = XB
+    bool train   (MatrixXd& X, MatrixXd& Y, MatrixXd* Beta);       // Sparse PLS regression: Y = XB
     bool validate(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta);
     bool classify(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta);
-    bool initParameters(SLGlpParameters& parameters);
-
+    bool initParameters(SLSparsePlsParameters parameters);
+    
 private:
-    /* Begin SLGlpParameters
-     * Only These private fields can be init when setting SLGlpParameters
-     */
-    int a;
-    int b;
-    /* End SLGlpParameters */
+    SLSparsePlsParameters param;
 };
 
 #endif

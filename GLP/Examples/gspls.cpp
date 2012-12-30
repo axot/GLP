@@ -24,9 +24,9 @@
 //
 
 #include <iostream>
+#include <stdexcept>
 #include <time.h>
 #include <boost/format.hpp>
-
 #include <Eigen/Core>
 
 #include "../Classes/SLGlp.h"
@@ -105,15 +105,22 @@ int main(int argc, const char *argv[])
         return -2;
     }
     
-    SLGlpParameters mParam;
+    SLSparsePls::SLSparsePlsParameters splsParam;
+    splsParam.a = 100;
     
-    mParam["a"] = "100";
-    mParam["b"] = "10";
-
-    auto gspls = SLGlpFactory<SLSparsePls, SLGspan>::create(mParam, mParam);
+    SLGspan::SLGspanParameters gspanParam;
+    gspanParam.a = 2;
+    
+    try{
+        // for C++11
+        // auto gspls = SLGlpFactory<SLSparsePls, SLGspan>::create(splsParam, gspanParam);
+        SLGlpProduct<SLSparsePls, SLGspan>* gspls = SLGlpFactory<SLSparsePls, SLGspan>::create(splsParam, gspanParam);
         
-    MatrixXd X, Y, Beta;
-    gspls->search();
-    gspls->train(X, Y, &Beta);
+        MatrixXd X, Y, Beta;
+        gspls->search();
+        gspls->train(X, Y, &Beta);
+    }catch (runtime_error rex) {
+        cerr << rex.what() << endl;
+    }
     return 0;
 }

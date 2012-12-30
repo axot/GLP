@@ -27,12 +27,13 @@ using namespace std;
 
 MatrixXd& SLGspan::search()
 {
-    cout << "SLGspan::search" << endl;
+    cout << "SLGspan::search:a: " << param.a << "\tb: " << param.b << endl;
     static MatrixXd X;
     return X;
 }
 
-bool SLGspan::initParameters(SLGlpParameters& parameters)
+bool SLGspan::initParameters(SLGspanParameters parameters)
 {
+    param = parameters;
     return true;
 }

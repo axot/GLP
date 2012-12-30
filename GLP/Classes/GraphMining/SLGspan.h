@@ -30,9 +30,29 @@
 class SLGspan : public SLGraphMiningStrategy
 {
 public:
+    class SLGspanParameters
+    {
+    public:
+        SLGspanParameters() : a(1), b(1) {}
+        
+    public:
+        friend class SLGspan;
+        
+        // assignable parameters
+        int a;
+        
+    private:
+        // not assignable parameters
+        int b;
+    };
+
+public:
     // Implementation SLGraphMiningStrategy Protocol
     MatrixXd& search();
-    bool initParameters(SLGlpParameters& parameters);
+    bool initParameters(SLGspanParameters parameters);
+
+private:
+    SLGspanParameters param;
 };
 
 #endif /* defined(__GLP__SLGspan__) */

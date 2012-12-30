@@ -41,13 +41,16 @@ class SLGraphMiningStrategy
 public:
     virtual MatrixXd& search() = 0;
     
-    /* Init Parameters: Convert std::map<string, string> to real parameters
+    /* Init Parameters:
      * Input
-     *      parameters: std::map parameters
+     *      parameters: Graph Mining parameters
      *
-     * return: true if sucessed.
+     * Return: true if sucessed.
+     *
+     * Discussion: must override this method
      */
-    virtual bool initParameters(SLGlpParameters& parameters) = 0;
+    template <typename GP>
+    bool initParameters(GP parameters) { return false; };
 };
 
 #endif /* defined(__GLP__SLGraphMiningStrategy__) */

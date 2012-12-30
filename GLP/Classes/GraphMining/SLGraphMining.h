@@ -37,8 +37,10 @@ template <typename AStrategy>
 class SLGraphMining
 {
 public:
-    MatrixXd& search()                                          { return aStrategy.search(); }
-    bool initParameters(SLGlpParameters& graphMiningParameters) { return aStrategy.initParameters(graphMiningParameters); }
+    MatrixXd& search() { return aStrategy.search(); }
+    
+    template <typename GP>
+    bool initParameters(GP modelParameters) { return aStrategy.initParameters(modelParameters); }
 
 private:
     AStrategy aStrategy;

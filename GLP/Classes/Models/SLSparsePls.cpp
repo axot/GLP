@@ -25,9 +25,9 @@
 
 using namespace std;
 
-bool SLSparsePls::train(MatrixXd& X, MatrixXd& Y, MatrixXd *Beta)
+bool SLSparsePls::train(MatrixXd& X, MatrixXd& Y, MatrixXd* Beta)
 {
-    cout << "SLSparsePls::train:a: " << a << "\tb:" << b << endl;
+    cout << "SLSparsePls::train:a: " << param.a << "\tb: " << param.b << endl;
     return false;
 }
 
@@ -41,13 +41,8 @@ bool SLSparsePls::classify(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta)
     return false;
 }
 
-bool SLSparsePls::initParameters(SLGlpParameters& parameters)
+bool SLSparsePls::initParameters(SLSparsePlsParameters parameters)
 {
-    if ( parameters.count("a") )
-        a = atoi(parameters["a"].c_str());
-    
-    if ( parameters.count("b") )
-        b = atoi(parameters["b"].c_str());
-        
+    param = parameters;
     return true;
 }

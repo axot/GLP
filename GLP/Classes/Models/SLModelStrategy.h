@@ -51,9 +51,9 @@ public:
      * Output
      *      Beta: the calculated Beta value
      *
-     * return: true if sucessed.
+     * Return: true if sucessed.
      */
-    virtual bool train(MatrixXd& X, MatrixXd& Y, MatrixXd *Beta) = 0;
+    virtual bool train(MatrixXd& X, MatrixXd& Y, MatrixXd* Beta) = 0;
     
     /* Validate:
      * Input
@@ -63,7 +63,7 @@ public:
      * Output
      *      Beta: the calculated Beta value
      *
-     * return: true if sucessed.
+     * Return: true if sucessed.
      */
     virtual bool validate(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta) = 0;
     
@@ -75,17 +75,20 @@ public:
      * Output
      *      Beta: the calculated Beta value
      *
-     * return: true if sucessed.
+     * Return: true if sucessed.
      */
     virtual bool classify(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta) = 0;
 
-    /* Init Parameters: Convert std::map<string, string> to real parameters
+    /* Init Parameters:
      * Input
-     *      parameters: std::map parameters
+     *      parameters: Model parameters
      *
-     * return: true if sucessed.
+     * Return: true if sucessed.
+     *
+     * Discussion: must override this method
      */
-    virtual bool initParameters(SLGlpParameters& parameters) = 0;
+    template <typename MP>
+    bool initParameters(MP parameters) { return false; };
 };
 
 #endif
