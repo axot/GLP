@@ -25,7 +25,6 @@
 #define __GLP__SLGlpProduct__
 
 #include <iostream>
-#include <stdexcept>
 #include "../Models/SLModel.h"
 #include "../GraphMining/SLGraphMining.h"
 #include "../SLUtility.h"
@@ -39,10 +38,11 @@ public:
     template <typename MP, typename GP>
     SLGlpProduct (MP& modelParameters, GP& graphMiningParameters)
     {
-        if ( !model.initParameters(modelParameters) )
-            throw runtime_error("model.initParameters failed, did you override initParameters method?");
-        if ( !graphMining.initParameters(graphMiningParameters) )
-            throw runtime_error("graphMining.initParameters failed, did you override initParameters method?");
+        ASSERT( model.initParameters(modelParameters) != false,
+               "Did you override initParameters method?");
+        
+        ASSERT( graphMining.initParameters(graphMiningParameters) != false,
+               "Did you override initParameters method?");
     }
     
     // Implementation SLModelStrategy
