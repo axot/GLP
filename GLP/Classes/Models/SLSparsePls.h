@@ -53,8 +53,8 @@ public:
      *
      * Return: true if sucessed.
      */
-    bool train   (MatrixXd& X, MatrixXd& Y);
-    bool validate(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta);
+    virtual bool train(const MatrixXd& X, const MatrixXd& Y);
+    virtual bool validate(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta);
     
     /* Classify:
      * Input
@@ -64,7 +64,7 @@ public:
      *
      * Return: the results stored in mapped structure
      */
-    SLTrainResult classify(MatrixXd& tX, MatrixXd& tY, SLTRAINRESULTYPE type);
+    virtual SLTrainResult classify(const MatrixXd& tX, const MatrixXd& tY, SLTRAINRESULTYPE type) const;
     
     /* Init Parameters:
      * Input
@@ -74,7 +74,7 @@ public:
      *
      * Discussion: no optional parameters for Sparse PLS
      */
-    bool initParameters(SLSparsePlsParameters parameters);
+    virtual bool initParameters(SLSparsePlsParameters parameters);
     
     /* Get Train Result:
      * Input
@@ -82,7 +82,7 @@ public:
      *
      * Return: the results stored in mapped structure, support Beta, Q2 and RSS.
      */
-    SLTrainResult getTrainResult(SLTRAINRESULTYPE type);
+    virtual SLTrainResult getTrainResult(SLTRAINRESULTYPE type) const;
 
 private:
     // assignable parameters via initParameters() method
@@ -90,6 +90,7 @@ private:
     // not assignable parameters
     bool verbose;
     MatrixXd X;
+    MatrixXd meanX;
     MatrixXd Y;
     MatrixXd meanY;
     MatrixXd T;

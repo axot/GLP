@@ -46,11 +46,12 @@ public:
     }
     
     // Implementation SLModelStrategy
-    SLTrainResult getTrainResult(SLTRAINRESULTYPE type)     { return model.getTrainResult(type); }
-    bool train   (MatrixXd& X, MatrixXd& Y)                 { return model.train(X, Y); }
-    bool validate(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta) { return model.validate(X, Y, Beta); }
+    virtual SLTrainResult getTrainResult(SLTRAINRESULTYPE type) const   { return model.getTrainResult(type); }
+    virtual bool train   (const MatrixXd& X, const MatrixXd& Y)         { return model.train(X, Y); }
+    virtual bool validate(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta)     { return model.validate(X, Y, Beta); }
     
-    SLTrainResult classify(MatrixXd& tX, MatrixXd& tY, SLTRAINRESULTYPE type) { return model.classify(tX, tY, type); }
+    virtual SLTrainResult classify(const MatrixXd& tX, const MatrixXd& tY, SLTRAINRESULTYPE type) const
+    { return model.classify(tX, tY, type); }
 
     // Implementation SLGraphMiningStrategy
     MatrixXd& search() { return graphMining.search(); }

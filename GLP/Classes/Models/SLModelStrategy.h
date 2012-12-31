@@ -55,7 +55,7 @@ public:
      *
      * Return: true if sucessed.
      */
-    virtual bool train(MatrixXd& X, MatrixXd& Y) = 0;
+    virtual bool train(const MatrixXd& X, const MatrixXd& Y) = 0;
     
     /* Get Train Result:
      * Input
@@ -63,7 +63,7 @@ public:
      *
      * Return: the results stored in mapped structure
      */
-    virtual SLTrainResult getTrainResult(SLTRAINRESULTYPE type) = 0;
+    virtual SLTrainResult getTrainResult(SLTRAINRESULTYPE type) const = 0;
 
     /* Validate:
      * Input
@@ -85,7 +85,7 @@ public:
      *
      * Return: the results stored in mapped structure
      */
-    virtual SLTrainResult classify(MatrixXd& tX, MatrixXd& tY, SLTRAINRESULTYPE type) = 0;
+    virtual SLTrainResult classify(const MatrixXd& tX, const MatrixXd& tY, SLTRAINRESULTYPE type) const = 0;
 
     /* Init Parameters:
      * Input

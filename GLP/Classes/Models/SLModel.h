@@ -40,11 +40,12 @@ template <typename AStrategy>
 class SLModel
 {
 public:
-    SLTrainResult getTrainResult(SLTRAINRESULTYPE type)     { return aStrategy.getTrainResult(type); }
-    bool train   (MatrixXd& X, MatrixXd& Y)                 { return aStrategy.train(X, Y); }
-    bool validate(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta) { return aStrategy.validate(X, Y, Beta); }
+    virtual SLTrainResult getTrainResult(SLTRAINRESULTYPE type) const   { return aStrategy.getTrainResult(type); }
+    virtual bool train   (const MatrixXd& X, const MatrixXd& Y)         { return aStrategy.train(X, Y); }
+    virtual bool validate(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta)     { return aStrategy.validate(X, Y, Beta); }
     
-    SLTrainResult classify(MatrixXd& tX, MatrixXd& tY, SLTRAINRESULTYPE type) { return aStrategy.classify(tX, tY, type); }
+    virtual SLTrainResult classify(const MatrixXd& tX, const MatrixXd& tY, SLTRAINRESULTYPE type) const
+    { return aStrategy.classify(tX, tY, type); }
     
     template <typename MP>
     bool initParameters(MP modelParameters) { return aStrategy.initParameters(modelParameters); }

@@ -26,7 +26,7 @@
 
 using namespace std;
 
-bool SLSparsePls::train(MatrixXd& appendedX, MatrixXd& theY)
+bool SLSparsePls::train(const MatrixXd& appendedX, const MatrixXd& theY)
 {
     if (Y.cols() == 0 || Y.rows() == 0)
     {
@@ -44,10 +44,14 @@ bool SLSparsePls::train(MatrixXd& appendedX, MatrixXd& theY)
     
     residual = RES.col(maxSquaredNormColumn);
 
+    meanX.conservativeResize(1
+                             , oldXCols+appendedXCols);
+    meanX << meanX.leftCols(oldXCols), appendedX.colwise().mean();
+    
     X.conservativeResize(appendedXRows, oldXCols+appendedXCols);
     X.rightCols(appendedXCols).setZero();
-    X << X.leftCols(oldXCols), appendedX;
-
+    X << X.leftCols(oldXCols), AutoScale(appendedX);
+    
     W.conservativeResize(oldXCols+appendedXCols, W.cols()+1);
     W.bottomRows(appendedXCols).setZero();
     W.rightCols(1).setZero();
@@ -77,13 +81,12 @@ bool SLSparsePls::train(MatrixXd& appendedX, MatrixXd& theY)
         LOG(X*Beta.col(0));
         getchar();
     }
-    
     RES = Y - X*Beta;
     
     return true;
 }
 
-SLTrainResult SLSparsePls::getTrainResult(SLTRAINRESULTYPE type)
+SLTrainResult SLSparsePls::getTrainResult(SLTRAINRESULTYPE type) const
 {
     ASSERT(type != SLTRAINRESULTYPENONE, "No type of result was indicated");
     ASSERT(!(type&SLTRAINRESULTYPEACC || type&SLTRAINRESULTYPEAUC), "Only support Beta Q2 RSS for Sparse PLS.");
@@ -110,7 +113,7 @@ bool SLSparsePls::validate(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta)
     return false;
 }
 
-SLTrainResult SLSparsePls::classify(MatrixXd& tX, MatrixXd& tY, SLTRAINRESULTYPE type)
+SLTrainResult SLSparsePls::classify(const MatrixXd& tX, const MatrixXd& tY, SLTRAINRESULTYPE type) const
 {
     ASSERT(type != SLTRAINRESULTYPENONE, "No type of result was indicated");
     ASSERT(!(type&SLTRAINRESULTYPEACC || type&SLTRAINRESULTYPEAUC || type&SLTRAINRESULTYPEBETA), "Only support Q2 RSS for Sparse PLS.");
@@ -119,8 +122,10 @@ SLTrainResult SLSparsePls::classify(MatrixXd& tX, MatrixXd& tY, SLTRAINRESULTYPE
     SLTrainResult result;
     
     MatrixXd autoSacaledY = tY - meanY.replicate(tY.rows(), 1);
-    MatrixXd tRES = autoSacaledY - tX*Beta;
-    
+    MatrixXd autoSacaledX = tX - meanX.replicate(tX.rows(), 1);
+
+    MatrixXd tRES = autoSacaledY - autoSacaledX*Beta;
+
     if(type & SLTRAINRESULTYPEQ2)
     {
         result[SLTRAINRESULTYPEQ2] = MatrixXd::Ones(1, autoSacaledY.cols()) - SSum(tRES).cwiseQuotient(SSum(autoSacaledY));

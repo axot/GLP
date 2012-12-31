@@ -31,30 +31,43 @@ using namespace std;
 
 int main(int argc, const char *argv[])
 {
-    srand((unsigned int)time(NULL));
-
+    /* b1=1, b2=2, b3=3
+       y1 = b1
+       y2 = b2
+       y3 = b3
+       y4 = b1 + b2
+       y5 = b1 + b3
+       y6 = b2 + b3
+       y7 = b1 + b2 + b3
+     */
     SLSparsePls spls;
-    MatrixXd X(100,3), Y(100,5);
-    Y.setRandom();
+    MatrixXd X(5,3), Y(5,1);
+    X.row(0) << 1,0,0;
+    X.row(1) << 0,1,0;
+    X.row(2) << 0,0,1;
+    X.row(3) << 1,1,0;
+    X.row(4) << 1,0,1;
     
-    for (int i = 1; i <= 5; ++i)
+    Y << 1,2,3,3,4;
+
+    for ( int i = 0; i < X.cols(); ++i)
     {
-        X.setRandom();
-        spls.train(X, Y);
+        spls.train(X.col(i), Y);
         
         auto result = spls.getTrainResult(SLTRAINRESULTYPEQ2 | SLTRAINRESULTYPERSS);
-        cout << "Loop: "    << i << endl;
-        cout << "Q2:\n"     << result[SLTRAINRESULTYPEQ2]  << endl;
-        cout << "\nRSS:\n"  << result[SLTRAINRESULTYPERSS] << '\n' << endl;
+        cout << "Training: "<< endl;
+        cout << "Q2: "  << result[SLTRAINRESULTYPEQ2]  << endl;
+        cout << "RSS: " << result[SLTRAINRESULTYPERSS] << endl;
+        cout << "Beta:\n"<< spls.getTrainResult(SLTRAINRESULTYPEBETA)[SLTRAINRESULTYPEBETA] << '\n' << endl;
     }
-    cout << "\nBeta:\n"  << spls.getTrainResult(SLTRAINRESULTYPEBETA)[SLTRAINRESULTYPEBETA] << '\n' << endl;
     
-    MatrixXd tX(10,15), tY(10,5);
-    tX.setRandom();
-    tY.setRandom();
-    auto result = spls.classify(tX, tY, SLTRAINRESULTYPEQ2 | SLTRAINRESULTYPERSS);
+    MatrixXd tX(2,3), tY(2,1);
+    tX.row(0) << 0,1,1;
+    tX.row(1) << 1,1,1;
+    tY << 5,6;
+    
+    auto tresult = spls.classify(tX, tY, SLTRAINRESULTYPEQ2 | SLTRAINRESULTYPERSS);
     cout << "Classify: "<< endl;
-    cout << "Q2:\n"     << result[SLTRAINRESULTYPEQ2]  << endl;
-    cout << "\nRSS:\n"  << result[SLTRAINRESULTYPERSS] << '\n' << endl;
-    return 0;
+    cout << "Q2: "      << tresult[SLTRAINRESULTYPEQ2]  << endl;
+    cout << "RSS: "     << tresult[SLTRAINRESULTYPERSS] << '\n' << endl;
 }
