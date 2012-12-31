@@ -36,17 +36,16 @@ int main(int argc, const char *argv[])
     MatrixXd X(100,3), Y(100,5);
     Y.setRandom();
     
-    for (int i = 1; i <= 50; ++i)
+    for (int i = 1; i <= 5; ++i)
     {
-        MatrixXd* Beta = NULL;
         X.setRandom();
-        spls.train(X, Y, &Beta);
+        spls.train(X, Y);
         
         auto result = spls.getTrainResult(SLTRAINRESULTYPEQ2 | SLTRAINRESULTYPERSS);
         cout << "Loop: "    << i << endl;
         cout << "Q2:\n"     << result[SLTRAINRESULTYPEQ2]  << endl;
         cout << "\nRSS:\n"  << result[SLTRAINRESULTYPERSS] << '\n' << endl;
     }
-
+    cout << "\nBeta:\n"  << spls.getTrainResult(SLTRAINRESULTYPEBETA)[SLTRAINRESULTYPEBETA] << '\n' << endl;
     return 0;
 }

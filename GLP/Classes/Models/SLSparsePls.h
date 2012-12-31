@@ -56,7 +56,7 @@ public:
      *
      * Return: true if sucessed.
      */
-    bool train   (MatrixXd& X, MatrixXd& Y, MatrixXd** Beta);
+    bool train   (MatrixXd& X, MatrixXd& Y);
     bool validate(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta);
     bool classify(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta);
     bool initParameters(SLSparsePlsParameters parameters);
@@ -65,9 +65,9 @@ public:
      * Input
      *      type: type of results
      *
-     * Return: the results stored in mapped structure, support Q2 and RSS.
+     * Return: the results stored in mapped structure, support Beta, Q2 and RSS.
      */
-    map<SLTRAINRESULTYPE, MatrixXd> getTrainResult(SLTRAINRESULTYPE type);
+    SLTrainResult getTrainResult(SLTRAINRESULTYPE type);
 
 private:
     // assignable parameters via initParameters() method

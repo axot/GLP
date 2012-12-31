@@ -26,7 +26,7 @@
 
 using namespace std;
 
-bool SLSparsePls::train(MatrixXd& appendedX, MatrixXd& theY, MatrixXd** outBeta)
+bool SLSparsePls::train(MatrixXd& appendedX, MatrixXd& theY)
 {
     if (Y.cols() == 0 || Y.rows() == 0)
     {
@@ -79,19 +79,14 @@ bool SLSparsePls::train(MatrixXd& appendedX, MatrixXd& theY, MatrixXd** outBeta)
     
     RES = Y - X*Beta;
     
-    if (outBeta != NULL)
-    {
-        *outBeta = &Beta;
-    }
-    
     return true;
 }
 
-map<SLTRAINRESULTYPE, MatrixXd> SLSparsePls::getTrainResult(SLTRAINRESULTYPE type)
+SLTrainResult SLSparsePls::getTrainResult(SLTRAINRESULTYPE type)
 {
-    ASSERT(!(type&SLTRAINRESULTYPEACC || type&SLTRAINRESULTYPEAUC), "Only support Q2 RSS for Sparse PLS.");
+    ASSERT(!(type&SLTRAINRESULTYPEACC || type&SLTRAINRESULTYPEAUC), "Only support Beta Q2 RSS for Sparse PLS.");
     
-    map<SLTRAINRESULTYPE, MatrixXd> result;
+    SLTrainResult result;
     if(type & SLTRAINRESULTYPEQ2)
     {
         result[SLTRAINRESULTYPEQ2] = MatrixXd::Ones(1, Y.cols()) - SSum(RES).cwiseQuotient(SSum(Y));
@@ -99,6 +94,10 @@ map<SLTRAINRESULTYPE, MatrixXd> SLSparsePls::getTrainResult(SLTRAINRESULTYPE typ
     if(type & SLTRAINRESULTYPERSS)
     {
         result[SLTRAINRESULTYPERSS] = SSum(RES);
+    }
+    if(type & SLTRAINRESULTYPEBETA)
+    {
+        result[SLTRAINRESULTYPEBETA] = Beta;
     }
     return result;
 }

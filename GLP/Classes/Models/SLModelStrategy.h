@@ -33,6 +33,17 @@
 using namespace std;
 using namespace Eigen;
 
+enum{
+    SLTRAINRESULTYPEQ2      = 1,
+    SLTRAINRESULTYPERSS     = 1 << 1,
+    SLTRAINRESULTYPEAUC     = 1 << 2,
+    SLTRAINRESULTYPEACC     = 1 << 3,
+    SLTRAINRESULTYPEBETA    = 1 << 4
+};
+
+typedef unsigned int SLTRAINRESULTYPE;
+typedef map<SLTRAINRESULTYPE, MatrixXd> SLTrainResult;
+
 class SLModelStrategy
 {
 public:
@@ -41,12 +52,9 @@ public:
      *      X: train X matrix
      *      Y: train Y matrix
      *
-     * Output
-     *      Beta: the calculated Beta value
-     *
      * Return: true if sucessed.
      */
-    virtual bool train(MatrixXd& X, MatrixXd& Y, MatrixXd** Beta) = 0;
+    virtual bool train(MatrixXd& X, MatrixXd& Y) = 0;
     
     /* getTrainResult:
      * Input
@@ -54,7 +62,7 @@ public:
      *
      * Return: the results stored in mapped structure
      */
-    virtual map<SLTRAINRESULTYPE, MatrixXd> getTrainResult(SLTRAINRESULTYPE type) = 0;
+    virtual SLTrainResult getTrainResult(SLTRAINRESULTYPE type) = 0;
 
     /* Validate:
      * Input

@@ -115,9 +115,8 @@ int main(int argc, const char *argv[])
     
     for (int i = 1; i <= 50; ++i)
     {
-        MatrixXd* Beta = NULL;
         X.setRandom();
-        gspls->train(X, Y, &Beta);
+        gspls->train(X, Y);
         
         auto result = gspls->getTrainResult(SLTRAINRESULTYPEQ2 | SLTRAINRESULTYPERSS);
         cout << "Loop: "    << i << endl;

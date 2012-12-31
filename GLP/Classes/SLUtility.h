@@ -39,13 +39,4 @@ do { \
     } \
 }while (false)
 
-enum{
-    SLTRAINRESULTYPEQ2      = 1,
-    SLTRAINRESULTYPERSS     = 1 << 1,
-    SLTRAINRESULTYPEAUC     = 1 << 2,
-    SLTRAINRESULTYPEACC     = 1 << 3
-};
-
-typedef unsigned int SLTRAINRESULTYPE;
-
 #endif
