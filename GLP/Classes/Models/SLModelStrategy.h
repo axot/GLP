@@ -34,7 +34,8 @@ using namespace std;
 using namespace Eigen;
 
 enum{
-    SLTRAINRESULTYPEQ2      = 1,
+    SLTRAINRESULTYPENONE    = 0,
+    SLTRAINRESULTYPEQ2      = 1 << 0,
     SLTRAINRESULTYPERSS     = 1 << 1,
     SLTRAINRESULTYPEAUC     = 1 << 2,
     SLTRAINRESULTYPEACC     = 1 << 3,
@@ -49,14 +50,14 @@ class SLModelStrategy
 public:
     /* Train:
      * Input
-     *      X: train X matrix
-     *      Y: train Y matrix
+     *      X: X matrix of train data
+     *      Y: Y matrix of train data
      *
      * Return: true if sucessed.
      */
     virtual bool train(MatrixXd& X, MatrixXd& Y) = 0;
     
-    /* getTrainResult:
+    /* Get Train Result:
      * Input
      *      type: type of results
      *
@@ -78,15 +79,13 @@ public:
     
     /* Classify:
      * Input
-     *      X: X matrix
-     *      Y: Y matrix
+     *     tX: X matrix of test data
+     *     tY: Y matrix of test data
+     *   type: type of results
      *
-     * Output
-     *      Beta: the calculated Beta value
-     *
-     * Return: true if sucessed.
+     * Return: the results stored in mapped structure
      */
-    virtual bool classify(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta) = 0;
+    virtual SLTrainResult classify(MatrixXd& tX, MatrixXd& tY, SLTRAINRESULTYPE type) = 0;
 
     /* Init Parameters:
      * Input

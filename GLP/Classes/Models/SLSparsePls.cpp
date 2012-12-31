@@ -30,6 +30,7 @@ bool SLSparsePls::train(MatrixXd& appendedX, MatrixXd& theY)
 {
     if (Y.cols() == 0 || Y.rows() == 0)
     {
+        meanY = theY.colwise().mean();
         Y = AutoScale(theY);
         RES = Y;
     }
@@ -84,8 +85,10 @@ bool SLSparsePls::train(MatrixXd& appendedX, MatrixXd& theY)
 
 SLTrainResult SLSparsePls::getTrainResult(SLTRAINRESULTYPE type)
 {
+    ASSERT(type != SLTRAINRESULTYPENONE, "No type of result was indicated");
     ASSERT(!(type&SLTRAINRESULTYPEACC || type&SLTRAINRESULTYPEAUC), "Only support Beta Q2 RSS for Sparse PLS.");
-    
+    ASSERT(meanY.cols() != 0 && meanY.rows() != 0, "Train data first");
+
     SLTrainResult result;
     if(type & SLTRAINRESULTYPEQ2)
     {
@@ -107,9 +110,26 @@ bool SLSparsePls::validate(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta)
     return false;
 }
 
-bool SLSparsePls::classify(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta)
+SLTrainResult SLSparsePls::classify(MatrixXd& tX, MatrixXd& tY, SLTRAINRESULTYPE type)
 {
-    return false;
+    ASSERT(type != SLTRAINRESULTYPENONE, "No type of result was indicated");
+    ASSERT(!(type&SLTRAINRESULTYPEACC || type&SLTRAINRESULTYPEAUC || type&SLTRAINRESULTYPEBETA), "Only support Q2 RSS for Sparse PLS.");
+    ASSERT(meanY.cols() != 0 && meanY.rows() != 0, "Train data first");
+    
+    SLTrainResult result;
+    
+    MatrixXd autoSacaledY = tY - meanY.replicate(tY.rows(), 1);
+    MatrixXd tRES = autoSacaledY - tX*Beta;
+    
+    if(type & SLTRAINRESULTYPEQ2)
+    {
+        result[SLTRAINRESULTYPEQ2] = MatrixXd::Ones(1, autoSacaledY.cols()) - SSum(tRES).cwiseQuotient(SSum(autoSacaledY));
+    }
+    if(type & SLTRAINRESULTYPERSS)
+    {
+        result[SLTRAINRESULTYPERSS] = SSum(tRES);
+    }
+    return result;
 }
 
 bool SLSparsePls::initParameters(SLSparsePlsParameters parameters)

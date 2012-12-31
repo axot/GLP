@@ -49,8 +49,9 @@ public:
     SLTrainResult getTrainResult(SLTRAINRESULTYPE type)     { return model.getTrainResult(type); }
     bool train   (MatrixXd& X, MatrixXd& Y)                 { return model.train(X, Y); }
     bool validate(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta) { return model.validate(X, Y, Beta); }
-    bool classify(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta) { return model.classify(X, Y, Beta); }
     
+    SLTrainResult classify(MatrixXd& tX, MatrixXd& tY, SLTRAINRESULTYPE type) { return model.classify(tX, tY, type); }
+
     // Implementation SLGraphMiningStrategy
     MatrixXd& search() { return graphMining.search(); }
         

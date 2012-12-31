@@ -44,24 +44,39 @@ public:
     };
     
 public:
-    SLSparsePls() : verbose(0) {}
+    SLSparsePls() : verbose(false) {}
         
     /* Train: Sparse PLS regression: Y = XB
      * Input
      *      X: the X matrix which need be appended
      *      Y: only assign when the inside Y did not be initialized.
      *
-     * Output
-     *      Beta: the calculated Beta value, if NULL passed, nothing will be assigned
-     *
      * Return: true if sucessed.
      */
     bool train   (MatrixXd& X, MatrixXd& Y);
     bool validate(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta);
-    bool classify(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta);
+    
+    /* Classify:
+     * Input
+     *     tX: X matrix of test data
+     *     tY: Y matrix of test data
+     *   type: type of results
+     *
+     * Return: the results stored in mapped structure
+     */
+    SLTrainResult classify(MatrixXd& tX, MatrixXd& tY, SLTRAINRESULTYPE type);
+    
+    /* Init Parameters:
+     * Input
+     *      parameters: Model assignable parameters
+     *
+     * Return: true if sucessed.
+     *
+     * Discussion: no optional parameters for Sparse PLS
+     */
     bool initParameters(SLSparsePlsParameters parameters);
     
-    /* getTrainResult:
+    /* Get Train Result:
      * Input
      *      type: type of results
      *
@@ -73,9 +88,10 @@ private:
     // assignable parameters via initParameters() method
     
     // not assignable parameters
-    ssize_t verbose;
+    bool verbose;
     MatrixXd X;
     MatrixXd Y;
+    MatrixXd meanY;
     MatrixXd T;
     MatrixXd Beta;
     MatrixXd RES;

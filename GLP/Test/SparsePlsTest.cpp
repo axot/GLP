@@ -31,8 +31,9 @@ using namespace std;
 
 int main(int argc, const char *argv[])
 {
+    srand((unsigned int)time(NULL));
+
     SLSparsePls spls;
-    
     MatrixXd X(100,3), Y(100,5);
     Y.setRandom();
     
@@ -47,5 +48,13 @@ int main(int argc, const char *argv[])
         cout << "\nRSS:\n"  << result[SLTRAINRESULTYPERSS] << '\n' << endl;
     }
     cout << "\nBeta:\n"  << spls.getTrainResult(SLTRAINRESULTYPEBETA)[SLTRAINRESULTYPEBETA] << '\n' << endl;
+    
+    MatrixXd tX(10,15), tY(10,5);
+    tX.setRandom();
+    tY.setRandom();
+    auto result = spls.classify(tX, tY, SLTRAINRESULTYPEQ2 | SLTRAINRESULTYPERSS);
+    cout << "Classify: "<< endl;
+    cout << "Q2:\n"     << result[SLTRAINRESULTYPEQ2]  << endl;
+    cout << "\nRSS:\n"  << result[SLTRAINRESULTYPERSS] << '\n' << endl;
     return 0;
 }

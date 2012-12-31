@@ -43,7 +43,8 @@ public:
     SLTrainResult getTrainResult(SLTRAINRESULTYPE type)     { return aStrategy.getTrainResult(type); }
     bool train   (MatrixXd& X, MatrixXd& Y)                 { return aStrategy.train(X, Y); }
     bool validate(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta) { return aStrategy.validate(X, Y, Beta); }
-    bool classify(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta) { return aStrategy.classify(X, Y, Beta); }
+    
+    SLTrainResult classify(MatrixXd& tX, MatrixXd& tY, SLTRAINRESULTYPE type) { return aStrategy.classify(tX, tY, type); }
     
     template <typename MP>
     bool initParameters(MP modelParameters) { return aStrategy.initParameters(modelParameters); }
