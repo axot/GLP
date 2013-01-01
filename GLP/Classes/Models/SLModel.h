@@ -39,17 +39,28 @@ using namespace Eigen;
 template <typename AStrategy>
 class SLModel
 {
-public:
-    virtual SLTrainResult getTrainResult(SLTRAINRESULTYPE type) const   { return aStrategy.getTrainResult(type); }
-    virtual bool train   (const MatrixXd& X, const MatrixXd& Y)         { return aStrategy.train(X, Y); }
-    virtual bool validate(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta)     { return aStrategy.validate(X, Y, Beta); }
+public:    
+    virtual SLGlpResult train(const MatrixXd& X, const MatrixXd& Y, SLGLPRESULTYPE type)
+    {
+        return aStrategy.train(X, Y, type);
+    }
     
-    virtual SLTrainResult classify(const MatrixXd& tX, const MatrixXd& tY, SLTRAINRESULTYPE type) const
-    { return aStrategy.classify(tX, tY, type); }
+    virtual SLGlpResult classify(const MatrixXd& tX, const MatrixXd& tY, SLGLPRESULTYPE type) const
+    {
+        return aStrategy.classify(tX, tY, type);
+    }
+    
+    virtual SLGlpCrossValidationResults crossValidation(const MatrixXd& X, const MatrixXd& Y, SLGLPRESULTYPE type) const
+    {
+        return aStrategy.crossValidation(X, Y, type);
+    }
     
     template <typename MP>
-    bool initParameters(MP modelParameters) { return aStrategy.initParameters(modelParameters); }
-    
+    bool initParameters(MP modelParameters)
+    {
+        return aStrategy.initParameters(modelParameters);
+    }
+        
 private:
     AStrategy aStrategy;
 };

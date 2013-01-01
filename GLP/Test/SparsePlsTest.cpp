@@ -40,7 +40,12 @@ int main(int argc, const char *argv[])
        y6 = b2 + b3
        y7 = b1 + b2 + b3
      */
-    SLSparsePls spls;
+    SLModel<SLSparsePls> spls;
+    SLSparsePls::SLSparsePlsParameters param;
+    
+    param.kFold = 4;
+    spls.initParameters(param);
+    
     MatrixXd X(5,3), Y(5,1);
     X.row(0) << 1,0,0;
     X.row(1) << 0,1,0;
@@ -52,13 +57,12 @@ int main(int argc, const char *argv[])
 
     for ( int i = 0; i < X.cols(); ++i)
     {
-        spls.train(X.col(i), Y);
+        auto result = spls.train(X.col(i), Y, SLGLPRESULTYPEQ2 | SLGLPRESULTYPERSS | SLGLPRESULTYPEBETA);
         
-        auto result = spls.getTrainResult(SLTRAINRESULTYPEQ2 | SLTRAINRESULTYPERSS);
         cout << "Training: "<< endl;
-        cout << "Q2: "  << result[SLTRAINRESULTYPEQ2]  << endl;
-        cout << "RSS: " << result[SLTRAINRESULTYPERSS] << endl;
-        cout << "Beta:\n"<< spls.getTrainResult(SLTRAINRESULTYPEBETA)[SLTRAINRESULTYPEBETA] << '\n' << endl;
+        cout << "Q2: "      << result[SLGLPRESULTYPEQ2]  << endl;
+        cout << "RSS: "     << result[SLGLPRESULTYPERSS] << endl;
+        cout << "Beta:\n"   << result[SLGLPRESULTYPEBETA]<< '\n' << endl;
     }
     
     MatrixXd tX(2,3), tY(2,1);
@@ -66,8 +70,14 @@ int main(int argc, const char *argv[])
     tX.row(1) << 1,1,1;
     tY << 5,6;
     
-    auto tresult = spls.classify(tX, tY, SLTRAINRESULTYPEQ2 | SLTRAINRESULTYPERSS);
+    auto tresult = spls.classify(tX, tY, SLGLPRESULTYPEQ2 | SLGLPRESULTYPERSS);
     cout << "Classify: "<< endl;
-    cout << "Q2: "      << tresult[SLTRAINRESULTYPEQ2]  << endl;
-    cout << "RSS: "     << tresult[SLTRAINRESULTYPERSS] << '\n' << endl;
+    cout << "Q2: "      << tresult[SLGLPRESULTYPEQ2]  << endl;
+    cout << "RSS: "     << tresult[SLGLPRESULTYPERSS] << '\n' << endl;
+    
+    MatrixXd cvX(7,3), cvY(7,1);
+    cvX << X, tX;
+    cvY << Y, tY;
+    
+    spls.crossValidation(cvX, cvY, SLGLPRESULTYPEQ2 | SLGLPRESULTYPERSS | SLGLPRESULTYPEBETA);
 }

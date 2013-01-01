@@ -34,49 +34,54 @@ using namespace std;
 using namespace Eigen;
 
 enum{
-    SLTRAINRESULTYPENONE    = 0,
-    SLTRAINRESULTYPEQ2      = 1 << 0,
-    SLTRAINRESULTYPERSS     = 1 << 1,
-    SLTRAINRESULTYPEAUC     = 1 << 2,
-    SLTRAINRESULTYPEACC     = 1 << 3,
-    SLTRAINRESULTYPEBETA    = 1 << 4
+    SLGLPRESULTYPENONE    = 0,
+    SLGLPRESULTYPEQ2      = 1 << 0,
+    SLGLPRESULTYPERSS     = 1 << 1,
+    SLGLPRESULTYPEAUC     = 1 << 2,
+    SLGLPRESULTYPEACC     = 1 << 3,
+    SLGLPRESULTYPEBETA    = 1 << 4
 };
 
-typedef unsigned int SLTRAINRESULTYPE;
-typedef map<SLTRAINRESULTYPE, MatrixXd> SLTrainResult;
+typedef unsigned int SLGLPRESULTYPE;
+typedef map<SLGLPRESULTYPE, MatrixXd> SLGlpResult;
+
+enum{
+    SLGLPCROSSVALIDATIONRESULTYPETRAIN      = 1 << 0,
+    SLGLPCROSSVALIDATIONRESULTYPEVALIDATION = 1 << 1,
+    SLGLPCROSSVALIDATIONRESULTYPETEST       = 1 << 2,
+};
+
+typedef unsigned int SLGLPCROSSVALIDATIONRESULTYPE;
+typedef map<SLGLPCROSSVALIDATIONRESULTYPE, SLGlpResult> SLGlpCrossValidationResults;
 
 class SLModelStrategy
 {
 public:
+    SLModelStrategy()
+    {
+        SLModelStrategy::SLModelParameters param;
+        initParameters(param);
+    }
+    
+    class SLModelParameters
+    {
+    public:
+        SLModelParameters() : kFold(10) {}
+        
+    public:
+        int kFold;
+    };
+    
     /* Train:
      * Input
      *      X: X matrix of train data
      *      Y: Y matrix of train data
+     *   type: type of results
      *
-     * Return: true if sucessed.
+     * Return: the results stored in mapped structure.
      */
-    virtual bool train(const MatrixXd& X, const MatrixXd& Y) = 0;
-    
-    /* Get Train Result:
-     * Input
-     *      type: type of results
-     *
-     * Return: the results stored in mapped structure
-     */
-    virtual SLTrainResult getTrainResult(SLTRAINRESULTYPE type) const = 0;
-
-    /* Validate:
-     * Input
-     *      X: test X matrix
-     *      Y: test Y matrix
-     *
-     * Output
-     *      Beta: the calculated Beta value
-     *
-     * Return: true if sucessed.
-     */
-    virtual bool validate(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta) = 0;
-    
+    virtual SLGlpResult train(const MatrixXd& X, const MatrixXd& Y, SLGLPRESULTYPE type) = 0;
+        
     /* Classify:
      * Input
      *     tX: X matrix of test data
@@ -85,18 +90,58 @@ public:
      *
      * Return: the results stored in mapped structure
      */
-    virtual SLTrainResult classify(const MatrixXd& tX, const MatrixXd& tY, SLTRAINRESULTYPE type) const = 0;
+    virtual SLGlpResult classify(const MatrixXd& tX, const MatrixXd& tY, SLGLPRESULTYPE type) const = 0;
+    
+    /* K-fold Cross Vaildate:
+     * Input
+     *      X: X matrix
+     *      Y: Y matrix
+     *   type: type of results
+     *
+     * Return: the results stored in mapped structure.
+     *
+     */
+    virtual SLGlpCrossValidationResults crossValidation(const MatrixXd& X, const MatrixXd& Y, SLGLPRESULTYPE type) const
+    {
+        ASSERT(kFold <= X.rows(), "K-Fold was too big than X rows.");
+        ASSERT(kFold >= 4, "K-Fold was too small, it must bigger than 4.");
+        
+        SLGlpCrossValidationResults result;
+        for (int i=0; i < kFold; ++i)
+        {
+//            MatrixXd trainX AssignCVBlocks(i, i*cvX.cols()/kFold, 2*cvX.cols()/kFold, cvX);
+//            MatrixXd trainY AssignCVBlocks(i, i*cvY.cols()/kFold, 2*cvX.cols()/kFold, cvY);
+//            
+//            MatrixXd validateX AssignCVBlocks(i, i*cvX.cols()/kFold, cvX);
+//            MatrixXd validateY AssignCVBlocks(i, i*cvY.cols()/kFold, cvY);
+//
+//            MatrixXd testX AssignCVBlocks(i, i*cvX.cols()/kFold, cvX);
+//            MatrixXd testY AssignCVBlocks(i, i*cvY.cols()/kFold, cvY);
 
+//            result[SLGLPCROSSVALIDATIONRESULTYPETRAIN]    = train(trainX, trainY, type);
+//            result[SLGLPCROSSVALIDATIONRESULTYPEVALIDATE] = classify(validateX, validateY, type);
+//            result[SLGLPCROSSVALIDATIONRESULTYPETEST]     = classify(testX, testY, type);
+        }
+        return result;
+    }
+    
     /* Init Parameters:
      * Input
      *      parameters: Model assignable parameters
      *
      * Return: true if sucessed.
      *
-     * Discussion: must override this method
      */
     template <typename MP>
-    bool initParameters(MP parameters) { return false; };
+    bool initParameters(MP parameters)
+    {
+        kFold = parameters.kFold;
+        return true;
+    };
+    
+protected:
+    // assignable parameters via initParameters() method
+    int kFold;
 };
 
 #endif

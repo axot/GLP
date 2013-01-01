@@ -35,7 +35,7 @@ using namespace Eigen;
 class SLSparsePls : public SLModelStrategy
 {
 public:
-    class SLSparsePlsParameters
+    class SLSparsePlsParameters : public SLModelStrategy::SLModelParameters
     {
     public:
         SLSparsePlsParameters() {}
@@ -49,12 +49,12 @@ public:
     /* Train: Sparse PLS regression: Y = XB
      * Input
      *      X: the X matrix which need be appended
-     *      Y: only assign when the inside Y did not be initialized.
+     *      Y: assignable when the inside Y did not be initialized.
+     *   type: type of results
      *
-     * Return: true if sucessed.
+     * Return: the results stored in mapped structure.
      */
-    virtual bool train(const MatrixXd& X, const MatrixXd& Y);
-    virtual bool validate(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta);
+    virtual SLGlpResult train(const MatrixXd& appendedX, const MatrixXd& theY, SLGLPRESULTYPE type);
     
     /* Classify:
      * Input
@@ -64,7 +64,7 @@ public:
      *
      * Return: the results stored in mapped structure
      */
-    virtual SLTrainResult classify(const MatrixXd& tX, const MatrixXd& tY, SLTRAINRESULTYPE type) const;
+    virtual SLGlpResult classify(const MatrixXd& tX, const MatrixXd& tY, SLGLPRESULTYPE type) const;
     
     /* Init Parameters:
      * Input
@@ -74,15 +74,10 @@ public:
      *
      * Discussion: no optional parameters for Sparse PLS
      */
-    virtual bool initParameters(SLSparsePlsParameters parameters);
+    bool initParameters(SLSparsePlsParameters parameters);
     
-    /* Get Train Result:
-     * Input
-     *      type: type of results
-     *
-     * Return: the results stored in mapped structure, support Beta, Q2 and RSS.
-     */
-    virtual SLTrainResult getTrainResult(SLTRAINRESULTYPE type) const;
+private:
+    SLGlpResult getTrainResult(SLGLPRESULTYPE type) const;
 
 private:
     // assignable parameters via initParameters() method
@@ -90,8 +85,8 @@ private:
     // not assignable parameters
     bool verbose;
     MatrixXd X;
-    MatrixXd meanX;
     MatrixXd Y;
+    MatrixXd meanX;
     MatrixXd meanY;
     MatrixXd T;
     MatrixXd Beta;

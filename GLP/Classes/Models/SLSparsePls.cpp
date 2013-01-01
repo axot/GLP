@@ -26,7 +26,8 @@
 
 using namespace std;
 
-bool SLSparsePls::train(const MatrixXd& appendedX, const MatrixXd& theY)
+// Public Methods
+SLGlpResult SLSparsePls::train(const MatrixXd& appendedX, const MatrixXd& theY, SLGLPRESULTYPE type)
 {
     if (Y.cols() == 0 || Y.rows() == 0)
     {
@@ -44,8 +45,7 @@ bool SLSparsePls::train(const MatrixXd& appendedX, const MatrixXd& theY)
     
     residual = RES.col(maxSquaredNormColumn);
 
-    meanX.conservativeResize(1
-                             , oldXCols+appendedXCols);
+    meanX.conservativeResize(1, oldXCols+appendedXCols);
     meanX << meanX.leftCols(oldXCols), appendedX.colwise().mean();
     
     X.conservativeResize(appendedXRows, oldXCols+appendedXCols);
@@ -83,61 +83,66 @@ bool SLSparsePls::train(const MatrixXd& appendedX, const MatrixXd& theY)
     }
     RES = Y - X*Beta;
     
-    return true;
+    return getTrainResult(type);
 }
 
-SLTrainResult SLSparsePls::getTrainResult(SLTRAINRESULTYPE type) const
+SLGlpResult SLSparsePls::classify(const MatrixXd& tX, const MatrixXd& tY, SLGLPRESULTYPE type) const
 {
-    ASSERT(type != SLTRAINRESULTYPENONE, "No type of result was indicated");
-    ASSERT(!(type&SLTRAINRESULTYPEACC || type&SLTRAINRESULTYPEAUC), "Only support Beta Q2 RSS for Sparse PLS.");
-    ASSERT(meanY.cols() != 0 && meanY.rows() != 0, "Train data first");
-
-    SLTrainResult result;
-    if(type & SLTRAINRESULTYPEQ2)
-    {
-        result[SLTRAINRESULTYPEQ2] = MatrixXd::Ones(1, Y.cols()) - SSum(RES).cwiseQuotient(SSum(Y));
-    }
-    if(type & SLTRAINRESULTYPERSS)
-    {
-        result[SLTRAINRESULTYPERSS] = SSum(RES);
-    }
-    if(type & SLTRAINRESULTYPEBETA)
-    {
-        result[SLTRAINRESULTYPEBETA] = Beta;
-    }
-    return result;
-}
-
-bool SLSparsePls::validate(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta)
-{
-    return false;
-}
-
-SLTrainResult SLSparsePls::classify(const MatrixXd& tX, const MatrixXd& tY, SLTRAINRESULTYPE type) const
-{
-    ASSERT(type != SLTRAINRESULTYPENONE, "No type of result was indicated");
-    ASSERT(!(type&SLTRAINRESULTYPEACC || type&SLTRAINRESULTYPEAUC || type&SLTRAINRESULTYPEBETA), "Only support Q2 RSS for Sparse PLS.");
+    ASSERT(type != SLGLPRESULTYPENONE, "No type of result was indicated");
+    
+    ASSERT(!(type & ~(SLGLPRESULTYPEBETA|SLGLPRESULTYPEQ2|SLGLPRESULTYPERSS)),
+           "Only support Beta Q2 RSS for Sparse PLS.");
+    
     ASSERT(meanY.cols() != 0 && meanY.rows() != 0, "Train data first");
     
-    SLTrainResult result;
+    SLGlpResult result;
     
     MatrixXd autoSacaledY = tY - meanY.replicate(tY.rows(), 1);
     MatrixXd autoSacaledX = tX - meanX.replicate(tX.rows(), 1);
 
     MatrixXd tRES = autoSacaledY - autoSacaledX*Beta;
 
-    if(type & SLTRAINRESULTYPEQ2)
+    if(type & SLGLPRESULTYPEQ2)
     {
-        result[SLTRAINRESULTYPEQ2] = MatrixXd::Ones(1, autoSacaledY.cols()) - SSum(tRES).cwiseQuotient(SSum(autoSacaledY));
+        result[SLGLPRESULTYPEQ2] = MatrixXd::Ones(1, autoSacaledY.cols()) - SSum(tRES).cwiseQuotient(SSum(autoSacaledY));
     }
-    if(type & SLTRAINRESULTYPERSS)
+    if(type & SLGLPRESULTYPERSS)
     {
-        result[SLTRAINRESULTYPERSS] = SSum(tRES);
+        result[SLGLPRESULTYPERSS] = SSum(tRES);
+    }
+    if(type & SLGLPRESULTYPEBETA)
+    {
+        result[SLGLPRESULTYPEBETA] = Beta;
     }
     return result;
 }
 
 bool SLSparsePls::initParameters(SLSparsePlsParameters parameters)
 {
+    SLModelStrategy::initParameters(parameters);
     return true;
+}
+
+// Private Methods
+SLGlpResult SLSparsePls::getTrainResult(SLGLPRESULTYPE type) const
+{
+    ASSERT(!(type & ~(SLGLPRESULTYPEBETA|SLGLPRESULTYPEQ2|SLGLPRESULTYPERSS)),
+           "Only support Beta Q2 RSS for Sparse PLS.");
+    
+    ASSERT(meanY.cols() != 0 && meanY.rows() != 0, "Train data first");
+    
+    SLGlpResult result;
+    if(type & SLGLPRESULTYPEQ2)
+    {
+        result[SLGLPRESULTYPEQ2] = MatrixXd::Ones(1, Y.cols()) - SSum(RES).cwiseQuotient(SSum(Y));
+    }
+    if(type & SLGLPRESULTYPERSS)
+    {
+        result[SLGLPRESULTYPERSS] = SSum(RES);
+    }
+    if(type & SLGLPRESULTYPEBETA)
+    {
+        result[SLGLPRESULTYPEBETA] = Beta;
+    }
+    return result;
 }

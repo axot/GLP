@@ -36,26 +36,34 @@ class SLGlpProduct : public SLModelStrategy, public SLGraphMiningStrategy
 {    
 public:
     template <typename MP, typename GP>
-    SLGlpProduct (MP& modelParameters, GP& graphMiningParameters)
+    SLGlpProduct(MP& modelParameters, GP& graphMiningParameters)
     {
-        ASSERT( model.initParameters(modelParameters) != false,
-               "Did you override initParameters method?");
-        
-        ASSERT( graphMining.initParameters(graphMiningParameters) != false,
-               "Did you override initParameters method?");
+        model.initParameters(modelParameters);
+        graphMining.initParameters(graphMiningParameters);
+    }
+
+    // SLModelStrategy
+    virtual SLGlpResult train(const MatrixXd& X, const MatrixXd& Y, SLGLPRESULTYPE type)
+    {
+        return model.train(X, Y, type);
+    }
+
+    virtual SLGlpResult classify(const MatrixXd& tX, const MatrixXd& tY, SLGLPRESULTYPE type) const
+    {
+        return model.classify(tX, tY, type);
     }
     
-    // Implementation SLModelStrategy
-    virtual SLTrainResult getTrainResult(SLTRAINRESULTYPE type) const   { return model.getTrainResult(type); }
-    virtual bool train   (const MatrixXd& X, const MatrixXd& Y)         { return model.train(X, Y); }
-    virtual bool validate(MatrixXd& X, MatrixXd& Y, MatrixXd& Beta)     { return model.validate(X, Y, Beta); }
-    
-    virtual SLTrainResult classify(const MatrixXd& tX, const MatrixXd& tY, SLTRAINRESULTYPE type) const
-    { return model.classify(tX, tY, type); }
+    virtual SLGlpCrossValidationResults crossValidation(const MatrixXd& X, const MatrixXd& Y, SLGLPRESULTYPE type) const
+    {
+        return model.crossValidation(type);
+    }
 
-    // Implementation SLGraphMiningStrategy
-    MatrixXd& search() { return graphMining.search(); }
-        
+    // SLGraphMiningStrategy
+    virtual MatrixXd& search()
+    {
+        return graphMining.search();
+    }
+
 private:
     SLModel<M> model;
     SLGraphMining<G> graphMining;
