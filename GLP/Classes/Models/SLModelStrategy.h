@@ -26,6 +26,7 @@
 #ifndef GLP_SLModelStrategy_h
 #define GLP_SLModelStrategy_h
 
+#include <iostream>
 #include <map>
 #include <Eigen/Core>
 #include "../SLUtility.h"
@@ -101,29 +102,7 @@ public:
      * Return: the results stored in mapped structure.
      *
      */
-    virtual SLGlpCrossValidationResults crossValidation(const MatrixXd& X, const MatrixXd& Y, SLGLPRESULTYPE type) const
-    {
-        ASSERT(kFold <= X.rows(), "K-Fold was too big than X rows.");
-        ASSERT(kFold >= 4, "K-Fold was too small, it must bigger than 4.");
-        
-        SLGlpCrossValidationResults result;
-        for (int i=0; i < kFold; ++i)
-        {
-//            MatrixXd trainX AssignCVBlocks(i, i*cvX.cols()/kFold, 2*cvX.cols()/kFold, cvX);
-//            MatrixXd trainY AssignCVBlocks(i, i*cvY.cols()/kFold, 2*cvX.cols()/kFold, cvY);
-//            
-//            MatrixXd validateX AssignCVBlocks(i, i*cvX.cols()/kFold, cvX);
-//            MatrixXd validateY AssignCVBlocks(i, i*cvY.cols()/kFold, cvY);
-//
-//            MatrixXd testX AssignCVBlocks(i, i*cvX.cols()/kFold, cvX);
-//            MatrixXd testY AssignCVBlocks(i, i*cvY.cols()/kFold, cvY);
-
-//            result[SLGLPCROSSVALIDATIONRESULTYPETRAIN]    = train(trainX, trainY, type);
-//            result[SLGLPCROSSVALIDATIONRESULTYPEVALIDATE] = classify(validateX, validateY, type);
-//            result[SLGLPCROSSVALIDATIONRESULTYPETEST]     = classify(testX, testY, type);
-        }
-        return result;
-    }
+    virtual SLGlpCrossValidationResults crossValidation(const MatrixXd& X, const MatrixXd& Y, SLGLPRESULTYPE type) const;
     
     /* Init Parameters:
      * Input
@@ -142,6 +121,9 @@ public:
 protected:
     // assignable parameters via initParameters() method
     int kFold;
+    
+    // not assignable parameters
+    mutable VectorXi randomIndexs;
 };
 
 #endif

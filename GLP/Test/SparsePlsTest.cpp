@@ -79,5 +79,24 @@ int main(int argc, const char *argv[])
     cvX << X, tX;
     cvY << Y, tY;
     
-    spls.crossValidation(cvX, cvY, SLGLPRESULTYPEQ2 | SLGLPRESULTYPERSS | SLGLPRESULTYPEBETA);
+    for ( int i = 0; i < cvX.cols(); ++i)
+    {
+        auto result = spls.crossValidation(cvX.col(i), cvY, SLGLPRESULTYPEQ2 | SLGLPRESULTYPERSS | SLGLPRESULTYPEBETA);
+        
+        cout << "Cross Validation: n: " << i << endl;
+        cout << "Training: "<< endl;
+        cout << "Q2: "      << result[SLGLPCROSSVALIDATIONRESULTYPETRAIN][SLGLPRESULTYPEQ2]  << endl;
+        cout << "RSS: "     << result[SLGLPCROSSVALIDATIONRESULTYPETRAIN][SLGLPRESULTYPERSS] << endl;
+        cout << "Beta:\n"   << result[SLGLPCROSSVALIDATIONRESULTYPETRAIN][SLGLPRESULTYPEBETA]<< '\n' << endl;
+        
+        cout << "Validation: "<< endl;
+        cout << "Q2: "      << result[SLGLPCROSSVALIDATIONRESULTYPEVALIDATION][SLGLPRESULTYPEQ2]  << endl;
+        cout << "RSS: "     << result[SLGLPCROSSVALIDATIONRESULTYPEVALIDATION][SLGLPRESULTYPERSS] << endl;
+        cout << "Beta:\n"   << result[SLGLPCROSSVALIDATIONRESULTYPEVALIDATION][SLGLPRESULTYPEBETA]<< '\n' << endl;
+
+        cout << "Test: "<< endl;
+        cout << "Q2: "      << result[SLGLPCROSSVALIDATIONRESULTYPETEST][SLGLPRESULTYPEQ2]  << endl;
+        cout << "RSS: "     << result[SLGLPCROSSVALIDATIONRESULTYPETEST][SLGLPRESULTYPERSS] << endl;
+        cout << "Beta:\n"   << result[SLGLPCROSSVALIDATIONRESULTYPETEST][SLGLPRESULTYPEBETA]<< '\n' << endl;
+    }
 }

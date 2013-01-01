@@ -10,6 +10,8 @@
 		53388A341690B0FD00AF9E5E /* SparsePlsTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53388A231690B03000AF9E5E /* SparsePlsTest.cpp */; };
 		53388A351690B10000AF9E5E /* SLSparsePls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53832810168D7E4E00E3B48F /* SLSparsePls.cpp */; };
 		53388A361690B10300AF9E5E /* SLGspan.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53C09381168DBB5D00A0ADC1 /* SLGspan.cpp */; };
+		5369BB91169364DF00EC7704 /* SLModelStrategy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5369BB90169364DF00EC7704 /* SLModelStrategy.cpp */; };
+		5369BB931693659200EC7704 /* SLModelStrategy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5369BB90169364DF00EC7704 /* SLModelStrategy.cpp */; };
 		53832811168D7E4E00E3B48F /* SLSparsePls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53832810168D7E4E00E3B48F /* SLSparsePls.cpp */; };
 		53C09383168DBB5D00A0ADC1 /* SLGspan.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53C09381168DBB5D00A0ADC1 /* SLGspan.cpp */; };
 		53C09388168DDEA500A0ADC1 /* gspls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53C09387168DDEA500A0ADC1 /* gspls.cpp */; };
@@ -47,6 +49,7 @@
 		53578E05168D69AD002668D3 /* SLSparsePls.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLSparsePls.h; path = Classes/Models/SLSparsePls.h; sourceTree = "<group>"; };
 		53578E07168D69B9002668D3 /* MatrixExt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MatrixExt.h; path = Classes/Extensions/MatrixExt.h; sourceTree = "<group>"; };
 		53578E09168D69CB002668D3 /* SLGlp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLGlp.h; path = Classes/SLGlp.h; sourceTree = "<group>"; };
+		5369BB90169364DF00EC7704 /* SLModelStrategy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SLModelStrategy.cpp; path = Classes/Models/SLModelStrategy.cpp; sourceTree = "<group>"; };
 		537123411683288A00B47D4E /* gspls */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = gspls; sourceTree = BUILT_PRODUCTS_DIR; };
 		5371237E16833C2D00B47D4E /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = SOURCE_ROOT; };
 		53832802168D6CEF00E3B48F /* SLUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SLUtility.h; path = Classes/SLUtility.h; sourceTree = "<group>"; };
@@ -157,6 +160,7 @@
 				53832812168D7F6200E3B48F /* Concrete */,
 				53832809168D767F00E3B48F /* SLModel.h */,
 				53578E04168D69AD002668D3 /* SLModelStrategy.h */,
+				5369BB90169364DF00EC7704 /* SLModelStrategy.cpp */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -256,8 +260,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				53388A341690B0FD00AF9E5E /* SparsePlsTest.cpp in Sources */,
+				5369BB931693659200EC7704 /* SLModelStrategy.cpp in Sources */,
 				53388A351690B10000AF9E5E /* SLSparsePls.cpp in Sources */,
+				53388A341690B0FD00AF9E5E /* SparsePlsTest.cpp in Sources */,
 				53388A361690B10300AF9E5E /* SLGspan.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -269,6 +274,7 @@
 				53832811168D7E4E00E3B48F /* SLSparsePls.cpp in Sources */,
 				53C09383168DBB5D00A0ADC1 /* SLGspan.cpp in Sources */,
 				53C09388168DDEA500A0ADC1 /* gspls.cpp in Sources */,
+				5369BB91169364DF00EC7704 /* SLModelStrategy.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -381,6 +387,7 @@
 				53388A331690B0D500AF9E5E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		5371233B1683288A00B47D4E /* Build configuration list for PBXProject "GLP" */ = {
 			isa = XCConfigurationList;
