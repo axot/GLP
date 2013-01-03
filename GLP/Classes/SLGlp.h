@@ -39,7 +39,8 @@
 // Extensions
 #include "Extensions/MatrixExt.h"
 
-// Utility
+// Utilities
 #include "SLUtility.h"
+#include "Utilities/SLCrossValidation.h"
 
 #endif

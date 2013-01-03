@@ -41,7 +41,7 @@ class SLGraphMiningStrategy
 public:
     virtual MatrixXd& search() = 0;
     
-    /* Init Parameters:
+    /* Set Parameters:
      * Input
      *      parameters: Graph Mining assignable parameters
      *
@@ -50,7 +50,7 @@ public:
      * Discussion: must override this method
      */
     template <typename GP>
-    bool initParameters(GP parameters) { return false; };
+    bool setParameters(GP parameters) { return false; };
 };
 
 #endif /* defined(__GLP__SLGraphMiningStrategy__) */

@@ -117,9 +117,9 @@ SLGlpResult SLSparsePls::classify(const MatrixXd& tX, const MatrixXd& tY, SLGLPR
     return result;
 }
 
-bool SLSparsePls::initParameters(SLSparsePlsParameters parameters)
+bool SLSparsePls::setParameters(SLSparsePlsParameters parameters)
 {
-    SLModelStrategy::initParameters(parameters);
+    param = parameters;
     return true;
 }
 

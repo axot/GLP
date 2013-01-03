@@ -40,7 +40,7 @@ public:
     MatrixXd& search() { return aStrategy.search(); }
     
     template <typename GP>
-    bool initParameters(GP modelParameters) { return aStrategy.initParameters(modelParameters); }
+    bool setParameters(GP modelParameters) { return aStrategy.setParameters(modelParameters); }
 
 private:
     AStrategy aStrategy;

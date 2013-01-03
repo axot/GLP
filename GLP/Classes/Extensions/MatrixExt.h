@@ -169,7 +169,7 @@ namespace EigenExt
         {
             if (!rows)
             {
-                for (ssize_t i=0; i < read; ++i)
+                for (size_t i=0; i < read; ++i)
                 {
                     delimPos = (size_t)strchr(&line[i], delim);
                     if (delimPos)
@@ -193,12 +193,12 @@ namespace EigenExt
         // fill matrix
         int currentRow = 0;
         int currentCol = 0;
-        ssize_t doubleEnds;
+        size_t doubleEnds;
         
         while ((read = getline(&line, &len, fp)) != -1)
         {
             currentCol = 0;
-            for (ssize_t i=0; i < read; ++i)
+            for (size_t i=0; i < read; ++i)
             {
                 delimPos = (size_t)strchr(&line[i], delim);
                 if (!delimPos)

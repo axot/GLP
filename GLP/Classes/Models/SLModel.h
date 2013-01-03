@@ -2,9 +2,6 @@
 //  SLModel.h
 //  GLP
 //
-//  Created by Zheng Shao on 12/28/12.
-//  Copyright (c) 2012 Saigo Laboratoire. All rights reserved.
-//
 //  Created by Zheng Shao on 12/20/12.
 //  Copyright (c) 2012 Saigo Laboratoire. All rights reserved.
 //
@@ -39,7 +36,7 @@ using namespace Eigen;
 template <typename AStrategy>
 class SLModel
 {
-public:    
+public:
     virtual SLGlpResult train(const MatrixXd& X, const MatrixXd& Y, SLGLPRESULTYPE type)
     {
         return aStrategy.train(X, Y, type);
@@ -49,19 +46,26 @@ public:
     {
         return aStrategy.classify(tX, tY, type);
     }
-    
-    virtual SLGlpCrossValidationResults crossValidation(const MatrixXd& X, const MatrixXd& Y, SLGLPRESULTYPE type) const
+
+    template <typename MP>
+    MP getParameters()
     {
-        return aStrategy.crossValidation(X, Y, type);
+        return aStrategy.getParameters();
     }
     
     template <typename MP>
-    bool initParameters(MP modelParameters)
+    bool setParameters(MP modelParameters)
     {
-        return aStrategy.initParameters(modelParameters);
+        return aStrategy.setParameters(modelParameters);
     }
-        
+    
+    AStrategy getModel()
+    {
+        return aStrategy;
+    }
+
 private:
+    // not assignable parameters
     AStrategy aStrategy;
 };
 

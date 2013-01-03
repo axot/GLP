@@ -49,7 +49,7 @@ public:
 public:
     // Implementation SLGraphMiningStrategy Protocol
     MatrixXd& search();
-    bool initParameters(SLGspanParameters parameters);
+    bool setParameters(SLGspanParameters parameters);
 
 private:
     SLGspanParameters param;

@@ -28,6 +28,7 @@
 #include "../Models/SLModel.h"
 #include "../GraphMining/SLGraphMining.h"
 #include "../SLUtility.h"
+#include "../Utilities/SLCrossValidation.h"
 
 using namespace std;
 
@@ -38,8 +39,11 @@ public:
     template <typename MP, typename GP>
     SLGlpProduct(MP& modelParameters, GP& graphMiningParameters)
     {
-        model.initParameters(modelParameters);
-        graphMining.initParameters(graphMiningParameters);
+        model.setParameters(modelParameters);
+        graphMining.setParameters(graphMiningParameters);
+        typename SLCrossValidation<M>::SLCrossValidationParameters param;
+        param.modelClone = model.getModel();
+        cv.setParameters(param);
     }
 
     // SLModelStrategy
@@ -52,11 +56,6 @@ public:
     {
         return model.classify(tX, tY, type);
     }
-    
-    virtual SLGlpCrossValidationResults crossValidation(const MatrixXd& X, const MatrixXd& Y, SLGLPRESULTYPE type) const
-    {
-        return model.crossValidation(type);
-    }
 
     // SLGraphMiningStrategy
     virtual MatrixXd& search()
@@ -64,9 +63,21 @@ public:
         return graphMining.search();
     }
 
+    // Customs Methods
+    SLGlpCrossValidationResults crossValidation(const MatrixXd& X, const MatrixXd& Y, SLGLPRESULTYPE type) const
+    {
+        return cv.crossValidation(type);
+    }
+
+    void setCrossValidationParameters(typename SLCrossValidation<M>::SLCrossValidationParameters parameters)
+    {
+        cv.setParameters(parameters);
+    }
+
 private:
     SLModel<M> model;
     SLGraphMining<G> graphMining;
+    SLCrossValidation<M> cv;
 };
 
 #endif /* defined(__GLP__SLGlpCombination__) */

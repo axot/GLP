@@ -28,6 +28,7 @@
 
 #include <iostream>
 #include <map>
+#include <vector>
 #include <Eigen/Core>
 #include "../SLUtility.h"
 
@@ -36,43 +37,21 @@ using namespace Eigen;
 
 enum{
     SLGLPRESULTYPENONE    = 0,
-    SLGLPRESULTYPEQ2      = 1 << 0,
-    SLGLPRESULTYPERSS     = 1 << 1,
-    SLGLPRESULTYPEAUC     = 1 << 2,
-    SLGLPRESULTYPEACC     = 1 << 3,
-    SLGLPRESULTYPEBETA    = 1 << 4
+    SLGLPRESULTYPEBETA    = 1 << 0,
+    SLGLPRESULTYPEQ2      = 1 << 1,
+    SLGLPRESULTYPERSS     = 1 << 2,
+    SLGLPRESULTYPEAUC     = 1 << 3,
+    SLGLPRESULTYPEACC     = 1 << 4,
+    SLGLPRESULTYPEAIC     = 1 << 5,
+    SLGLPRESULTYPEBIC     = 1 << 6,
 };
 
 typedef unsigned int SLGLPRESULTYPE;
 typedef map<SLGLPRESULTYPE, MatrixXd> SLGlpResult;
 
-enum{
-    SLGLPCROSSVALIDATIONRESULTYPETRAIN      = 1 << 0,
-    SLGLPCROSSVALIDATIONRESULTYPEVALIDATION = 1 << 1,
-    SLGLPCROSSVALIDATIONRESULTYPETEST       = 1 << 2,
-};
-
-typedef unsigned int SLGLPCROSSVALIDATIONRESULTYPE;
-typedef map<SLGLPCROSSVALIDATIONRESULTYPE, SLGlpResult> SLGlpCrossValidationResults;
-
 class SLModelStrategy
 {
-public:
-    SLModelStrategy()
-    {
-        SLModelStrategy::SLModelParameters param;
-        initParameters(param);
-    }
-    
-    class SLModelParameters
-    {
-    public:
-        SLModelParameters() : kFold(10) {}
-        
-    public:
-        int kFold;
-    };
-    
+public:    
     /* Train:
      * Input
      *      X: X matrix of train data
@@ -92,19 +71,8 @@ public:
      * Return: the results stored in mapped structure
      */
     virtual SLGlpResult classify(const MatrixXd& tX, const MatrixXd& tY, SLGLPRESULTYPE type) const = 0;
-    
-    /* K-fold Cross Vaildate:
-     * Input
-     *      X: X matrix
-     *      Y: Y matrix
-     *   type: type of results
-     *
-     * Return: the results stored in mapped structure.
-     *
-     */
-    virtual SLGlpCrossValidationResults crossValidation(const MatrixXd& X, const MatrixXd& Y, SLGLPRESULTYPE type) const;
-    
-    /* Init Parameters:
+        
+    /* Set Parameters:
      * Input
      *      parameters: Model assignable parameters
      *
@@ -112,18 +80,15 @@ public:
      *
      */
     template <typename MP>
-    bool initParameters(MP parameters)
-    {
-        kFold = parameters.kFold;
-        return true;
-    };
+    bool setParameters(MP parameters) { return true; };
     
-protected:
-    // assignable parameters via initParameters() method
-    int kFold;
-    
-    // not assignable parameters
-    mutable VectorXi randomIndexs;
+    /* Get Parameters:
+     *
+     *      Return: current parameters.
+     *  Discussion: default return nothing, for cross validation you have to override this method.
+     */
+    template <typename MP>
+    MP getParameters() { MP mp; return mp; }
 };
 
 #endif

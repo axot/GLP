@@ -40,11 +40,10 @@ int main(int argc, const char *argv[])
        y6 = b2 + b3
        y7 = b1 + b2 + b3
      */
-    SLModel<SLSparsePls> spls;
+    SLSparsePls spls;
     SLSparsePls::SLSparsePlsParameters param;
     
-    param.kFold = 4;
-    spls.initParameters(param);
+    spls.setParameters(param);
     
     MatrixXd X(5,3), Y(5,1);
     X.row(0) << 1,0,0;
@@ -57,7 +56,7 @@ int main(int argc, const char *argv[])
 
     for ( int i = 0; i < X.cols(); ++i)
     {
-        auto result = spls.train(X.col(i), Y, SLGLPRESULTYPEQ2 | SLGLPRESULTYPERSS | SLGLPRESULTYPEBETA);
+        SLGlpResult result = spls.train(X.col(i), Y, SLGLPRESULTYPEQ2 | SLGLPRESULTYPERSS | SLGLPRESULTYPEBETA);
         
         cout << "Training: "<< endl;
         cout << "Q2: "      << result[SLGLPRESULTYPEQ2]  << endl;
@@ -70,33 +69,40 @@ int main(int argc, const char *argv[])
     tX.row(1) << 1,1,1;
     tY << 5,6;
     
-    auto tresult = spls.classify(tX, tY, SLGLPRESULTYPEQ2 | SLGLPRESULTYPERSS);
+    SLGlpResult tresult = spls.classify(tX, tY, SLGLPRESULTYPEQ2 | SLGLPRESULTYPERSS);
     cout << "Classify: "<< endl;
     cout << "Q2: "      << tresult[SLGLPRESULTYPEQ2]  << endl;
     cout << "RSS: "     << tresult[SLGLPRESULTYPERSS] << '\n' << endl;
     
-    MatrixXd cvX(7,3), cvY(7,1);
+    MatrixXd cvX(7,3), cvY(7,3);
     cvX << X, tX;
-    cvY << Y, tY;
+    cvY.col(0) << Y, tY;
+    cvY.col(1) << 2*cvY.col(0);
+    cvY.col(2) << 2.5*cvY.col(0);
+
+    SLCrossValidation<SLSparsePls>::SLCrossValidationParameters cvParam;
+    cvParam.kFold = 7;
+    cvParam.modelClone = spls;
     
+    SLCrossValidation<SLSparsePls> cv;
+    cv.setParameters(cvParam);
     for ( int i = 0; i < cvX.cols(); ++i)
     {
-        auto result = spls.crossValidation(cvX.col(i), cvY, SLGLPRESULTYPEQ2 | SLGLPRESULTYPERSS | SLGLPRESULTYPEBETA);
+        cout << "\nCross Validation: n: " << i+1 << endl;
+        SLGlpCrossValidationResults result = cv.crossValidation(cvX.col(i), cvY, SLGLPRESULTYPEQ2 | SLGLPRESULTYPERSS | SLGLPRESULTYPEBETA);
         
-        cout << "Cross Validation: n: " << i << endl;
-        cout << "Training: "<< endl;
-        cout << "Q2: "      << result[SLGLPCROSSVALIDATIONRESULTYPETRAIN][SLGLPRESULTYPEQ2]  << endl;
-        cout << "RSS: "     << result[SLGLPCROSSVALIDATIONRESULTYPETRAIN][SLGLPRESULTYPERSS] << endl;
-        cout << "Beta:\n"   << result[SLGLPCROSSVALIDATIONRESULTYPETRAIN][SLGLPRESULTYPEBETA]<< '\n' << endl;
+        cout << "Training: "    << endl;
+        cout << "Q2:\n"         << result.mean(SLGLPCROSSVALIDATIONRESULTYPETRAIN, SLGLPRESULTYPEQ2)  << endl;
+        cout << "\nRSS:\n"      << result.mean(SLGLPCROSSVALIDATIONRESULTYPETRAIN, SLGLPRESULTYPERSS) << endl;
         
-        cout << "Validation: "<< endl;
-        cout << "Q2: "      << result[SLGLPCROSSVALIDATIONRESULTYPEVALIDATION][SLGLPRESULTYPEQ2]  << endl;
-        cout << "RSS: "     << result[SLGLPCROSSVALIDATIONRESULTYPEVALIDATION][SLGLPRESULTYPERSS] << endl;
-        cout << "Beta:\n"   << result[SLGLPCROSSVALIDATIONRESULTYPEVALIDATION][SLGLPRESULTYPEBETA]<< '\n' << endl;
+        cout << "\nValidation:" << endl;
+        cout << "Q2:\n"         << result.mean(SLGLPCROSSVALIDATIONRESULTYPEVALIDATION, SLGLPRESULTYPEQ2)  << endl;
+        cout << "\nRSS:\n"      << result.mean(SLGLPCROSSVALIDATIONRESULTYPEVALIDATION, SLGLPRESULTYPERSS) << endl;
 
-        cout << "Test: "<< endl;
-        cout << "Q2: "      << result[SLGLPCROSSVALIDATIONRESULTYPETEST][SLGLPRESULTYPEQ2]  << endl;
-        cout << "RSS: "     << result[SLGLPCROSSVALIDATIONRESULTYPETEST][SLGLPRESULTYPERSS] << endl;
-        cout << "Beta:\n"   << result[SLGLPCROSSVALIDATIONRESULTYPETEST][SLGLPRESULTYPEBETA]<< '\n' << endl;
+        cout << "\nTest: "      << endl;
+        cout << "Q2:\n"         << result.mean(SLGLPCROSSVALIDATIONRESULTYPETEST, SLGLPRESULTYPEQ2)  << endl;
+        cout << "\nRSS:\n"      << result.mean(SLGLPCROSSVALIDATIONRESULTYPETEST, SLGLPRESULTYPERSS) << endl;
+        
+        cout << "\nBeta:"       << result.print(SLGLPCROSSVALIDATIONRESULTYPETEST, SLGLPRESULTYPEBETA) << endl;
     }
 }

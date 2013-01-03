@@ -31,7 +31,7 @@ MatrixXd& SLGspan::search()
     return X;
 }
 
-bool SLGspan::initParameters(SLGspanParameters parameters)
+bool SLGspan::setParameters(SLGspanParameters parameters)
 {
     param = parameters;
     return true;

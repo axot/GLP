@@ -29,13 +29,14 @@
 #include <iostream>
 #include <Eigen/Core>
 #include "SLModelStrategy.h"
+#include "SLModel.h"
 
 using namespace Eigen;
 
 class SLSparsePls : public SLModelStrategy
 {
 public:
-    class SLSparsePlsParameters : public SLModelStrategy::SLModelParameters
+    class SLSparsePlsParameters
     {
     public:
         SLSparsePlsParameters() {}
@@ -66,7 +67,7 @@ public:
      */
     virtual SLGlpResult classify(const MatrixXd& tX, const MatrixXd& tY, SLGLPRESULTYPE type) const;
     
-    /* Init Parameters:
+    /* Set Parameters:
      * Input
      *      parameters: Model assignable parameters
      *
@@ -74,15 +75,22 @@ public:
      *
      * Discussion: no optional parameters for Sparse PLS
      */
-    bool initParameters(SLSparsePlsParameters parameters);
+    bool setParameters(SLSparsePlsParameters parameters);
+    
+    /* Get Parameters:
+     *
+     *      Return: current parameters.
+     */
+    SLSparsePlsParameters getParameters() { return param; }
     
 private:
     SLGlpResult getTrainResult(SLGLPRESULTYPE type) const;
 
 private:
-    // assignable parameters via initParameters() method
+    // assignable parameters via setParameters() method
     
     // not assignable parameters
+    SLSparsePlsParameters param;
     bool verbose;
     MatrixXd X;
     MatrixXd Y;
