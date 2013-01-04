@@ -82,6 +82,7 @@ int main(int argc, const char *argv[])
 
     SLCrossValidation<SLSparsePls>::SLCrossValidationParameters cvParam;
     cvParam.kFold = 7;
+    cvParam.resultHistorySize = 3;
     cvParam.modelClone = spls;
     
     SLCrossValidation<SLSparsePls> cv;
@@ -89,20 +90,29 @@ int main(int argc, const char *argv[])
     for ( int i = 0; i < cvX.cols(); ++i)
     {
         cout << "\nCross Validation: n: " << i+1 << endl;
-        SLGlpCrossValidationResults result = cv.crossValidation(cvX.col(i), cvY, SLGLPRESULTYPEQ2 | SLGLPRESULTYPERSS | SLGLPRESULTYPEBETA);
+        SLCrossValidationResults result = cv.crossValidation(cvX.col(i),
+                                                             cvY,
+                                                             SLGLPRESULTYPEQ2 | SLGLPRESULTYPERSS | SLGLPRESULTYPEBETA,
+                                                             SLCROSSVALIDATIONMETHODSUSINGAPPENDEDXASVALIDATIONDATA | SLCROSSVALIDATIONMETHODSUSINGAPPENDEDXASCLASSIFYDATA);
         
         cout << "Training: "    << endl;
-        cout << "Q2:\n"         << result.mean(SLGLPCROSSVALIDATIONRESULTYPETRAIN, SLGLPRESULTYPEQ2)  << endl;
-        cout << "\nRSS:\n"      << result.mean(SLGLPCROSSVALIDATIONRESULTYPETRAIN, SLGLPRESULTYPERSS) << endl;
+        cout << "Q2:\n"         << result.mean(SLCROSSVALIDATIONRESULTYPETRAIN, SLGLPRESULTYPEQ2)  << endl;
+        cout << "\nRSS:\n"      << result.mean(SLCROSSVALIDATIONRESULTYPETRAIN, SLGLPRESULTYPERSS) << endl;
         
         cout << "\nValidation:" << endl;
-        cout << "Q2:\n"         << result.mean(SLGLPCROSSVALIDATIONRESULTYPEVALIDATION, SLGLPRESULTYPEQ2)  << endl;
-        cout << "\nRSS:\n"      << result.mean(SLGLPCROSSVALIDATIONRESULTYPEVALIDATION, SLGLPRESULTYPERSS) << endl;
+        cout << "Q2:\n"         << result.mean(SLCROSSVALIDATIONRESULTYPEVALIDATION, SLGLPRESULTYPEQ2)  << endl;
+        cout << "\nRSS:\n"      << result.mean(SLCROSSVALIDATIONRESULTYPEVALIDATION, SLGLPRESULTYPERSS) << endl;
 
         cout << "\nTest: "      << endl;
-        cout << "Q2:\n"         << result.mean(SLGLPCROSSVALIDATIONRESULTYPETEST, SLGLPRESULTYPEQ2)  << endl;
-        cout << "\nRSS:\n"      << result.mean(SLGLPCROSSVALIDATIONRESULTYPETEST, SLGLPRESULTYPERSS) << endl;
+        cout << "Q2:\n"         << result.mean(SLCROSSVALIDATIONRESULTYPETEST, SLGLPRESULTYPEQ2)  << endl;
+        cout << "\nRSS:\n"      << result.mean(SLCROSSVALIDATIONRESULTYPETEST, SLGLPRESULTYPERSS) << endl;
         
-        cout << "\nBeta:"       << result.print(SLGLPCROSSVALIDATIONRESULTYPETEST, SLGLPRESULTYPEBETA) << endl;
+        cout << "\nBeta:"       << result.print(SLCROSSVALIDATIONRESULTYPETEST, SLGLPRESULTYPEBETA) << endl;
     }
+    
+    SLCrossValidationResults oldResult = cv.getResultHistory()[1];
+    cout << "History: "     << endl;
+    cout << "Q2:\n"         << oldResult.mean(SLCROSSVALIDATIONRESULTYPETEST, SLGLPRESULTYPEQ2)  << endl;
+    cout << "\nRSS:\n"      << oldResult.mean(SLCROSSVALIDATIONRESULTYPETEST, SLGLPRESULTYPERSS) << endl;
+    cout << "\nBeta:"       << oldResult.print(SLCROSSVALIDATIONRESULTYPETEST, SLGLPRESULTYPEBETA) << endl;
 }

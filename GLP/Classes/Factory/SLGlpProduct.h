@@ -63,15 +63,23 @@ public:
         return graphMining.search();
     }
 
-    // Customs Methods
-    SLGlpCrossValidationResults crossValidation(const MatrixXd& X, const MatrixXd& Y, SLGLPRESULTYPE type) const
+    // Custom Methods
+    SLCrossValidationResults crossValidation(const MatrixXd& X,
+                                             const MatrixXd& Y,
+                                             SLGLPRESULTYPE resultType,
+                                             SLCROSSVALIDATIONMETHODSTYPE methodType)
     {
-        return cv.crossValidation(type);
+        return cv.crossValidation(X, Y, resultType, methodType);
     }
 
     void setCrossValidationParameters(typename SLCrossValidation<M>::SLCrossValidationParameters parameters)
     {
         cv.setParameters(parameters);
+    }
+    
+    const SLCrossValidationResultHistory& getResultHistory()
+    {
+        return cv.getResultHistory();
     }
 
 private:

@@ -77,7 +77,6 @@ public:
      *      parameters: Model assignable parameters
      *
      * Return: true if sucessed.
-     *
      */
     template <typename MP>
     bool setParameters(MP parameters) { return true; };
@@ -85,7 +84,7 @@ public:
     /* Get Parameters:
      *
      *      Return: current parameters.
-     *  Discussion: default return nothing, for cross validation you have to override this method.
+     *  Discussion: for implementng cross validation you have to override this method.
      */
     template <typename MP>
     MP getParameters() { MP mp; return mp; }

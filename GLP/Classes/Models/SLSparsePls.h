@@ -79,7 +79,7 @@ public:
     
     /* Get Parameters:
      *
-     *      Return: current parameters.
+     * Return: current parameters.
      */
     SLSparsePlsParameters getParameters() { return param; }
     
