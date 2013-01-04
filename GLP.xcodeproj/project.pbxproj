@@ -11,6 +11,12 @@
 		53388A351690B10000AF9E5E /* SLSparsePls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53832810168D7E4E00E3B48F /* SLSparsePls.cpp */; };
 		53388A361690B10300AF9E5E /* SLGspan.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53C09381168DBB5D00A0ADC1 /* SLGspan.cpp */; };
 		53832811168D7E4E00E3B48F /* SLSparsePls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53832810168D7E4E00E3B48F /* SLSparsePls.cpp */; };
+		53B5D64D169730DD00AE0523 /* Graph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53B5D64C169730DD00AE0523 /* Graph.cpp */; };
+		53B5D64E169730DD00AE0523 /* Graph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53B5D64C169730DD00AE0523 /* Graph.cpp */; };
+		53B5D650169731C900AE0523 /* Dfs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53B5D64F169731C900AE0523 /* Dfs.cpp */; };
+		53B5D651169731C900AE0523 /* Dfs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53B5D64F169731C900AE0523 /* Dfs.cpp */; };
+		53B5D654169733FC00AE0523 /* Utility.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53B5D652169733FC00AE0523 /* Utility.cpp */; };
+		53B5D655169733FC00AE0523 /* Utility.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53B5D652169733FC00AE0523 /* Utility.cpp */; };
 		53C09383168DBB5D00A0ADC1 /* SLGspan.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53C09381168DBB5D00A0ADC1 /* SLGspan.cpp */; };
 		53C09388168DDEA500A0ADC1 /* gspls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53C09387168DDEA500A0ADC1 /* gspls.cpp */; };
 /* End PBXBuildFile section */
@@ -54,6 +60,15 @@
 		53832802168D6CEF00E3B48F /* SLUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SLUtility.h; path = Classes/SLUtility.h; sourceTree = "<group>"; };
 		53832809168D767F00E3B48F /* SLModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLModel.h; path = Classes/Models/SLModel.h; sourceTree = "<group>"; };
 		53832810168D7E4E00E3B48F /* SLSparsePls.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SLSparsePls.cpp; path = Classes/Models/SLSparsePls.cpp; sourceTree = "<group>"; };
+		53B5D6451697251800AE0523 /* Graph.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Graph.h; path = Classes/GraphMining/Gspan/Graph.h; sourceTree = "<group>"; };
+		53B5D6461697271900AE0523 /* Dfs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Dfs.h; path = Classes/GraphMining/Gspan/Dfs.h; sourceTree = "<group>"; };
+		53B5D64716972B5900AE0523 /* tree.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = tree.hh; path = Classes/GraphMining/Gspan/tree.hh; sourceTree = "<group>"; };
+		53B5D64A1697303900AE0523 /* darts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = darts.h; path = Classes/GraphMining/Gspan/darts.h; sourceTree = "<group>"; };
+		53B5D64B1697303900AE0523 /* mmap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mmap.h; path = Classes/GraphMining/Gspan/mmap.h; sourceTree = "<group>"; };
+		53B5D64C169730DD00AE0523 /* Graph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Graph.cpp; path = Classes/GraphMining/Gspan/Graph.cpp; sourceTree = "<group>"; };
+		53B5D64F169731C900AE0523 /* Dfs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Dfs.cpp; path = Classes/GraphMining/Gspan/Dfs.cpp; sourceTree = "<group>"; };
+		53B5D652169733FC00AE0523 /* Utility.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Utility.cpp; path = Classes/GraphMining/Gspan/Utility.cpp; sourceTree = "<group>"; };
+		53B5D653169733FC00AE0523 /* Utility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Utility.h; path = Classes/GraphMining/Gspan/Utility.h; sourceTree = "<group>"; };
 		53C09381168DBB5D00A0ADC1 /* SLGspan.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SLGspan.cpp; path = Classes/GraphMining/SLGspan.cpp; sourceTree = "<group>"; };
 		53C09382168DBB5D00A0ADC1 /* SLGspan.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLGspan.h; path = Classes/GraphMining/SLGspan.h; sourceTree = "<group>"; };
 		53C09387168DDEA500A0ADC1 /* gspls.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = gspls.cpp; path = Examples/gspls.cpp; sourceTree = "<group>"; };
@@ -185,10 +200,27 @@
 		53832813168D7F8500E3B48F /* Concrete */ = {
 			isa = PBXGroup;
 			children = (
+				53B5D6431697245F00AE0523 /* Gspan */,
 				53C09382168DBB5D00A0ADC1 /* SLGspan.h */,
 				53C09381168DBB5D00A0ADC1 /* SLGspan.cpp */,
 			);
 			name = Concrete;
+			sourceTree = "<group>";
+		};
+		53B5D6431697245F00AE0523 /* Gspan */ = {
+			isa = PBXGroup;
+			children = (
+				53B5D6451697251800AE0523 /* Graph.h */,
+				53B5D64C169730DD00AE0523 /* Graph.cpp */,
+				53B5D6461697271900AE0523 /* Dfs.h */,
+				53B5D64F169731C900AE0523 /* Dfs.cpp */,
+				53B5D653169733FC00AE0523 /* Utility.h */,
+				53B5D652169733FC00AE0523 /* Utility.cpp */,
+				53B5D64A1697303900AE0523 /* darts.h */,
+				53B5D64B1697303900AE0523 /* mmap.h */,
+				53B5D64716972B5900AE0523 /* tree.hh */,
+			);
+			name = Gspan;
 			sourceTree = "<group>";
 		};
 		53FC1E2F16942D5100F3FD58 /* Utilities */ = {
@@ -273,6 +305,9 @@
 				53388A351690B10000AF9E5E /* SLSparsePls.cpp in Sources */,
 				53388A341690B0FD00AF9E5E /* SparsePlsTest.cpp in Sources */,
 				53388A361690B10300AF9E5E /* SLGspan.cpp in Sources */,
+				53B5D64E169730DD00AE0523 /* Graph.cpp in Sources */,
+				53B5D651169731C900AE0523 /* Dfs.cpp in Sources */,
+				53B5D655169733FC00AE0523 /* Utility.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -283,6 +318,9 @@
 				53832811168D7E4E00E3B48F /* SLSparsePls.cpp in Sources */,
 				53C09383168DBB5D00A0ADC1 /* SLGspan.cpp in Sources */,
 				53C09388168DDEA500A0ADC1 /* gspls.cpp in Sources */,
+				53B5D64D169730DD00AE0523 /* Graph.cpp in Sources */,
+				53B5D650169731C900AE0523 /* Dfs.cpp in Sources */,
+				53B5D654169733FC00AE0523 /* Utility.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

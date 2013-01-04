@@ -5,9 +5,6 @@
 //  Created by Zheng Shao on 12/28/12.
 //  Copyright (c) 2012 Saigo Laboratoire. All rights reserved.
 //
-//  Created by Zheng Shao on 12/20/12.
-//  Copyright (c) 2012 Saigo Laboratoire. All rights reserved.
-//
 //  This is free software with ABSOLUTELY NO WARRANTY.
 //
 //  This program is free software; you can redistribute it and/or modify

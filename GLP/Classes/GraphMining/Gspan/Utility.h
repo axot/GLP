@@ -1,9 +1,9 @@
 //
-//  SLGraphMiningStrategy.h
+//  Utility.h
 //  GLP
 //
-//  Created by Zheng Shao on 12/28/12.
-//  Copyright (c) 2012 Saigo Laboratoire. All rights reserved.
+//  Created by Zheng Shao on 1/5/13.
+//  Copyright (c) 2013 Saigo Laboratoire. All rights reserved.
 //
 //  This is free software with ABSOLUTELY NO WARRANTY.
 //
@@ -23,29 +23,20 @@
 //  02111-1307, USA
 //
 
-#ifndef __GLP__SLGraphMiningStrategy__
-#define __GLP__SLGraphMiningStrategy__
+#ifndef __GLP__Utility__
+#define __GLP__Utility__
 
 #include <iostream>
+#include "Graph.h"
+#include "Dfs.h"
 
-#include <Eigen/Core>
-#include "../SLUtility.h"
-
-using namespace Eigen;
-
-class SLGraphMiningStrategy
-{    
+class Utility
+{
 public:
-    virtual MatrixXd& search() = 0;
-    
-    /* Set Parameters:
-     * Input
-     *      parameters: Graph Mining assignable parameters
-     *
-     * Return: true if sucessed.
-     */
-    template <typename GP>
-    bool setParameters(GP parameters) { return true; };
+    static bool  get_forward_pure   (Graph&, Edge *, int,    History&, EdgeList &);
+    static bool  get_forward_rmpath (Graph&, Edge *, int,    History&, EdgeList &);
+    static bool  get_forward_root   (Graph&, Vertex&, EdgeList &);
+    static Edge* get_backward       (Graph&, Edge *, Edge *, History&);
 };
 
-#endif /* defined(__GLP__SLGraphMiningStrategy__) */
+#endif /* defined(__GLP__Utility__) */
