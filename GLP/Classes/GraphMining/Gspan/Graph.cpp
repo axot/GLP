@@ -85,9 +85,7 @@ istream &Graph::read (istream &is)
                 is.seekg (pos, ios_base::beg);
                 break;
             } else {
-                y = atoi (result[3].c_str());
-                regy = atof(result[3].c_str());
-                //cout << result[4].c_str() << endl;
+                value = atof(result[3].c_str());
             }
         } else if (result[0] == "v" && result.size() >= 3) {
             unsigned int id    = atoi (result[1].c_str());

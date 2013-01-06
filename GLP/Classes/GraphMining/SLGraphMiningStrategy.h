@@ -27,7 +27,6 @@
 #define __GLP__SLGraphMiningStrategy__
 
 #include <iostream>
-
 #include <Eigen/Core>
 #include "../SLUtility.h"
 

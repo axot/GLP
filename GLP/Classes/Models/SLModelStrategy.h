@@ -23,8 +23,8 @@
 //  02111-1307, USA
 //
 
-#ifndef GLP_SLModelStrategy_h
-#define GLP_SLModelStrategy_h
+#ifndef __GLP__SLModelStrategy__
+#define __GLP__SLModelStrategy__
 
 #include <iostream>
 #include <map>

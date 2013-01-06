@@ -23,23 +23,23 @@
 //  02111-1307, USA
 //
 
-#ifndef __GLP__SLGspan__
-#define __GLP__SLGspan__
+#ifndef GLP_SLGspan_h
+#define GLP_SLGspan_h
 
 #include <iostream>
 #include <vector>
 #include <map>
 #include <set>
 #include <list>
+#include <Eigen/Core>
 #include "SLGraphMiningStrategy.h"
 #include "Gspan/Graph.h"
 #include "Gspan/Dfs.h"
 #include "Gspan/Utility.h"
 #include "Gspan/tree.hh"
-#include "Gspan/darts.h"
-#include "Gspan/mmap.h"
 
 using namespace std;
+using namespace Eigen;
 
 typedef map<int, Projected>         Projected_map1;
 typedef map<int, Projected_map1>    Projected_map2;
@@ -56,35 +56,41 @@ public:
     class SLGspanParameters
     {
     public:
-        SLGspanParameters() : a(1) {}
+        SLGspanParameters() : minsup(2), maxpat(10), n(10), topk(10) {}
         
     public:
         // assignable parameters
-        int a;
+        size_t minsup;
+        size_t maxpat;
+        size_t n;
+        size_t topk;
     };
 
 public:
-    SLGspan (): ID(0), minsup(0), maxpat(0), wbias(0.0), tau(0.0), least_tau(0.0),
-    alpha(0), bias(0.0), os(0) {};
+    SLGspan (): wbias(0.0), tau(0.0) {};
 
     // Implementation SLGraphMiningStrategy Protocol
-    MatrixXd& search();
+    virtual MatrixXd& search();
     bool setParameters(SLGspanParameters parameters);
 
 private:
-    bool is_min ();
-    bool project_is_min (Projected &);
-    bool is_same_code ();
+    bool is_min();
+    bool project_is_min(Projected &);
     
-    bool can_prune (Projected &);
-    bool can_prune_boost (Projected &, size_t);
+//    bool can_prune(Projected &);
+    bool can_prune_boost(Projected &, int);
     
-    void project (Projected &, tree<TNODE>::iterator &); // for training mode
-    void project (Projected &); // for test mode
+    void project(Projected &, tree<TNODE>::iterator &); // for training mode
+    void project(Projected &); // for test mode
 
+    istream& read(std::istream &);
+    
 private:
     // assignable parameters
-    int a;
+    size_t minsup;
+    size_t maxpat;
+    size_t n;
+    size_t topk;
     
     // not assignable parameters
     vector<Graph>   transaction;
@@ -92,40 +98,18 @@ private:
     DFSCode         DFS_CODE_IS_MIN;
     Graph           GRAPH_IS_MIN;
     
-    vector <double> y;
-    vector <double> w;
-    set<Rule>       rule_cache;
-    
-    size_t ID;
-    size_t minsup;
-    size_t maxpat;
-    size_t maxitr;
-    size_t tasktype;
-    size_t n;
-    size_t topk;
-    double       wbias;
-    double       tau;
-    double       least_tau;
-    
-    clock_t stime, etime1, etime2;
-    list<double> tau_list;
-    
-    double rho0;
-    double eta0;
-    vector <double> uw;
-    vector <double> uv;
+    VectorXd y;
+    VectorXd w;
+    VectorXd uw;
+    VectorXd uv;
     
     Rule rule;
-    Darts::DoubleArray da;
-    MeCab::Mmap<char> mmap;
-    size_t alphaSize;
-    double *alpha;
-    double bias;    // = -Beta.sum()
-    map <string, double> rules;
-    vector <int> result;
-    ostream *os;
+    set<Rule> rule_cache;
     
-    tree<TNODE> tr;
+    double wbias;
+    double tau;
+    
+    tree<TNODE> memCache;
 };
 
 #endif /* defined(__GLP__SLGspan__) */

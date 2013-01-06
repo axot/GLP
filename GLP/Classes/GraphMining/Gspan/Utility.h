@@ -23,18 +23,22 @@
 //  02111-1307, USA
 //
 
-#ifndef __GLP__Utility__
-#define __GLP__Utility__
+#ifndef GLP_Gspan_Utility_h
+#define GLP_Gspan_Utility_h
 
 #include <iostream>
+#include <functional>
+#include <utility>
 #include "Graph.h"
 #include "Dfs.h"
+
+using namespace std;
 
 class Utility
 {
 public:
-    static bool  get_forward_pure   (Graph&, Edge *, int,    History&, EdgeList &);
-    static bool  get_forward_rmpath (Graph&, Edge *, int,    History&, EdgeList &);
+    static bool  get_forward_pure   (Graph&, Edge *, int, History&, EdgeList &);
+    static bool  get_forward_rmpath (Graph&, Edge *, int, History&, EdgeList &);
     static bool  get_forward_root   (Graph&, Vertex&, EdgeList &);
     static Edge* get_backward       (Graph&, Edge *, Edge *, History&);
 };

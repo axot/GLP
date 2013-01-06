@@ -26,8 +26,8 @@
 //  02111-1307, USA
 //
 
-#ifndef GLP_Graph_h
-#define GLP_Graph_h
+#ifndef GLP_Gspan_Graph_h
+#define GLP_Gspan_Graph_h
 
 #include <iostream>
 #include <vector>
@@ -66,8 +66,7 @@ private:
     size_t edge_size_;
     
 public:
-    double y;       // class label
-    double regy;    // regression label
+    double value;
     
 public:
     size_t edge_size ()   { return edge_size_; }

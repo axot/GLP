@@ -23,8 +23,8 @@
 //  02111-1307, USA
 //
 
-#ifndef GLP_SLCrossValidationResultHistory_h
-#define GLP_SLCrossValidationResultHistory_h
+#ifndef __GLP__SLCrossValidationResultHistory__
+#define __GLP__SLCrossValidationResultHistory__
 
 #include <deque>
 

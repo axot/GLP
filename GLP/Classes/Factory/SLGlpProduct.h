@@ -26,6 +26,7 @@
 
 #include <iostream>
 #include "../Models/SLModel.h"
+#include "../Models/SLSparsePls.h"
 #include "../GraphMining/SLGraphMining.h"
 #include "../SLUtility.h"
 #include "../Utilities/SLCrossValidation.h"
@@ -67,9 +68,13 @@ public:
     SLCrossValidationResults crossValidation(const MatrixXd& X,
                                              const MatrixXd& Y,
                                              SLGLPRESULTYPE resultType,
-                                             SLCROSSVALIDATIONMETHODSTYPE methodType)
+                                             SLCROSSVALIDATIONMETHODSTYPE methodType = SLCROSSVALIDATIONMETHODSUSINGWHOLEDATA)
     {
-        return cv.crossValidation(X, Y, resultType, methodType);
+        // C++ does not support partial specialization of member function
+        if ( typeid(model) == typeid(SLModel<SLSparsePls>) )
+            return cv.crossValidation(X, Y, resultType, SLCROSSVALIDATIONMETHODSUSINGAPPENDEDXASCLASSIFYDATA);
+        else
+            return cv.crossValidation(X, Y, resultType, methodType);
     }
 
     void setCrossValidationParameters(typename SLCrossValidation<M>::SLCrossValidationParameters parameters)

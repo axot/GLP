@@ -26,16 +26,18 @@
 //  02111-1307, USA
 //
 
-#ifndef GLP_Dfs_h
-#define GLP_Dfs_h
+#ifndef GLP_Gspan_Dfs_h
+#define GLP_Gspan_Dfs_h
 
 #include <iostream>
 #include <vector>
 #include <cmath>
 #include "Graph.h"
 
-typedef std::vector<int>    RMPath;
-typedef std::vector<Edge*>  EdgeList;
+using namespace std;
+
+typedef vector<int>    RMPath;
+typedef vector<Edge*>  EdgeList;
 
 class DFS
 {
@@ -56,7 +58,7 @@ public:
     DFS(): from(0), to(0), fromlabel(0), elabel(0), tolabel(0) {};
 };
 
-struct DFSCode: public std::vector <DFS>
+struct DFSCode: public vector <DFS>
 {
 private:
     RMPath rmpath;
@@ -71,22 +73,22 @@ public:
         d.from = from; d.to = to; d.fromlabel = fromlabel; d.elabel = elabel; d.tolabel = tolabel;
     }
     void pop () {  resize (size()-1); }
-    std::ostream &write  (std::ostream &); // write
+    ostream &write  (ostream &); // write
 };
 
 struct PDFS // projected DFS
 {
-    size_t id;
+    int id;
     Edge        *edge;
     PDFS        *prev;
     PDFS(): id(0), edge(0), prev(0) {};
 };
 
-class History: public std::vector<Edge*>
+class History: public vector<Edge*>
 {
 private:
-    std::vector<int> edge;
-    std::vector<int> vertex;
+    vector<int> edge;
+    vector<int> vertex;
     
 public:
     bool hasEdge   (size_t id) { return (bool)edge[id]; }
@@ -104,18 +106,18 @@ public:
     size_t treesize;
     double time1;
     double time2;
-    std::vector <double> beta;
-    std::vector <double> gamma;
-    std::vector <size_t> active_dfs;
+    vector <double> beta;
+    vector <double> gamma;
+    vector <size_t> active_dfs;
 };
 
 class Rule
 {
 public:
-    std::string dfs;
+    string dfs;
     double gain;
     size_t size;
-    std::vector <size_t> loc;
+    vector <size_t> loc;
     
 public:
     friend bool operator < (const Rule &r1, const Rule &r2)
@@ -125,7 +127,7 @@ public:
     }
 };
 
-class Projected: public std::vector<PDFS>
+class Projected: public vector<PDFS>
 {
 public:
     void push (int id, Edge *edge, PDFS *prev)

@@ -23,8 +23,8 @@
 //  02111-1307, USA
 //
 
-#ifndef GLP_SLGlp_h
-#define GLP_SLGlp_h
+#ifndef __GLP__SLGlp__
+#define __GLP__SLGlp__
 
 // Factories
 #include "Factory/SLGlpFactory.h"

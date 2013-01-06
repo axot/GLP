@@ -41,7 +41,6 @@ using namespace Eigen;
 
 enum{
     SLCROSSVALIDATIONMETHODSUSINGWHOLEDATA                  = 0,
-    SLCROSSVALIDATIONMETHODSUSINGAPPENDEDXASVALIDATIONDATA  = 1 << 0,
     SLCROSSVALIDATIONMETHODSUSINGAPPENDEDXASCLASSIFYDATA    = 1 << 1,
 };
 
@@ -250,7 +249,7 @@ SLGlpMultipleResults SLCrossValidation<T>::crossValidationValidationClassify(con
                                                                              SLCROSSVALIDATIONMETHODSTYPE methodType)
 {
     SLGlpMultipleResults result;
-    if (methodType&SLCROSSVALIDATIONMETHODSUSINGAPPENDEDXASVALIDATIONDATA)
+    if ( methodType & SLCROSSVALIDATIONMETHODSUSINGAPPENDEDXASCLASSIFYDATA )
     {
         if(cvXValidationData.size() < cvModels.size()){
             cvXValidationData.push_back(X);
@@ -278,7 +277,7 @@ SLGlpMultipleResults SLCrossValidation<T>::crossValidationTestClassify(const siz
                                                                        SLCROSSVALIDATIONMETHODSTYPE methodType)
 {
     SLGlpMultipleResults result;
-    if (methodType&SLCROSSVALIDATIONMETHODSUSINGAPPENDEDXASCLASSIFYDATA)
+    if ( methodType & SLCROSSVALIDATIONMETHODSUSINGAPPENDEDXASCLASSIFYDATA )
     {
         if(cvXTestData.size() < cvModels.size()){
             cvXTestData.push_back(X);

@@ -23,8 +23,8 @@
 //  02111-1307, USA
 //
 
-#ifndef GLP_SLUtility_h
-#define GLP_SLUtility_h
+#ifndef __GLP__SLUtility__
+#define __GLP__SLUtility__
 
 #define LOG(x)          cout << #x << ":\n" << x << '\n' << endl;
 #define SSum(x)         x.colwise().squaredNorm()
