@@ -70,20 +70,20 @@ public:
     SLGspan (): wbias(0.0), tau(0.0) {};
 
     // Implementation SLGraphMiningStrategy Protocol
-    virtual MatrixXd& search();
+//    virtual MatrixXd& search();
     bool setParameters(SLGspanParameters parameters);
 
 private:
     bool is_min();
-    bool project_is_min(Projected &);
+    bool project_is_min(Projected&);
     
 //    bool can_prune(Projected &);
-    bool can_prune_boost(Projected &, int);
+    bool can_prune_boost(Projected&);
     
-    void project(Projected &, tree<TNODE>::iterator &); // for training mode
-    void project(Projected &); // for test mode
+    void projectForTrain(Projected&, tree<TNODE>::iterator&);
+    void projectForTest(Projected&);
 
-    istream& read(std::istream &);
+    istream& read(std::istream&);
     
 private:
     // assignable parameters
@@ -100,11 +100,11 @@ private:
     
     VectorXd y;
     VectorXd w;
-    VectorXd uw;
-    VectorXd uv;
     
     Rule rule;
     set<Rule> rule_cache;
+    vector <int> result;
+    ostream *os;
     
     double wbias;
     double tau;

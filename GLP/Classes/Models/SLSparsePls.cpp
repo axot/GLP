@@ -33,7 +33,7 @@ SLGlpResult SLSparsePls::train(const MatrixXd& appendedX, const MatrixXd& theY, 
     {
         meanY = theY.colwise().mean();
         Y = AutoScale(theY);
-        RES = Y;
+        Res = Y;
     }
     
     long appendedXRows = appendedX.rows();
@@ -41,9 +41,8 @@ SLGlpResult SLSparsePls::train(const MatrixXd& appendedX, const MatrixXd& theY, 
     long oldXCols      = X.cols();
     
     long maxSquaredNormColumn;
-    SSum(RES).maxCoeff(&maxSquaredNormColumn);
-    
-    residual = RES.col(maxSquaredNormColumn);
+    SSum(Res).maxCoeff(&maxSquaredNormColumn);
+    VectorXd largestResCol = Res.col(maxSquaredNormColumn);
 
     meanX.conservativeResize(1, oldXCols+appendedXCols);
     meanX << meanX.leftCols(oldXCols), appendedX.colwise().mean();
@@ -56,7 +55,7 @@ SLGlpResult SLSparsePls::train(const MatrixXd& appendedX, const MatrixXd& theY, 
     W.bottomRows(appendedXCols).setZero();
     W.rightCols(1).setZero();
     
-    W.rightCols(1) = X.transpose()*residual;
+    W.rightCols(1) = X.transpose()*largestResCol;
     W.rightCols(1).normalize();
         
     T.conservativeResize(appendedXRows, T.cols()+1);
@@ -76,12 +75,12 @@ SLGlpResult SLSparsePls::train(const MatrixXd& appendedX, const MatrixXd& theY, 
         LOG(Y);
         LOG(X.rightCols(appendedXCols));
         LOG(W);
-        LOG(residual);
+        LOG(largestResCol);
         LOG(Beta);
         LOG(X*Beta.col(0));
         getchar();
     }
-    RES = Y - X*Beta;
+    Res = Y - X*Beta;
     
     return getTrainResult(type);
 }
@@ -134,11 +133,11 @@ SLGlpResult SLSparsePls::getTrainResult(SLGLPRESULTYPE type) const
     SLGlpResult result;
     if(type & SLGLPRESULTYPEQ2)
     {
-        result[SLGLPRESULTYPEQ2] = MatrixXd::Ones(1, Y.cols()) - SSum(RES).cwiseQuotient(SSum(Y));
+        result[SLGLPRESULTYPEQ2] = MatrixXd::Ones(1, Y.cols()) - SSum(Res).cwiseQuotient(SSum(Y));
     }
     if(type & SLGLPRESULTYPERSS)
     {
-        result[SLGLPRESULTYPERSS] = SSum(RES);
+        result[SLGLPRESULTYPERSS] = SSum(Res);
     }
     if(type & SLGLPRESULTYPEBETA)
     {

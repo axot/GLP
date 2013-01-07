@@ -92,7 +92,7 @@ int main(int argc, const char *argv[])
         cout << "\nCross Validation: n: " << i+1 << endl;
         SLCrossValidationResults results = cv.crossValidation(cvX.col(i),
                                                               cvY,
-                                                              SLGLPRESULTYPEQ2 | SLGLPRESULTYPERSS | SLGLPRESULTYPEBETA|
+                                                              SLGLPRESULTYPEQ2 | SLGLPRESULTYPERSS | SLGLPRESULTYPEBETA,
                                                               SLCROSSVALIDATIONMETHODSUSINGAPPENDEDXASCLASSIFYDATA);
         
         cout << "Training: "    << endl;

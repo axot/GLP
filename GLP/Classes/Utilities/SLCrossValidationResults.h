@@ -45,6 +45,64 @@ typedef vector<SLGlpResult> SLGlpMultipleResults;
 class SLCrossValidationResults : public map<SLCROSSVALIDATIONRESULTYPE, SLGlpMultipleResults>
 {
 public:
+    SLCrossValidationResults& operator+=(SLCrossValidationResults& b)
+    {
+        *this = *this + b;
+        return *this;
+    }
+    
+    /* Print Cross Vaildate Results:
+     * Input
+     *     cvType: cross validation type: (train, validation, test)
+     * resultType: type of results
+     *
+     * Return: the result of the cross validation type
+     *
+     * Discussion: only one type of each cvType and resultType can be used
+     */
+    string print(SLCROSSVALIDATIONRESULTYPE cvType, SLGLPRESULTYPE resultType)
+    {
+        ASSERT(isIncludeOnlyOneType(cvType), "only one of cross vaildate type can be calculate");
+        ASSERT(isIncludeOnlyOneType(resultType), "only one of cross result type can be calculate");
+
+        stringstream output;
+        SLGlpMultipleResults::iterator it;
+        size_t i = 0;
+        for ( it = (*this)[cvType].begin(); it != (*this)[cvType].end(); ++it )
+        {
+            output << "\n[" << i << "]:"  << endl;
+            output << (*it)[resultType]   << endl;
+            ++i;
+        }
+        return output.str();
+    }
+    
+    /* Mean of Cross Vaildate Results:
+     * Input
+     *     cvType: cross validation type: (train, validation, test)
+     * resultType: type of results
+     *
+     * Return: the result mean of the cross validation type
+     *
+     * Discussion: only one type of each cvType and resultType can be used
+     */
+    double mean(SLCROSSVALIDATIONRESULTYPE cvType, SLGLPRESULTYPE resultType)
+    {
+        ASSERT(isIncludeOnlyOneType(cvType), "only one of cross vaildate type can be calculate");
+        ASSERT(isIncludeOnlyOneType(resultType), "only one of cross result type can be calculate");
+
+        SLGlpMultipleResults::iterator it = (*this)[cvType].begin();
+        
+        MatrixXd sum = (*it)[resultType];
+        ++it;
+        while ( it != (*this)[cvType].end() )
+        {
+            sum += (*it)[resultType];
+            ++it;
+        }
+        return sum.mean()/(*this)[cvType].size();
+    }
+    
     SLCrossValidationResults operator+(SLCrossValidationResults& b)
     {
         if ( this->size() == 0 && b.size() == 0 )
@@ -76,38 +134,28 @@ public:
         return result;
     }
     
-    SLCrossValidationResults& operator+=(SLCrossValidationResults& b)
+private:
+    bool isIncludeOnlyOneType(size_t type)
     {
-        *this = *this + b;
-        return *this;
-    }
-    
-    string print(SLCROSSVALIDATIONRESULTYPE cvType, SLGLPRESULTYPE resultType)
-    {
-        stringstream output;
-        SLGlpMultipleResults::iterator it;
-        size_t i = 0;
-        for ( it = (*this)[cvType].begin(); it != (*this)[cvType].end(); ++it )
+        if ( type == 0 )
         {
-            output << "\n[" << i << "]:"  << endl;
-            output << (*it)[resultType]   << endl;
-            ++i;
+            return false;
         }
-        return output.str();
-    }
-    
-    double mean(SLCROSSVALIDATIONRESULTYPE cvType, SLGLPRESULTYPE resultType)
-    {
-        SLGlpMultipleResults::iterator it = (*this)[cvType].begin();
-        
-        MatrixXd sum = (*it)[resultType];
-        ++it;
-        while ( it != (*this)[cvType].end() )
+        else
         {
-            sum += (*it)[resultType];
-            ++it;
+            while(true)
+            {
+                if ( type&1 )
+                {
+                    if ( type == 1 )
+                        return true;
+                    else
+                        return false;
+                }
+                type >>= 1;
+            }
         }
-        return sum.mean()/(*this)[cvType].size();
+        return false;
     }
 };
 

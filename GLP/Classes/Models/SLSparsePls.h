@@ -98,8 +98,7 @@ private:
     MatrixXd meanY;
     MatrixXd T;
     MatrixXd Beta;
-    MatrixXd RES;
-    VectorXd residual;
+    MatrixXd Res;
     MatrixXd W;
 };
 

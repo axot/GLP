@@ -72,7 +72,7 @@ public:
     {
         // C++ does not support partial specialization of member function
         if ( typeid(model) == typeid(SLModel<SLSparsePls>) )
-            return cv.crossValidation(X, Y, resultType, SLCROSSVALIDATIONMETHODSUSINGAPPENDEDXASCLASSIFYDATA);
+            return cv.crossValidation(X, Y, resultType, SLCROSSVALIDATIONMETHODSUSINGAPPENDEDXASCLASSIFYDATA|methodType);
         else
             return cv.crossValidation(X, Y, resultType, methodType);
     }
