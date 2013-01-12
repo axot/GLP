@@ -55,7 +55,7 @@ public:
      *
      * Return: the results stored in mapped structure.
      */
-    virtual SLGlpResult train(const MatrixXd& appendedX, const MatrixXd& theY, SLGLPRESULTYPE type);
+    virtual SLModelResult train(const MatrixXd& appendedX, const MatrixXd& theY, SLMODELRESULTYPE type);
     
     /* Classify:
      * Input
@@ -65,7 +65,7 @@ public:
      *
      * Return: the results stored in mapped structure
      */
-    virtual SLGlpResult classify(const MatrixXd& tX, const MatrixXd& tY, SLGLPRESULTYPE type) const;
+    virtual SLModelResult classify(const MatrixXd& tX, const MatrixXd& tY, SLMODELRESULTYPE type) const;
     
     /* Set Parameters:
      * Input
@@ -84,7 +84,7 @@ public:
     SLSparsePlsParameters getParameters() { return param; }
     
 private:
-    SLGlpResult getTrainResult(SLGLPRESULTYPE type) const;
+    SLModelResult getTrainResult(SLMODELRESULTYPE type) const;
 
 private:
     // assignable parameters via setParameters() method

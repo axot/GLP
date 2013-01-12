@@ -56,60 +56,97 @@ public:
     class SLGspanParameters
     {
     public:
-        SLGspanParameters() : minsup(2), maxpat(10), n(10), topk(10) {}
+        SLGspanParameters() : minsup(2), maxpat(10), topk(1), doesUseMemoryBoost(false) {}
         
     public:
         // assignable parameters
         size_t minsup;
         size_t maxpat;
-        size_t n;
         size_t topk;
+        
+        bool    doesUseMemoryBoost;
+        string  gspFilename;
     };
 
 public:
     SLGspan (): wbias(0.0), tau(0.0) {};
 
     // Implementation SLGraphMiningStrategy Protocol
-//    virtual MatrixXd& search();
+    
+    /* Search substructure
+     * Input
+     *      residual: the residual of Y
+     *      taskType: must be specified either train or classify
+     *    resultType: type of results
+     *
+     * Return: the results stored in mapped structure.
+     */
+    virtual SLGraphMiningResult search(VectorXd residual,
+                                       SLGRAPHMININGTASKTYPE taskType,
+                                       SLGRAPHMININGRESULTYPE resultType);
+    /* Get Inner Values
+     * Input
+     *    type: type of results
+     *
+     * Return: the results stored in mapped structure.
+     */
+    virtual SLGraphMiningInnerValues getInnerValues(SLGRAPHMININGINNERVALUE type);
+    
+    /* Set Parameters:
+     * Input
+     *      parameters: Gspan assignable parameters
+     *
+     * Return: true if sucessed.
+     */
     bool setParameters(SLGspanParameters parameters);
 
 private:
+    void init();
+    void initDFSTree(Projected_map3 &root);
+    void initMemoryCache(Projected_map3 &root);
+    
     bool is_min();
     bool project_is_min(Projected&);
     
-//    bool can_prune(Projected &);
-    bool can_prune_boost(Projected&);
+    bool can_prune(Projected&);
     
-    void projectForTrain(Projected&, tree<TNODE>::iterator&);
-    void projectForTest(Projected&);
+    virtual void project(Projected&);
+    virtual void project(Projected&, tree<TNODE>::iterator&);   // use memory cache
 
-    istream& read(std::istream&);
+    /* Read gsp file into transaction
+     * Input
+     *  filename: the file name of gsp
+     */
+    void read(string filename);
     
 private:
     // assignable parameters
     size_t minsup;
     size_t maxpat;
-    size_t n;
     size_t topk;
+    string          gspFilename;
+    bool            doesUseMemoryBoost;
     
     // not assignable parameters
-    vector<Graph>   transaction;
+    SLGRAPHMININGTASKTYPE taskType;
+    vector<Graph>   transaction;        // store whole graphs which read from gsp file.
     DFSCode         DFS_CODE;
     DFSCode         DFS_CODE_IS_MIN;
     Graph           GRAPH_IS_MIN;
     
-    VectorXd y;
-    VectorXd w;
+    VectorXd y;                         // sgn(residual)
+    VectorXd w;                         // weigth of graph mining, abs(residual)
     
-    Rule rule;
-    set<Rule> rule_cache;
-    vector <int> result;
-    ostream *os;
+    Rule rule;                          // current rule
+    set<Rule> rule_cache;               // topk rule cache
+    vector<Rule> entireRules;
+    vector<size_t> patternMatchedResult;// the index result of classify data matched current patterns
     
-    double wbias;
-    double tau;
+    double wbias;                       // 
+    double tau;                         // fabs of gain, gain: 重み付き頻度の差
     
-    tree<TNODE> memCache;
+    Projected_map3 root;
+    tree<TNODE> memoryCache;
 };
 
 #endif /* defined(__GLP__SLGspan__) */

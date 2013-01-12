@@ -34,7 +34,17 @@ template <typename AStrategy>
 class SLGraphMining
 {
 public:
-    MatrixXd& search() { return aStrategy.search(); }
+    SLGraphMiningResult search(VectorXd residual,
+                               SLGRAPHMININGTASKTYPE taskType,
+                               SLGRAPHMININGRESULTYPE resultType)
+    {
+        return aStrategy.search(residual, taskType, resultType);
+    }
+    
+    SLGraphMiningInnerValues getInnerValues(SLGRAPHMININGINNERVALUE type)
+    {
+        return aStrategy.getInnerValues(type);
+    }
     
     template <typename GP>
     bool setParameters(GP modelParameters) { return aStrategy.setParameters(modelParameters); }

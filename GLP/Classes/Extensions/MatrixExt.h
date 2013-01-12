@@ -27,26 +27,35 @@
 #define EIGEN_MATRIXEXT_H
 
 #include <iostream>
-#include <string>
+#include <fcntl.h>
+#include <unistd.h>
+#include <cstdio>
+#include <cstring>
+#include <cerrno>
+#include <sys/mman.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <Eigen/Core>
+#include <Eigen/Sparse>
 #include <boost/xpressive/xpressive.hpp>
 
 using namespace Eigen;
 using namespace boost::xpressive;
 using namespace std;
 
+typedef SparseMatrix<int>    SMatrixXi;
+
 namespace EigenExt
 {
-    /* RegEx Version
-       flexible matrix format, but slower
-       
-       Example:
-
-       MatrixXd X;
-       loadMatrixFromFile(X, "Matrix.data");
+    /* RegEx Version: flexible matrix format, but slower
+     * 
+     * Example:
+     * 
+     * MatrixXd X;
+     * loadMatrixFromFile(X, "Matrix.data");
      */
     template<typename MatrixType>
-    bool loadMatrixFromFile(MatrixType& m, const char* filename);
+    bool loadMatrixFromFile(MatrixType& m, const char* filename, bool doesUseMemoryBoost = false);
 
     /* Fast Version
        strict matrix format, but more faster
@@ -71,26 +80,59 @@ namespace EigenExt
        loadMatrixFromFileFast(X, "Matrix.data", ';');
      */
     template<typename MatrixType>
-    bool loadMatrixFromFileFast(MatrixType& m, const char* filename);
+    bool loadMatrixFromFileFast(MatrixType& m, const char* filename, bool doesUseMemoryBoost = false);
 
     template<typename MatrixType>
-    bool loadMatrixFromFileFast(MatrixType& m, const char* filename, const char delim);
+    bool loadMatrixFromFileFast(MatrixType& m, const char* filename, const char delim, bool doesUseMemoryBoost = false);
 
     /* Implementation */
-    
-    template<typename MatrixType>
-    bool loadMatrixFromFile(MatrixType& m, const char* filename)
+    inline void setMatValue(vector< Triplet<int> >& tripletList, MatrixXd& m, int row, int col, char* begin)
     {
-        FILE *fp;
+        m.row(row)[col] = atof(begin);
+    }
+    
+    inline void setMatValue(vector< Triplet<int> >& tripletList, MatrixXi& m, int row, int col, char* begin)
+    {
+        m.row(row)[col] = atoi(begin);
+    }
+        
+    inline void setMatValue(vector< Triplet<int> >& tripletList, SMatrixXi& m, int row, int col, char* begin)
+    {
+        int real = atoi(begin);
+        if ( real != 0 )
+        {
+            tripletList.push_back(Triplet<int>(row, col, real));
+        }
+    }
+    
+    inline void assignTripletList(vector< Triplet<int> >& tripletList, SMatrixXi& m)
+    {
+        m.setFromTriplets(tripletList.begin(), tripletList.end());
+    }
+    
+    inline void assignTripletList(vector< Triplet<int> >& tripletList, MatrixXd& m)
+    {
+        return;
+    }
+    
+    inline void assignTripletList(vector< Triplet<int> >& tripletList, MatrixXi& m)
+    {
+        return;
+    }
+
+    template<typename MatrixType>
+    bool loadMatrixFromFile(MatrixType& m, const char* filename, bool doesUseMemoryBoost)
+    {
+        sregex regex = sregex::compile("[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?");
+
         char *line = NULL;
         size_t len = 0;
         ssize_t read;
         
         size_t rows = 0;
         size_t cols = 0;
-        
-        sregex regex = sregex::compile("[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?");
-        
+    
+        FILE *fp;
         fp = fopen(filename, "r");
         if (fp == NULL)
             return false;
@@ -141,88 +183,210 @@ namespace EigenExt
     }
     
     template<typename MatrixType>
-    bool loadMatrixFromFileFast(MatrixType& m, const char* filename)
+    bool loadMatrixFromFileFast(MatrixType& m, const char* filename, bool doesUseMemoryBoost)
     {
-        return loadMatrixFromFileFast(m, filename, ' ');
+        return loadMatrixFromFileFast(m, filename, ' ', doesUseMemoryBoost);
     }
     
     template<typename MatrixType>
-    bool loadMatrixFromFileFast(MatrixType& m, const char* filename, const char delim)
+    bool loadMatrixFromFileFast(MatrixType& m, const char* filename, const char delim, bool doesUseMemoryBoost)
     {
-        FILE *fp;
-        char *line = NULL;
-        size_t len = 0;
-        ssize_t read;
-        
+        size_t delimCount = 0;
         size_t rows = 0;
         size_t cols = 0;
-        size_t delimCount = 0;
-        
-        fp = fopen(filename, "r");
-        if (fp == NULL)
-            return false;
-        
-        // calc matrix size
-        size_t delimPos;
-        
-        while ((read = getline(&line, &len, fp)) != -1)
+        vector< Triplet<int> > tripletList;
+
+        if ( doesUseMemoryBoost == false )
         {
-            if (!rows)
+            FILE *fp = NULL;
+            char *line = NULL;
+            size_t len = 0;
+            ssize_t read;
+
+            fp = fopen(filename, "r");
+            if (fp == NULL)
+                return false;
+            
+            // calc matrix size
+            size_t delimPos;
+            
+            while ((read = getline(&line, &len, fp)) != -1)
             {
+                if (!rows)
+                {
+                    for (size_t i=0; i < read; ++i)
+                    {
+                        delimPos = (size_t)strchr(&line[i], delim);
+                        if (delimPos)
+                        {
+                            ++delimCount;
+                            i = delimPos - (size_t)line;
+                        }
+                    }
+                    cols = delimCount + 1;
+                }
+                ++rows;
+            }
+            
+            rewind(fp);
+            
+            if (rows == 0 || cols == 0)
+                return false;
+            
+            m.resize(rows, cols);
+            
+            // fill matrix
+            int currentRow = 0;
+            int currentCol = 0;
+            size_t doubleEnds;
+            
+            while ((read = getline(&line, &len, fp)) != -1)
+            {
+                currentCol = 0;
                 for (size_t i=0; i < read; ++i)
                 {
                     delimPos = (size_t)strchr(&line[i], delim);
-                    if (delimPos)
-                    {
-                        ++delimCount;
-                        i = delimPos - (size_t)line;
-                    }
-                }
-                cols = delimCount + 1;
-            }
-            ++rows;
-        }
-        
-        rewind(fp);
-        
-        if (rows == 0 || cols == 0)
-            return false;
-        
-        m.resize(rows, cols);
-        
-        // fill matrix
-        int currentRow = 0;
-        int currentCol = 0;
-        size_t doubleEnds;
-        
-        while ((read = getline(&line, &len, fp)) != -1)
-        {
-            currentCol = 0;
-            for (size_t i=0; i < read; ++i)
-            {
-                delimPos = (size_t)strchr(&line[i], delim);
-                if (!delimPos)
-                {
-                    delimPos = (size_t)strchr(&line[i], '\n');
                     if (!delimPos)
                     {
-                        delimPos = (size_t)strchr(&line[i], '\r');
-                        if (!delimPos) return false;
+                        delimPos = (size_t)strchr(&line[i], '\n');
+                        if (!delimPos)
+                        {
+                            delimPos = (size_t)strchr(&line[i], '\r');
+                            if (!delimPos) return false;
+                        }
+                    }
+                    doubleEnds = delimPos - (size_t)line;
+                    if (doubleEnds > i)
+                    {
+                        char oldDelim = *(char*)delimPos;
+                        char* end = (char*)delimPos;
+                        
+                        *end = '\0';
+                        setMatValue(tripletList, m, currentRow, currentCol, &line[i]);
+                        *end = oldDelim;
+
+                        ++currentCol;
+                        i = doubleEnds;
                     }
                 }
-                doubleEnds = delimPos - (size_t)line;
-                if (doubleEnds > i)
-                {
-                    m.row(currentRow)[currentCol] = atof(strndup(&line[i], doubleEnds-i));
-                    ++currentCol;
-                    i = doubleEnds;
-                }
+                ++currentRow;
             }
-            ++currentRow;
+            
+            free(line);
+            fclose(fp);
+        }
+        else if ( doesUseMemoryBoost == true )
+        {
+            int fd = open(filename, O_RDWR);
+            struct stat fs;
+            size_t buf, buf_end;
+            char* begin;
+            
+            if (fd == -1) {
+                cerr << "open file failed: " << filename << endl;;
+                return false;
+            }
+            
+            if (fstat(fd, &fs) == -1) {
+                cerr << "stat file failed: " <<  filename << endl;;
+                return false;
+            }
+            
+            /* fs.st_size could have been 0 actually */
+            buf = (size_t)mmap(0, fs.st_size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
+            if ((void*)buf == MAP_FAILED) {
+                cerr << "mmap failed: " << filename << endl;;
+                close(fd);
+                return false;
+            }
+            
+            buf_end = buf + fs.st_size;
+            
+            begin = (char *)buf;
+            // calc matrix size
+            while ( (size_t)begin < buf_end )
+            {
+                if ( *begin != '\n' && *begin != '\r' )
+                {
+                    if ( rows == 0 && *begin == delim )
+                    {
+                        ++delimCount;
+                    }
+                }
+                else
+                {
+                    /* see if we got "\r\n" or "\n\r" here */
+                    if ( (size_t)begin+1 < buf_end && ( *(begin+1) == '\n' || *(begin+1) == '\r' ) )
+                    {
+                        ++begin;
+                    }
+                    ++rows;
+                }
+                
+                ++begin;
+            }
+            
+            cols = delimCount + 1;
+            
+            if (rows == 0 || cols == 0)
+                return false;
+            
+            m.resize(rows, cols);
+            
+            // fill matrix
+            int currentRow = 0;
+            int currentCol = 0;
+            
+            begin = (char *)buf;
+            char* end = begin;
+            
+            while ( (size_t)end < buf_end )
+            {
+                if ( *end != '\n' && *end != '\r' )
+                {
+                    if ( *end == delim )
+                    {
+                        *end = '\0';
+                        setMatValue(tripletList, m, currentRow, currentCol, begin);
+                        *end = delim;
+                        
+                        ++currentCol;
+                        begin = end + 1;
+                    }
+                }
+                else
+                {
+                    if ( *end == '\n' )
+                    {
+                        *end = '\0';
+                        setMatValue(tripletList, m, currentRow, currentCol, begin);
+                        *end = '\n';
+                    }
+                    else if ( *end == '\r' )
+                    {
+                        *end = '\0';
+                        setMatValue(tripletList, m, currentRow, currentCol, begin);
+                        *end = '\r';
+                    }
+
+                    /* see if we got "\r\n" or "\n\r" here */
+                    if ( (size_t)end+1 < buf_end && ( *(end+1) == '\n' || *(end+1) == '\r' ) )
+                    {
+                        ++end;
+                    }
+                    
+                    ++currentRow;
+                    currentCol = 0;
+                    begin = end + 1;
+                }
+                
+                ++end;
+            }
+            munmap((void*)buf, fs.st_size);
+            close(fd);
         }
         
-        free(line);
-        fclose(fp);
+        assignTripletList(tripletList, m);
         return true;
     }
 };

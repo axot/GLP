@@ -39,4 +39,31 @@ do { \
     } \
 }while (false)
 
+class SLUtility
+{
+public:
+    static bool isIncludedOnlyOneType(size_t type)
+    {
+        if ( type == 0 )
+        {
+            return false;
+        }
+        else
+        {
+            while(true)
+            {
+                if ( type&1 )
+                {
+                    if ( type == 1 )
+                        return true;
+                    else
+                        return false;
+                }
+                type >>= 1;
+            }
+        }
+        return false;
+    }
+};
+
 #endif

@@ -37,12 +37,12 @@ template <typename AStrategy>
 class SLModel
 {
 public:
-    SLGlpResult train(const MatrixXd& X, const MatrixXd& Y, SLGLPRESULTYPE type)
+    SLModelResult train(const MatrixXd& X, const MatrixXd& Y, SLMODELRESULTYPE type)
     {
         return aStrategy.train(X, Y, type);
     }
     
-    SLGlpResult classify(const MatrixXd& tX, const MatrixXd& tY, SLGLPRESULTYPE type) const
+    SLModelResult classify(const MatrixXd& tX, const MatrixXd& tY, SLMODELRESULTYPE type) const
     {
         return aStrategy.classify(tX, tY, type);
     }

@@ -29,6 +29,7 @@
 #include <map>
 #include <iostream>
 #include <Eigen/Core>
+#include "../SLUtility.h"
 
 using namespace std;
 using namespace Eigen;
@@ -40,7 +41,7 @@ enum{
 };
 
 typedef unsigned int SLCROSSVALIDATIONRESULTYPE;
-typedef vector<SLGlpResult> SLGlpMultipleResults;
+typedef vector<SLModelResult> SLGlpMultipleResults;
 
 class SLCrossValidationResults : public map<SLCROSSVALIDATIONRESULTYPE, SLGlpMultipleResults>
 {
@@ -60,10 +61,10 @@ public:
      *
      * Discussion: only one type of each cvType and resultType can be used
      */
-    string print(SLCROSSVALIDATIONRESULTYPE cvType, SLGLPRESULTYPE resultType)
+    string print(SLCROSSVALIDATIONRESULTYPE cvType, SLMODELRESULTYPE resultType)
     {
-        ASSERT(isIncludeOnlyOneType(cvType), "only one of cross vaildate type can be calculate");
-        ASSERT(isIncludeOnlyOneType(resultType), "only one of cross result type can be calculate");
+        ASSERT(SLUtility::isIncludedOnlyOneType(cvType), "only one of cross vaildate type can be calculate");
+        ASSERT(SLUtility::isIncludedOnlyOneType(resultType), "only one of cross result type can be calculate");
 
         stringstream output;
         SLGlpMultipleResults::iterator it;
@@ -86,10 +87,10 @@ public:
      *
      * Discussion: only one type of each cvType and resultType can be used
      */
-    double mean(SLCROSSVALIDATIONRESULTYPE cvType, SLGLPRESULTYPE resultType)
+    double mean(SLCROSSVALIDATIONRESULTYPE cvType, SLMODELRESULTYPE resultType)
     {
-        ASSERT(isIncludeOnlyOneType(cvType), "only one of cross vaildate type can be calculate");
-        ASSERT(isIncludeOnlyOneType(resultType), "only one of cross result type can be calculate");
+        ASSERT(SLUtility::isIncludedOnlyOneType(cvType), "only one of cross vaildate type can be calculate");
+        ASSERT(SLUtility::isIncludedOnlyOneType(resultType), "only one of cross result type can be calculate");
 
         SLGlpMultipleResults::iterator it = (*this)[cvType].begin();
         
@@ -132,30 +133,6 @@ public:
             }
         }
         return result;
-    }
-    
-private:
-    bool isIncludeOnlyOneType(size_t type)
-    {
-        if ( type == 0 )
-        {
-            return false;
-        }
-        else
-        {
-            while(true)
-            {
-                if ( type&1 )
-                {
-                    if ( type == 1 )
-                        return true;
-                    else
-                        return false;
-                }
-                type >>= 1;
-            }
-        }
-        return false;
     }
 };
 

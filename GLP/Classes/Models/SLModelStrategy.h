@@ -36,18 +36,18 @@ using namespace std;
 using namespace Eigen;
 
 enum{
-    SLGLPRESULTYPENONE    = 0,
-    SLGLPRESULTYPEBETA    = 1 << 0,
-    SLGLPRESULTYPEQ2      = 1 << 1,
-    SLGLPRESULTYPERSS     = 1 << 2,
-    SLGLPRESULTYPEAUC     = 1 << 3,
-    SLGLPRESULTYPEACC     = 1 << 4,
-    SLGLPRESULTYPEAIC     = 1 << 5,
-    SLGLPRESULTYPEBIC     = 1 << 6,
+    SLMODELRESULTYPENONE    = 0,
+    SLMODELRESULTYPEBETA    = 1 << 0,
+    SLMODELRESULTYPEQ2      = 1 << 1,
+    SLMODELRESULTYPERSS     = 1 << 2,
+    SLMODELRESULTYPEAUC     = 1 << 3,
+    SLMODELRESULTYPEACC     = 1 << 4,
+    SLMODELRESULTYPEAIC     = 1 << 5,
+    SLMODELRESULTYPEBIC     = 1 << 6,
 };
 
-typedef unsigned int SLGLPRESULTYPE;
-typedef map<SLGLPRESULTYPE, MatrixXd> SLGlpResult;
+typedef unsigned int SLMODELRESULTYPE;
+typedef map<SLMODELRESULTYPE, MatrixXd> SLModelResult;
 
 class SLModelStrategy
 {
@@ -60,7 +60,7 @@ public:
      *
      * Return: the results stored in mapped structure.
      */
-    virtual SLGlpResult train(const MatrixXd& X, const MatrixXd& Y, SLGLPRESULTYPE type) = 0;
+    virtual SLModelResult train(const MatrixXd& X, const MatrixXd& Y, SLMODELRESULTYPE type) = 0;
         
     /* Classify:
      * Input
@@ -70,7 +70,7 @@ public:
      *
      * Return: the results stored in mapped structure
      */
-    virtual SLGlpResult classify(const MatrixXd& tX, const MatrixXd& tY, SLGLPRESULTYPE type) const = 0;
+    virtual SLModelResult classify(const MatrixXd& tX, const MatrixXd& tY, SLMODELRESULTYPE type) const = 0;
         
     /* Set Parameters:
      * Input

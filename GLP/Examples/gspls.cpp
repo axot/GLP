@@ -27,6 +27,7 @@
 #include <time.h>
 #include <boost/format.hpp>
 #include <Eigen/Core>
+#include <cfloat>
 #include "../Classes/SLGlp.h"
 
 using namespace Eigen;
@@ -56,10 +57,11 @@ void usage()
 int main(int argc, const char *argv[])
 {
     size_t maxpat = 10;
-    size_t minsup = 1;
-    size_t n = 10;
-    size_t topk = 10;
+    size_t minsup = 2;
+    size_t n = 20;
+    size_t topk = 5;
     char *yfile = NULL;
+    char *gspfile = NULL;
     int verbose = 0;
 
     if (argc < 1) {
@@ -96,6 +98,9 @@ int main(int argc, const char *argv[])
         }
     }
     
+    gspfile = strdup(argv[argc-1]);
+    
+    ++optind;
     for (size_t i = optind; i < argc; i++)
     {
         printf ("Unknown argument: %s\n", argv[i]);
@@ -104,53 +109,95 @@ int main(int argc, const char *argv[])
     }
     
     SLSparsePls::SLSparsePlsParameters splsParam;
+    
     SLGspan::SLGspanParameters gspanParam;
+    gspanParam.minsup = minsup;
+    gspanParam.maxpat = maxpat;
+    gspanParam.topk   = topk;
+    gspanParam.doesUseMemoryBoost = true;
+    gspanParam.gspFilename = string(gspfile);
     
-    SLGlpProduct<SLSparsePls, SLGspan>* gspls = SLGlpFactory<SLSparsePls, SLGspan>::create(splsParam, gspanParam);
-    
-    MatrixXd X(7,3), Y(7,1);
-    X.row(0) << 1,0,0;
-    X.row(1) << 0,1,0;
-    X.row(2) << 0,0,1;
-    X.row(3) << 1,1,0;
-    X.row(4) << 1,0,1;
-    X.row(5) << 0,1,1;
-    X.row(6) << 1,1,1;
-    
-    Y << 1,2,3,3,4,5,6;
-    
+    SLGlpProduct<SLSparsePls, SLGspan> gspls = *SLGlpFactory<SLSparsePls, SLGspan>::create(splsParam, gspanParam);
+        
     SLCrossValidation<SLSparsePls>::SLCrossValidationParameters cvParam;
-    cvParam.kFold = 7;
-    cvParam.resultHistorySize = 3;
+    cvParam.kFold = 59;
+    cvParam.resultHistorySize = 4;
     
-    SLCrossValidation<SLSparsePls> cv;
-    gspls->setCrossValidationParameters(cvParam);
+    gspls.setCrossValidationParameters(cvParam);
     
-    for ( int i = 0; i < X.cols(); ++i)
+    MatrixXd X, Y, Res;
+
+    SMatrixXi Test;
+    EigenExt::loadMatrixFromFileFast(Test, "small.txt", true);
+    cout << "Test:\n" << Test << endl;
+    
+    if ( yfile != NULL )
     {
-        cout << "\nCross Validation: n: " << i+1 << endl;
-        SLCrossValidationResults result =
-            gspls->crossValidation(X.col(i), Y, SLGLPRESULTYPEQ2 | SLGLPRESULTYPERSS | SLGLPRESULTYPEBETA);
-        
-        cout << "Training: "    << endl;
-        cout << "Q2:\n"         << result.mean(SLCROSSVALIDATIONRESULTYPETRAIN, SLGLPRESULTYPEQ2)  << endl;
-        cout << "\nRSS:\n"      << result.mean(SLCROSSVALIDATIONRESULTYPETRAIN, SLGLPRESULTYPERSS) << endl;
-        
-        cout << "\nValidation:" << endl;
-        cout << "Q2:\n"         << result.mean(SLCROSSVALIDATIONRESULTYPEVALIDATION, SLGLPRESULTYPEQ2)  << endl;
-        cout << "\nRSS:\n"      << result.mean(SLCROSSVALIDATIONRESULTYPEVALIDATION, SLGLPRESULTYPERSS) << endl;
-        
-        cout << "\nTest: "      << endl;
-        cout << "Q2:\n"         << result.mean(SLCROSSVALIDATIONRESULTYPETEST, SLGLPRESULTYPEQ2)  << endl;
-        cout << "\nRSS:\n"      << result.mean(SLCROSSVALIDATIONRESULTYPETEST, SLGLPRESULTYPERSS) << endl;
-        
-        cout << "\nBeta:"       << result.print(SLCROSSVALIDATIONRESULTYPETEST, SLGLPRESULTYPEBETA) << endl;
+        EigenExt::loadMatrixFromFile(Y, yfile);
+    }
+    else
+    {
+        Y = gspls.getInnerValues(SLGRAPHMININGINNERVALUEY)[SLGRAPHMININGINNERVALUEY];
     }
     
-    SLCrossValidationResults oldResult = cv.getResultHistory()[1];
-    cout << "History: "     << endl;
-    cout << "Q2:\n"         << oldResult.mean(SLCROSSVALIDATIONRESULTYPETEST, SLGLPRESULTYPEQ2)  << endl;
-    cout << "\nRSS:\n"      << oldResult.mean(SLCROSSVALIDATIONRESULTYPETEST, SLGLPRESULTYPERSS) << endl;
-    cout << "\nBeta:"       << oldResult.print(SLCROSSVALIDATIONRESULTYPETEST, SLGLPRESULTYPEBETA) << endl;
+    Y = Y.array() - Y.mean();
+    Res = Y;
+    
+    double lastQ2 = -DBL_MAX;
+    int overfitCount = 0;
+    
+    unsigned int i = 0;
+    
+    while ( i < n )
+    {
+        cout << "\nCross Validation: n: " << ++i << endl;
+        
+        long maxSquaredNormColumn;
+        SSum(Res).maxCoeff(&maxSquaredNormColumn);
+        VectorXd largestResCol = Res.col(maxSquaredNormColumn);
+        
+        SLGraphMiningResult gspanResult = gspls.search(largestResCol, SLGRAPHMININGTASKTYPETRAIN, SLGRAPHMININGRESULTYPEX);
+        
+        MatrixXd x = gspanResult[SLGRAPHMININGRESULTYPEX];
+        
+        cout << x << endl;
+        
+        SLCrossValidationResults cvResult =
+            gspls.crossValidation(x, Y, SLMODELRESULTYPEQ2 | SLMODELRESULTYPERSS | SLMODELRESULTYPEBETA);
+
+        long appendedXRows = x.rows();
+        long appendedXCols = x.cols();
+        long oldXCols      = X.cols();
+        X.conservativeResize(appendedXRows, oldXCols+appendedXCols);
+        X.rightCols(appendedXCols).setZero();
+        X << X.leftCols(oldXCols), x;
+
+        Res = Y - X*cvResult[SLCROSSVALIDATIONRESULTYPETRAIN][0][SLMODELRESULTYPEBETA];
+        
+        double Q2 = cvResult.mean(SLCROSSVALIDATIONRESULTYPEVALIDATION, SLMODELRESULTYPEQ2);
+        cout << "Q2:\n"     << Q2  << endl;
+        cout << "RSS:\n"    << cvResult.mean(SLCROSSVALIDATIONRESULTYPEVALIDATION, SLMODELRESULTYPERSS) << endl;
+        cout << "\nBeta:"         << cvResult.print(SLCROSSVALIDATIONRESULTYPEVALIDATION, SLMODELRESULTYPEBETA) << endl;
+        if ( Q2 < lastQ2 )
+        {
+            ++overfitCount;
+        }
+        else
+        {
+            overfitCount = 0;
+        }
+        if ( overfitCount >= cvParam.resultHistorySize-1 )
+        {
+            break;
+        }
+        
+        lastQ2 = Q2;
+    }
+    
+    SLCrossValidationResults oldResult = gspls.getResultHistory().back();
+    cout << "\nHistory: n = " <<  i - cvParam.resultHistorySize + 1 << endl;
+    cout << "Q2:\n"           << oldResult.mean(SLCROSSVALIDATIONRESULTYPEVALIDATION, SLMODELRESULTYPEQ2)  << endl;
+    cout << "\nRSS:\n"        << oldResult.mean(SLCROSSVALIDATIONRESULTYPEVALIDATION, SLMODELRESULTYPERSS) << endl;
+//    cout << "\nBeta:"         << oldResult.print(SLCROSSVALIDATIONRESULTYPEVALIDATION, SLMODELRESULTYPEBETA) << endl;
     return 0;
 }

@@ -56,12 +56,12 @@ int main(int argc, const char *argv[])
 
     for ( int i = 0; i < X.cols(); ++i)
     {
-        SLGlpResult result = spls.train(X.col(i), Y, SLGLPRESULTYPEQ2 | SLGLPRESULTYPERSS | SLGLPRESULTYPEBETA);
+        SLModelResult result = spls.train(X.col(i), Y, SLMODELRESULTYPEQ2 | SLMODELRESULTYPERSS | SLMODELRESULTYPEBETA);
         
         cout << "Training: "<< endl;
-        cout << "Q2: "      << result[SLGLPRESULTYPEQ2]  << endl;
-        cout << "RSS: "     << result[SLGLPRESULTYPERSS] << endl;
-        cout << "Beta:\n"   << result[SLGLPRESULTYPEBETA]<< '\n' << endl;
+        cout << "Q2: "      << result[SLMODELRESULTYPEQ2]  << endl;
+        cout << "RSS: "     << result[SLMODELRESULTYPERSS] << endl;
+        cout << "Beta:\n"   << result[SLMODELRESULTYPEBETA]<< '\n' << endl;
     }
     
     MatrixXd tX(2,3), tY(2,1);
@@ -69,10 +69,10 @@ int main(int argc, const char *argv[])
     tX.row(1) << 1,1,1;
     tY << 5,6;
     
-    SLGlpResult tresult = spls.classify(tX, tY, SLGLPRESULTYPEQ2 | SLGLPRESULTYPERSS);
+    SLModelResult tresult = spls.classify(tX, tY, SLMODELRESULTYPEQ2 | SLMODELRESULTYPERSS);
     cout << "Classify: "<< endl;
-    cout << "Q2: "      << tresult[SLGLPRESULTYPEQ2]  << endl;
-    cout << "RSS: "     << tresult[SLGLPRESULTYPERSS] << '\n' << endl;
+    cout << "Q2: "      << tresult[SLMODELRESULTYPEQ2]  << endl;
+    cout << "RSS: "     << tresult[SLMODELRESULTYPERSS] << '\n' << endl;
     
     MatrixXd cvX(7,3), cvY(7,3);
     cvX << X, tX;
@@ -92,27 +92,27 @@ int main(int argc, const char *argv[])
         cout << "\nCross Validation: n: " << i+1 << endl;
         SLCrossValidationResults results = cv.crossValidation(cvX.col(i),
                                                               cvY,
-                                                              SLGLPRESULTYPEQ2 | SLGLPRESULTYPERSS | SLGLPRESULTYPEBETA,
+                                                              SLMODELRESULTYPEQ2 | SLMODELRESULTYPERSS | SLMODELRESULTYPEBETA,
                                                               SLCROSSVALIDATIONMETHODSUSINGAPPENDEDXASCLASSIFYDATA);
         
         cout << "Training: "    << endl;
-        cout << "Q2:\n"         << results.mean(SLCROSSVALIDATIONRESULTYPETRAIN, SLGLPRESULTYPEQ2)  << endl;
-        cout << "\nRSS:\n"      << results.mean(SLCROSSVALIDATIONRESULTYPETRAIN, SLGLPRESULTYPERSS) << endl;
+        cout << "Q2:\n"         << results.mean(SLCROSSVALIDATIONRESULTYPETRAIN, SLMODELRESULTYPEQ2)  << endl;
+        cout << "\nRSS:\n"      << results.mean(SLCROSSVALIDATIONRESULTYPETRAIN, SLMODELRESULTYPERSS) << endl;
         
         cout << "\nValidation:" << endl;
-        cout << "Q2:\n"         << results.mean(SLCROSSVALIDATIONRESULTYPEVALIDATION, SLGLPRESULTYPEQ2)  << endl;
-        cout << "\nRSS:\n"      << results.mean(SLCROSSVALIDATIONRESULTYPEVALIDATION, SLGLPRESULTYPERSS) << endl;
+        cout << "Q2:\n"         << results.mean(SLCROSSVALIDATIONRESULTYPEVALIDATION, SLMODELRESULTYPEQ2)  << endl;
+        cout << "\nRSS:\n"      << results.mean(SLCROSSVALIDATIONRESULTYPEVALIDATION, SLMODELRESULTYPERSS) << endl;
 
         cout << "\nTest: "      << endl;
-        cout << "Q2:\n"         << results.mean(SLCROSSVALIDATIONRESULTYPETEST, SLGLPRESULTYPEQ2)  << endl;
-        cout << "\nRSS:\n"      << results.mean(SLCROSSVALIDATIONRESULTYPETEST, SLGLPRESULTYPERSS) << endl;
+        cout << "Q2:\n"         << results.mean(SLCROSSVALIDATIONRESULTYPETEST, SLMODELRESULTYPEQ2)  << endl;
+        cout << "\nRSS:\n"      << results.mean(SLCROSSVALIDATIONRESULTYPETEST, SLMODELRESULTYPERSS) << endl;
         
-        cout << "\nBeta:"       << results.print(SLCROSSVALIDATIONRESULTYPETEST, SLGLPRESULTYPEBETA) << endl;
+        cout << "\nBeta:"       << results.print(SLCROSSVALIDATIONRESULTYPETEST, SLMODELRESULTYPEBETA) << endl;
     }
     
     SLCrossValidationResults oldResult = cv.getResultHistory()[1];
     cout << "History: "     << endl;
-    cout << "Q2:\n"         << oldResult.mean(SLCROSSVALIDATIONRESULTYPETEST, SLGLPRESULTYPEQ2)  << endl;
-    cout << "\nRSS:\n"      << oldResult.mean(SLCROSSVALIDATIONRESULTYPETEST, SLGLPRESULTYPERSS) << endl;
-    cout << "\nBeta:"       << oldResult.print(SLCROSSVALIDATIONRESULTYPETEST, SLGLPRESULTYPEBETA) << endl;
+    cout << "Q2:\n"         << oldResult.mean(SLCROSSVALIDATIONRESULTYPETEST, SLMODELRESULTYPEQ2)  << endl;
+    cout << "\nRSS:\n"      << oldResult.mean(SLCROSSVALIDATIONRESULTYPETEST, SLMODELRESULTYPERSS) << endl;
+    cout << "\nBeta:"       << oldResult.print(SLCROSSVALIDATIONRESULTYPETEST, SLMODELRESULTYPEBETA) << endl;
 }

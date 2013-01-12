@@ -22,20 +22,147 @@
 //
 
 #include "SLGspan.h"
+#include <fstream>
 #include <utility>
+#include "../SLUtility.h"
 
 using namespace std;
 
+// Public Methods
 bool SLGspan::setParameters(SLGspanParameters parameters)
 {
+    ASSERT(parameters.gspFilename.empty() == false, "Parameter gspFilename is required for Gspan.");
+    
     minsup = parameters.minsup;
     maxpat = parameters.maxpat;
-    n      = parameters.n;;
     topk   = parameters.topk;
+    
+    gspFilename = parameters.gspFilename;
+    read(gspFilename);
+    
+    doesUseMemoryBoost = parameters.doesUseMemoryBoost;
+    
+    init();
 
     return true;
 }
 
+SLGraphMiningInnerValues SLGspan::getInnerValues(SLGRAPHMININGINNERVALUE type)
+{
+    ASSERT( type != SLGRAPHMININGINNERVALUENOTDEFINED, "inner values must be specified");
+    
+    SLGraphMiningInnerValues results;
+    if ( type & SLGRAPHMININGINNERVALUEY )
+    {
+        MatrixXd y(transaction.size(), 1);
+        for (size_t i = 0; i < y.size(); ++i)   y.col(0)[i] = transaction[i].value;
+        
+        results[SLGRAPHMININGINNERVALUEY] = y;
+    }
+    return results;
+}
+
+SLGraphMiningResult SLGspan::search(VectorXd residual, SLGRAPHMININGTASKTYPE taskType, SLGRAPHMININGRESULTYPE resultType)
+{
+    ASSERT(taskType != SLGRAPHMININGTASKTYPENOTDEFINED &&
+           SLUtility::isIncludedOnlyOneType(taskType),
+           "taskType must be specified either train or classify");
+    
+    this->taskType = taskType;
+    
+    rule_cache.clear();
+    
+    tau     = 0.0f;
+    wbias   = 0.0f;
+
+    size_t l = transaction.size();
+    y.resize(l);
+    w = residual.array().abs();
+    
+    if ( taskType & SLGRAPHMININGTASKTYPETRAIN )
+    {
+        for (size_t i = 0; i < l; ++i)
+        {
+            if (residual[i] < 0)
+            {
+                y[i] = -1;
+            }
+            else
+            {
+                y[i] = 1;
+            }
+        }
+    }
+
+    if ( doesUseMemoryBoost )
+    {
+        vector<tree<TNODE>::pre_order_iterator> mount;
+
+        tree<TNODE>::pre_order_iterator pre = memoryCache.begin();
+        while ( pre != memoryCache.end() )
+        {
+            DFS_CODE.assign(pre->dfscode.begin(), pre->dfscode.end());
+            
+            if ((pre->id == TNODEYETEXPLORE) && !can_prune(pre->projected)){
+                mount.push_back(pre);
+            }
+            ++pre;
+        }
+        
+        vector<tree<TNODE>::pre_order_iterator>::iterator it = mount.begin();
+        while ( it != mount.end() )
+        {
+            DFS_CODE.assign((*it)->dfscode.begin(), (*it)->dfscode.end());
+            project((*it)->projected, (*it));
+            ++it;
+        }
+    }
+    else
+    {
+        for (Projected_iterator3 fromlabel = root.begin(); fromlabel != root.end(); ++fromlabel)
+        {
+            for (Projected_iterator2 elabel = fromlabel->second.begin(); elabel != fromlabel->second.end(); ++elabel)
+            {
+                for (Projected_iterator1 tolabel = elabel->second.begin();tolabel != elabel->second.end(); ++tolabel) {
+                    DFS_CODE.push (0, 1, fromlabel->first, elabel->first, tolabel->first);
+                    project(tolabel->second);
+                    DFS_CODE.pop ();
+                }
+            }
+        }
+    }
+    
+    if ( taskType == SLGRAPHMININGTASKTYPETRAIN )
+    {
+        entireRules.insert(entireRules.end(), rule_cache.begin(), rule_cache.end());
+    }
+    else if ( taskType == SLGRAPHMININGTASKTYPECLASSIFY )
+    {
+        
+    }
+    
+    SLGraphMiningResult result;
+    if ( resultType & SLGRAPHMININGRESULTYPEX )
+    {
+        MatrixXd X(residual.rows(), topk);
+        X.setConstant(0.0f);
+        
+        size_t j = 0;
+        for(set<Rule>::iterator it = rule_cache.begin(); it != rule_cache.end(); ++it)
+        {
+            for(size_t i = 0; i < it->loc.size(); ++i)
+            {
+                X(it->loc[i], j) = 1.0f;
+            }
+            ++j;
+        }
+
+        result[SLGRAPHMININGRESULTYPEX] = X;
+    }
+    return result;
+}
+
+// Private Methods
 bool SLGspan::is_min()
 {
     if (DFS_CODE.size() == 1) return true;
@@ -134,407 +261,364 @@ bool SLGspan::project_is_min(Projected &projected)
     return true;
 }
 
-istream& SLGspan::read (istream &is)
+void SLGspan::read(string filename)
 {
+    ifstream ifs(filename.c_str(), ios::in);
+    ASSERT(ifs.fail() == false, "Cannot open gsp file.");
+    
     Graph g;
     while(true) {
-        g.read(is);
+        g.read(ifs);
         if (g.empty()) break;
         transaction.push_back(g);
     }
-    return is;
+    ifs.close();
 }
 
-//bool SLGspan::can_prune (Projected &projected)
-//{
-//    double bound; double d; double etadiff;
-//    
-//    lars_bound(projected, &bound, &d, &etadiff);
-//    
-//    if (bound < 0.0) return true;
-//    
-//    // check if it is included in active set
-//    if (etadiff < 0.0001){
-//        return false;
-//    }
-//    
-//    
-//    // rewrite
-//    if ((d < tau) && (d > 0.000001)){
-//        
-//        rule.loc.clear ();
-//        int oid = 0xffffffff;
-//        for (Projected::iterator it = projected.begin(); it != projected.end(); ++it) {
-//            if (oid != it->id) {
-//                rule.loc.push_back (it->id);
-//            }
-//            oid = it->id;
-//        }
-//        
-//        fprintf(stderr,"XXX d: %f\n",d);
-//        tau       = d;
-//        rule.gain = d;
-//        rule.size = DFS_CODE.size();
-//        
-//        ostringstream ostrs;
-//        DFS_CODE.write (ostrs);
-//        rule.dfs = ostrs.str ();
-//    }
-//    
-//    return false;
-//}
+bool SLGspan::can_prune(Projected& projected)
+{
+    double gain = 0;
+    double upos = 0;
+    double uneg = 0;
+    
+    if( taskType & SLGRAPHMININGTASKTYPECLASSIFY )
+    {
+        gain = -wbias;
+        upos = -wbias;
+        uneg = wbias;
+    }
+    
+    size_t support = 0;
+    int oid = UINT_MAX;
+    int multi = (taskType & SLGRAPHMININGTASKTYPETRAIN) ? 1 : 2;
+    for (Projected::iterator it = projected.begin(); it != projected.end(); ++it)
+    {
+        if (oid != it->id)
+        {
+            gain += multi * y[it->id] * w[it->id];
+            
+            if (y[it->id] > 0)  upos += multi * w[it->id];
+            else                uneg += multi * w[it->id];
+            
+            ++support;
+        }
+        oid = it->id;
+    }
+    
+    double g = fabs(gain);
+    if (support < minsup || max (upos, uneg) <= tau)    return true;
+    
+    if (g > tau || (g == tau && DFS_CODE.size() < rule.size))
+    {
+        rule.gain = gain;
+        rule.size = DFS_CODE.size();
+        
+        ostringstream ostrs;
+        DFS_CODE.write (ostrs);
+        rule.dfs = ostrs.str();
+        
+        rule.loc.clear ();
+        int oid = UINT_MAX;
+        for (Projected::iterator it = projected.begin(); it != projected.end(); ++it)
+        {
+            if (oid != it->id) { // remember used location using mask "oid"
+                rule.loc.push_back(it->id);
+            }
+            oid = it->id;
+        }
+        
+        rule_cache.insert (rule);
+        if(rule_cache.size() > topk)
+        {
+            set<Rule>::iterator it = rule_cache.begin();
+            rule_cache.erase(it);
+            ++it;
+            tau = fabs(it->gain);
+        }
+    }
+    
+    return false;
+}
 
-//bool SLGspan::can_prune_boost(Projected& projected)
-//{
-//    double gain = 0;
-//    double upos = 0;
-//    double uneg = 0;
-//    
-//    if(mode == 2 || mode ==4){ //classification
-//        gain = -wbias;
-//        upos = -wbias;
-//        uneg = wbias;
-//    }
-//    
-//    int support = 0;
-//    
-//    int oid = 0xffffffff;
-//    for (Projected::iterator it = projected.begin(); it != projected.end(); ++it) {
-//        if (oid != it->id) {
-//            ++support;
-//            if(mode == 1 || mode ==3){ //regression
-//                gain += 1 * y[it->id] * w[it->id];
-//                if (y[it->id] > 0) upos += 1 * w[it->id];
-//                else               uneg += 1 * w[it->id];
-//            }else{
-//                if(mode == 2 || mode == 4){ //classification
-//                    gain += 2 * y[it->id] * w[it->id];
-//                    if (y[it->id] > 0) upos += 2 * w[it->id];
-//                    else               uneg += 2 * w[it->id];
-//                }
-//            }
-//        }
-//        oid = it->id;
-//    }
-//    double g = fabs (gain);
-//    
-//    if (support < minsup || max (upos, uneg) <= tau) return true;
-//    
-//    if (g > tau || (g == tau && DFS_CODE.size() < rule.size)) {
-//        rule.gain = gain;
-//        rule.size = DFS_CODE.size();
-//        
-//        ostringstream ostrs;
-//        DFS_CODE.write (ostrs);
-//        rule.dfs = ostrs.str();
-//        
-//        rule.loc.clear ();
-//        int oid = 0xffffffff;
-//        for (Projected::iterator it = projected.begin(); it != projected.end(); ++it) {
-//            if (oid != it->id) { // remember used location using mask "oid"
-//                rule.loc.push_back(it->id);
-//            }
-//            oid = it->id;
-//        }
-//        if((mode == 1)||(mode == 2)){ // single tau
-//            tau = g;
-//        }else{
-//            if((mode == 3)||(mode == 4)){ // multi tau
-//                rule_cache.insert (rule);
-//                if(rule_cache.size() > topk){
-//                    set <Rule>::iterator it = rule_cache.begin();
-//                    rule_cache.erase(it);
-//                    ++it;
-//                    tau = fabs(it->gain);
-//                }
-//            }
-//        }
-//    }
-//    
-//    return false;
-//}
-//
-////project without restart for test phase
-//
-//void SLGspan::projectForTest (Projected& projected)
-//{
-//    //    if (mode == CLASSIFY) {
-//    
-//    ostringstream ostrs;
-//    DFS_CODE.write (ostrs);
-//    
-//    // each rule in model without beta value
-//    string s = ostrs.str();
-//    int id = doubleArray.exactMatchSearch (s.c_str());
-//    
-//    if (id == -2) return;
-//    if (id >= 0) {
-//        if (os)
-//            rules.insert (std::make_pair<std::string, double> (s, alpha[id]));
-//        result.push_back (id);
-//    }
-//    
-//    if (maxpat == DFS_CODE.size()) return;
-//    
-//    const RMPath &rmpath = DFS_CODE.buildRMPath ();
-//    int minlabel         = DFS_CODE[0].fromlabel;
-//    int maxtoc           = DFS_CODE[rmpath[0]].to;
-//    
-//    Projected_map3 new_fwd_root;
-//    Projected_map2 new_bck_root;
-//    EdgeList edges;
-//    
-//    for (int n = 0; n < projected.size(); ++n) {
-//        
-//        int id = projected[n].id;
-//        
-//        PDFS *cur = &projected[n];
-//        
-//        History history (transaction[id], cur);
-//        
-//        // backward
-//        for (int i = (int)rmpath.size()-1; i >= 1; --i) {
-//            Edge *e = Utility::get_backward (transaction[id], history[rmpath[i]], history[rmpath[0]], history);
-//            if (e) new_bck_root[DFS_CODE[rmpath[i]].from][e->elabel].push (id, e, cur);
-//        }
-//        
-//        // pure forward
-//        if (Utility::get_forward_pure (transaction[id], history[rmpath[0]], minlabel,
-//                              history, edges)) {
-//            for (EdgeList::iterator it = edges.begin(); it != edges.end();  ++it) {
-//                new_fwd_root[maxtoc][(*it)->elabel][transaction[id][(*it)->to].label].push (id, *it, cur);
-//            }
-//        }
-//        
-//        // backtracked forward
-//        for (int i = 0; i < (int)rmpath.size(); ++i) {
-//            if (Utility::get_forward_rmpath (transaction[id], history[rmpath[i]], minlabel, history, edges)) {
-//                for (EdgeList::iterator it = edges.begin(); it != edges.end();  ++it)
-//                    new_fwd_root[DFS_CODE[rmpath[i]].from][(*it)->elabel][transaction[id][(*it)->to].label].push (id, *it, cur);
-//            }
-//        }
-//    }
-//    
-//    // backward (recursive)
-//    for (Projected_iterator2 to = new_bck_root.begin(); to != new_bck_root.end(); ++to) {
-//        for (Projected_iterator1 elabel = to->second.begin(); elabel != to->second.end(); ++elabel) {
-//            DFS_CODE.push (maxtoc, to->first, -1, elabel->first, -1);
-//            projectForTest (elabel->second);
-//            DFS_CODE.pop();
-//        }
-//    }
-//    
-//    // forward
-//    for (Projected_riterator3 from = new_fwd_root.rbegin(); from != new_fwd_root.rend(); ++from) {
-//        for (Projected_iterator2 elabel = from->second.begin(); elabel != from->second.end(); ++elabel) {
-//            for (Projected_iterator1 tolabel = elabel->second.begin();
-//                 tolabel != elabel->second.end(); ++tolabel) {
-//                DFS_CODE.push (from->first, maxtoc+1, -1, elabel->first, tolabel->first);
-//                projectForTest (tolabel->second);
-//                DFS_CODE.pop ();
-//            }
-//        }
-//    }
-//    
-//    return;
-//}
-//
-////project with restart for training phase
-//
-//void SLGspan::projectForTrain (Projected& projected, tree<TNODE>::iterator& tnode)
-//{
-//    if (! is_min ()) {
-//        return;
-//    }
-//    
-//    if (maxpat == DFS_CODE.size()){
-//        return;
-//    }
-//    
-//    int support = 0;
-//    int oid = 0xffffffff;
-//    for (Projected::iterator it = projected.begin(); it != projected.end(); ++it) {
-//        if (oid != it->id)
-//            ++support;
-//    }
-//    if (support < minsup){
-//        return;
-//    }
-//    
-//    //    }
-//    
-//    bool p = false;
-//    if (tasktype == 0){
-//        p = can_prune(projected);
-//    }else{
-//        p = can_prune_boost(projected,tasktype);
-//    }
-//    
-//    if (p && (tnode->id ==1)){
-//        return;}
-//    
-//    tree<TNODE>::iterator child;
-//    
-//    if (!p && (tnode->id == 1)){
-//        //      printf("*");
-//        tnode->id = 0;
-//        child = tnode;  // not making a child
-//    }
-//    else{
-//        //      printf(".");
-//        TNODE tn;
-//        
-//        tn.id = 0;
-//        tn.dfscode.clear();
-//        for (vector<DFS>::iterator it = DFS_CODE.begin() ; it != DFS_CODE.end() ; ++it){
-//            tn.dfscode.push_back(*it);
-//        }
-//        
-//        tn.projected.clear();
-//        for (Projected::iterator it=projected.begin() ; it != projected.end() ; ++it){
-//            tn.projected.push(it->id, it->edge, it->prev);
-//        }
-//        
-//        if (tnode != memCache.begin())
-//            child = memCache.append_child(tnode,tn);
-//        else
-//            child = memCache.insert(tnode,tn);
-//        
-//        if (p){
-//            child->id = 1;
-//            return; // Make mounting node and quit
-//        }
-//    }
-//    
-//    const RMPath &rmpath = DFS_CODE.buildRMPath ();
-//    int minlabel         = DFS_CODE[0].fromlabel;
-//    int maxtoc           = DFS_CODE[rmpath[0]].to;
-//    
-//    Projected_map3 new_fwd_root;
-//    Projected_map2 new_bck_root;
-//    EdgeList edges;
-//    
-//    //printf("%d %d %d\n",projected.size(), child->projected.size(), child->id);
-//    
-//    for (int n = 0; n < child->projected.size(); ++n) {
-//        
-//        int id = child->projected[n].id;
-//        
-//        PDFS *cur = &(child->projected[n]);
-//        
-//        History history (transaction[id], cur);
-//        
-//        // backward
-//        for (int i = (int)rmpath.size()-1; i >= 1; --i) {
-//            Edge *e = Utility::get_backward (transaction[id], history[rmpath[i]], history[rmpath[0]], history);
-//            if (e) new_bck_root[DFS_CODE[rmpath[i]].from][e->elabel].push (id, e, cur);
-//        }
-//        
-//        // pure forward
-//        if (Utility::get_forward_pure (transaction[id], history[rmpath[0]], minlabel, history, edges)) {
-//            for (EdgeList::iterator it = edges.begin(); it != edges.end();  ++it) {
-//                new_fwd_root[maxtoc][(*it)->elabel][transaction[id][(*it)->to].label].push (id, *it, cur);
-//            }
-//        }
-//        
-//        // backtracked forward
-//        for (int i = 0; i < (int)rmpath.size(); ++i) {
-//            if (Utility::get_forward_rmpath (transaction[id], history[rmpath[i]], minlabel, history, edges)) {
-//                for (EdgeList::iterator it = edges.begin(); it != edges.end();  ++it)
-//                    new_fwd_root[DFS_CODE[rmpath[i]].from][(*it)->elabel][transaction[id][(*it)->to].label].push (id, *it, cur);
-//            }
-//        }
-//    }
-//    
-//    // backward (recursive)
-//    for (Projected_iterator2 to = new_bck_root.begin(); to != new_bck_root.end(); ++to) {
-//        for (Projected_iterator1 elabel = to->second.begin(); elabel != to->second.end(); ++elabel) {
-//            DFS_CODE.push (maxtoc, to->first, -1, elabel->first, -1);
-//            
-//            projectForTrain (elabel->second, child);
-//            DFS_CODE.pop();
-//        }
-//    }
-//    
-//    // forward
-//    for (Projected_riterator3 from = new_fwd_root.rbegin(); from != new_fwd_root.rend(); ++from) {
-//        for (Projected_iterator2 elabel = from->second.begin(); elabel != from->second.end(); ++elabel) {
-//            for (Projected_iterator1 tolabel = elabel->second.begin();
-//                 tolabel != elabel->second.end(); ++tolabel) {
-//                DFS_CODE.push (from->first, maxtoc+1, -1, elabel->first, tolabel->first);
-//                projectForTrain (tolabel->second, child);
-//                DFS_CODE.pop ();
-//            }
-//        }
-//    }
-//    
-//    //printf("---\n");
-//    
-//    return;
-//}
-//
-////  double gSpan::calc_gain (const vector <int> &loc)
-////    {
-////      double gain = - wbias;
-////      for (int i = 0; i < loc.size(); ++i)
-////        gain += 2 * y[loc[i]] * w[loc[i]];
-////      return gain;
-////    }
-//
-//MatrixXd& SLGspan::search(VectorXd& residual)
-//{
-//    size_t l = transaction.size();
-//    y.resize (l);
-//    w = residual.array().abs();
-//
-//    if (tasktype == 0){ // LARS
-//        tau     = 1000000.0;
-//        wbias   = 0.0;
-//    }else{
-//        tau = 0.0;
-//        if ((tasktype == 1)||(tasktype == 3)) {// Boost regression
-//            for (int i = 0; i < l; ++i) {
-//                if (residual[i] < 0){
-//                    y[i] = -1;
-//                }
-//                else{
-//                    y[i] = 1;
-//                }
-//            }
-//        }else{
-//            if ((tasktype == 2)||(tasktype == 4)){// Boost classification
-//            }
-//        }
-//    }
-//    
-//    // Searching in the ready-built tree
-//    vector<tree<TNODE>::pre_order_iterator> mount;
-//    
-//    tree<TNODE>::pre_order_iterator pre=memCache.begin();
-//    while ( pre != memCache.end() )
-//    {
-//        DFS_CODE.assign(pre->dfscode.begin(), pre->dfscode.end());
-//        
-//        bool p = false;
-//        if (tasktype == 0){ // LARS
-//            p = can_prune(pre->projected);
-//        }else{
-//            p = can_prune_boost(pre->projected,tasktype);
-//        }
-//        
-//        if ((pre->id == 1) && !p){
-//            mount.push_back(pre);
-//        }
-//        ++pre;
-//    }
-//    
-//    vector<tree<TNODE>::pre_order_iterator>::iterator it = mount.begin();
-//    while ( it != mount.end() )
-//    {
-//        DFS_CODE.assign((*it)->dfscode.begin(), (*it)->dfscode.end());
-//        projectForTrain((*it)->projected, (*it));     // id=1;
-//        ++it;
-//    }
-//    
-//    return true;
-//}
+void SLGspan::project(Projected& projected)
+{
+    if ( taskType == SLGRAPHMININGTASKTYPETRAIN )
+    {
+        if (!is_min ()                  ||
+            maxpat == DFS_CODE.size()   ||
+            can_prune(projected))
+        {
+            return;
+        }
+    }
+    else if ( taskType == SLGRAPHMININGTASKTYPECLASSIFY )
+    {
+        ostringstream ostrs;
+        DFS_CODE.write (ostrs);
+        
+        vector<Rule>::iterator it;
+        it = find(entireRules.begin(), entireRules.end(), ostrs.str());
+        if ( it != entireRules.end() )
+        {
+            size_t index = it - entireRules.begin();
+            patternMatchedResult.push_back(index);
+        }
+        
+        if (maxpat == DFS_CODE.size()) return;
+    }
+    
+    const RMPath &rmpath = DFS_CODE.buildRMPath ();
+    int minlabel         = DFS_CODE[0].fromlabel;
+    int maxtoc           = DFS_CODE[rmpath[0]].to;
+
+    Projected_map3 new_fwd_root;
+    Projected_map2 new_bck_root;
+    EdgeList edges;
+    
+    for (int n = 0; n < projected.size(); ++n)
+    {
+        int id = projected[n].id;
+        PDFS *cur = &projected[n];
+        History history (transaction[id], cur);
+        
+        // backward
+        for (int i = (int)rmpath.size()-1; i >= 1; --i) {
+            Edge *e = Utility::get_backward (transaction[id], history[rmpath[i]], history[rmpath[0]], history);
+            if (e) new_bck_root[DFS_CODE[rmpath[i]].from][e->elabel].push (id, e, cur);
+        }
+        
+        // pure forward
+        if (Utility::get_forward_pure (transaction[id], history[rmpath[0]], minlabel,
+                                       history, edges)) {
+            for (EdgeList::iterator it = edges.begin(); it != edges.end();  ++it) {
+                new_fwd_root[maxtoc][(*it)->elabel][transaction[id][(*it)->to].label].push (id, *it, cur);
+            }
+        }
+        
+        // backtracked forward
+        for (int i = 0; i < (int)rmpath.size(); ++i) {
+            if (Utility::get_forward_rmpath (transaction[id], history[rmpath[i]], minlabel, history, edges)) {
+                for (EdgeList::iterator it = edges.begin(); it != edges.end();  ++it)
+                    new_fwd_root[DFS_CODE[rmpath[i]].from][(*it)->elabel][transaction[id][(*it)->to].label].push (id, *it, cur);
+            }
+        }
+    }
+    
+    // backward (recursive)
+    for (Projected_iterator2 to = new_bck_root.begin(); to != new_bck_root.end(); ++to) {
+        for (Projected_iterator1 elabel = to->second.begin(); elabel != to->second.end(); ++elabel) {
+            DFS_CODE.push (maxtoc, to->first, -1, elabel->first, -1);
+            project(elabel->second);
+            DFS_CODE.pop();
+        }
+    }
+    
+    // forward
+    for (Projected_riterator3 from = new_fwd_root.rbegin(); from != new_fwd_root.rend(); ++from) {
+        for (Projected_iterator2 elabel = from->second.begin(); elabel != from->second.end(); ++elabel) {
+            for (Projected_iterator1 tolabel = elabel->second.begin();
+                 tolabel != elabel->second.end(); ++tolabel) {
+                DFS_CODE.push (from->first, maxtoc+1, -1, elabel->first, tolabel->first);
+                project(tolabel->second);
+                DFS_CODE.pop ();
+            }
+        }
+    }
+}
+
+void SLGspan::project(Projected& projected, tree<TNODE>::iterator& tnode)
+{
+    bool p = false;
+    if ( taskType == SLGRAPHMININGTASKTYPETRAIN )
+    {
+        if (!is_min() || maxpat == DFS_CODE.size())
+        {
+            return;
+        }
+        
+        unsigned int support = 0;
+        unsigned int oid = UINT_MAX;
+        for (Projected::iterator it = projected.begin(); it != projected.end(); ++it)
+        {
+            if (oid != it->id)
+                ++support;
+        }
+        
+        if (support < minsup)
+        {
+            return;
+        }
+        
+        p = can_prune(projected);
+        if (p && tnode->id == TNODEYETEXPLORE)
+        {
+            return;
+        }
+    }
+    else if ( taskType == SLGRAPHMININGTASKTYPECLASSIFY )
+    {
+        ostringstream ostrs;
+        DFS_CODE.write (ostrs);
+        
+        vector<Rule>::iterator it;
+        it = find(entireRules.begin(), entireRules.end(), ostrs.str());
+        if ( it != entireRules.end() )
+        {
+            size_t index = it - entireRules.begin();
+            patternMatchedResult.push_back(index);
+        }
+        
+        if (maxpat == DFS_CODE.size()) return;
+        
+        p = can_prune(projected);
+    }
+
+    tree<TNODE>::iterator child;
+        
+    if (!p && (tnode->id == TNODEYETEXPLORE)){
+        printf("*");
+        tnode->id = 0;
+        child = tnode;  // not making a child
+    }
+    else{
+        printf(".");
+        TNODE tn;
+        
+        tn.id = 0;
+        tn.dfscode.clear();
+        for (vector<DFS>::iterator it = DFS_CODE.begin() ; it != DFS_CODE.end() ; ++it){
+            tn.dfscode.push_back(*it);
+        }
+        
+        tn.projected.clear();
+        for (Projected::iterator it=projected.begin() ; it != projected.end() ; ++it){
+            tn.projected.push(it->id, it->edge, it->prev);
+        }
+        
+        if (tnode != memoryCache.begin())
+            child = memoryCache.append_child(tnode, tn);
+        else
+            child = memoryCache.insert(tnode, tn);
+        
+        if (p){
+            child->id = TNODEYETEXPLORE;
+            return; // Make mounting node and quit
+        }
+    }
+    
+    const RMPath &rmpath = DFS_CODE.buildRMPath();
+    int minlabel         = DFS_CODE[0].fromlabel;
+    int maxtoc           = DFS_CODE[rmpath[0]].to;
+
+    Projected_map3 new_fwd_root;
+    Projected_map2 new_bck_root;
+    EdgeList edges;
+    
+    //printf("%d %d %d\n",projected.size(), child->projected.size(), child->id);
+    
+    for (int n = 0; n < child->projected.size(); ++n)
+    {
+        int id = child->projected[n].id;
+        PDFS *cur = &(child->projected[n]);
+        History history (transaction[id], cur);
+        
+        // backward
+        for (int i = (int)rmpath.size()-1; i >= 1; --i) {
+            Edge *e = Utility::get_backward (transaction[id], history[rmpath[i]], history[rmpath[0]], history);
+            if (e) new_bck_root[DFS_CODE[rmpath[i]].from][e->elabel].push (id, e, cur);
+        }
+        
+        // pure forward
+        if (Utility::get_forward_pure (transaction[id], history[rmpath[0]], minlabel, history, edges)) {
+            for (EdgeList::iterator it = edges.begin(); it != edges.end(); ++it) {
+                new_fwd_root[maxtoc][(*it)->elabel][transaction[id][(*it)->to].label].push (id, *it, cur);
+            }
+        }
+        
+        // backtracked forward
+        for (int i = 0; i < (int)rmpath.size(); ++i) {
+            if (Utility::get_forward_rmpath (transaction[id], history[rmpath[i]], minlabel, history, edges)) {
+                for (EdgeList::iterator it = edges.begin(); it != edges.end(); ++it)
+                    new_fwd_root[DFS_CODE[rmpath[i]].from][(*it)->elabel][transaction[id][(*it)->to].label].push (id, *it, cur);
+            }
+        }
+    }
+    
+    // backward (recursive)
+    for (Projected_iterator2 to = new_bck_root.begin(); to != new_bck_root.end(); ++to) {
+        for (Projected_iterator1 elabel = to->second.begin(); elabel != to->second.end(); ++elabel) {
+            DFS_CODE.push(maxtoc, to->first, -1, elabel->first, -1);
+            project(elabel->second, child);
+            DFS_CODE.pop();
+        }
+    }
+    
+    // forward
+    for (Projected_riterator3 from = new_fwd_root.rbegin(); from != new_fwd_root.rend(); ++from) {
+        for (Projected_iterator2 elabel = from->second.begin(); elabel != from->second.end(); ++elabel) {
+            for (Projected_iterator1 tolabel = elabel->second.begin(); tolabel != elabel->second.end(); ++tolabel) {
+                DFS_CODE.push(from->first, maxtoc+1, -1, elabel->first, tolabel->first);
+                project(tolabel->second, child);
+                DFS_CODE.pop();
+            }
+        }
+    }
+    //printf("---\n");
+}
+
+void SLGspan::init()
+{
+    initDFSTree(root);
+    
+    if ( doesUseMemoryBoost )
+    {
+       initMemoryCache(root); 
+    }
+}
+
+void SLGspan::initDFSTree(Projected_map3 &root)
+{    
+    EdgeList edges;
+    
+    for (int id = 0; id < transaction.size(); ++id)
+    {
+        Graph& g = transaction[id];
+        for (size_t from = 0; from < g.size(); ++from)
+        {
+            if (Utility::get_forward_root(g, g[from], edges))
+            {
+                for (EdgeList::iterator it = edges.begin(); it != edges.end(); ++it)
+                {
+                    root[g[from].label][(*it)->elabel][g[(*it)->to].label].push(id, *it, 0);
+                }
+            }
+        }
+    }
+}
+
+void SLGspan::initMemoryCache(Projected_map3 &root)
+{
+    tree<TNODE>::iterator top = memoryCache.begin();
+    for (Projected_iterator3 fromlabel = root.begin(); fromlabel != root.end(); ++fromlabel)
+    {
+        for (Projected_iterator2 elabel = fromlabel->second.begin(); elabel != fromlabel->second.end(); ++elabel)
+        {
+            for (Projected_iterator1 tolabel = elabel->second.begin(); tolabel != elabel->second.end(); ++tolabel)
+            {
+                DFS_CODE.push(0, 1, fromlabel->first, elabel->first, tolabel->first);
+                
+                TNODE tn;
+                tn.id = TNODEYETEXPLORE;
+                tn.dfscode.assign(DFS_CODE.begin(), DFS_CODE.end());
+                
+                for (Projected::iterator it = tolabel->second.begin() ; it != tolabel->second.end() ; ++it)
+                {
+                    tn.projected.push(it->id, it->edge, it->prev);
+                }
+                
+                memoryCache.insert(top, tn);
+                DFS_CODE.pop();
+            }
+        }
+    }
+}

@@ -81,7 +81,7 @@ public:
      */
     SLCrossValidationResults crossValidation(const MatrixXd& X,
                                              const MatrixXd& Y,
-                                             SLGLPRESULTYPE resultType,
+                                             SLMODELRESULTYPE resultType,
                                              SLCROSSVALIDATIONMETHODSTYPE methodType = SLCROSSVALIDATIONMETHODSUSINGWHOLEDATA);
     
     /* Set Parameters:
@@ -124,19 +124,19 @@ private:
     SLGlpMultipleResults crossValidationTrain(const size_t index,
                                               const MatrixXd& X,
                                               const MatrixXd& Y,
-                                              SLGLPRESULTYPE resultType,
+                                              SLMODELRESULTYPE resultType,
                                               SLCROSSVALIDATIONMETHODSTYPE methodType);
     
     SLGlpMultipleResults crossValidationValidationClassify(const size_t index,
                                                            const MatrixXd& X,
                                                            const MatrixXd& Y,
-                                                           SLGLPRESULTYPE resultType,
+                                                           SLMODELRESULTYPE resultType,
                                                            SLCROSSVALIDATIONMETHODSTYPE methodType);
     
     SLGlpMultipleResults crossValidationTestClassify(const size_t index,
                                                      const MatrixXd& X,
                                                      const MatrixXd& Y,
-                                                     SLGLPRESULTYPE resultType,
+                                                     SLMODELRESULTYPE resultType,
                                                      SLCROSSVALIDATIONMETHODSTYPE methodType);
     
 private:
@@ -158,7 +158,7 @@ private:
 template <typename T>
 SLCrossValidationResults SLCrossValidation<T>::crossValidation(const MatrixXd& X,
                                                                const MatrixXd& Y,
-                                                               SLGLPRESULTYPE resultType,
+                                                               SLMODELRESULTYPE resultType,
                                                                SLCROSSVALIDATIONMETHODSTYPE methodType)
 {
     ASSERT(kFold <= X.rows(), "K-Fold was too big than X rows.");
@@ -168,7 +168,7 @@ SLCrossValidationResults SLCrossValidation<T>::crossValidation(const MatrixXd& X
     {
         srand((unsigned int)time(NULL));
         randomIndexs.setLinSpaced(X.rows(), 0, (int)X.rows());
-        random_shuffle(randomIndexs.derived().data(), randomIndexs.derived().data()+randomIndexs.derived().size());
+//        random_shuffle(randomIndexs.derived().data(), randomIndexs.derived().data()+randomIndexs.derived().size());
         
         for (size_t i=0; i<kFold; ++i)
         {
@@ -233,7 +233,7 @@ template <typename T>
 SLGlpMultipleResults SLCrossValidation<T>::crossValidationTrain(const size_t index,
                                                                 const MatrixXd& X,
                                                                 const MatrixXd& Y,
-                                                                SLGLPRESULTYPE resultType,
+                                                                SLMODELRESULTYPE resultType,
                                                                 SLCROSSVALIDATIONMETHODSTYPE methodType)
 {
     SLGlpMultipleResults result;
@@ -245,7 +245,7 @@ template <typename T>
 SLGlpMultipleResults SLCrossValidation<T>::crossValidationValidationClassify(const size_t index,
                                                                              const MatrixXd& X,
                                                                              const MatrixXd& Y,
-                                                                             SLGLPRESULTYPE resultType,
+                                                                             SLMODELRESULTYPE resultType,
                                                                              SLCROSSVALIDATIONMETHODSTYPE methodType)
 {
     SLGlpMultipleResults result;
@@ -273,7 +273,7 @@ template <typename T>
 SLGlpMultipleResults SLCrossValidation<T>::crossValidationTestClassify(const size_t index,
                                                                        const MatrixXd& X,
                                                                        const MatrixXd& Y,
-                                                                       SLGLPRESULTYPE resultType,
+                                                                       SLMODELRESULTYPE resultType,
                                                                        SLCROSSVALIDATIONMETHODSTYPE methodType)
 {
     SLGlpMultipleResults result;

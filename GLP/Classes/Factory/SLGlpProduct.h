@@ -48,26 +48,33 @@ public:
     }
 
     // SLModelStrategy
-    virtual SLGlpResult train(const MatrixXd& X, const MatrixXd& Y, SLGLPRESULTYPE type)
+    virtual SLModelResult train(const MatrixXd& X, const MatrixXd& Y, SLMODELRESULTYPE type)
     {
         return model.train(X, Y, type);
     }
 
-    virtual SLGlpResult classify(const MatrixXd& tX, const MatrixXd& tY, SLGLPRESULTYPE type) const
+    virtual SLModelResult classify(const MatrixXd& tX, const MatrixXd& tY, SLMODELRESULTYPE type) const
     {
         return model.classify(tX, tY, type);
     }
 
     // SLGraphMiningStrategy
-    virtual MatrixXd& search()
+    virtual SLGraphMiningResult search(VectorXd residual,
+                               SLGRAPHMININGTASKTYPE taskType,
+                               SLGRAPHMININGRESULTYPE resultType)
     {
-        return graphMining.search();
+        return graphMining.search(residual, taskType, resultType);
+    }
+
+    virtual SLGraphMiningInnerValues getInnerValues(SLGRAPHMININGINNERVALUE type)
+    {
+        return graphMining.getInnerValues(type);
     }
 
     // Custom Methods
     SLCrossValidationResults crossValidation(const MatrixXd& X,
                                              const MatrixXd& Y,
-                                             SLGLPRESULTYPE resultType,
+                                             SLMODELRESULTYPE resultType,
                                              SLCROSSVALIDATIONMETHODSTYPE methodType = SLCROSSVALIDATIONMETHODSUSINGWHOLEDATA)
     {
         // C++ does not support partial specialization of member function

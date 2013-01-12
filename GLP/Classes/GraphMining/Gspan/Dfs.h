@@ -125,6 +125,12 @@ public:
         // return r1.dfs > r2.dfs;
         return fabs(r1.gain) < fabs(r2.gain);
     }
+    
+    bool operator == (const string &dfs)
+    {
+        return (*this).dfs == dfs;
+    }
+
 };
 
 class Projected: public vector<PDFS>
@@ -138,12 +144,17 @@ public:
     }
 };
 
+enum{
+    TNODEYETEXPLORE = 1 << 0,
+};
+
+typedef size_t TNODEIDTYPE;
+
 struct TNODE
 {
-    size_t id;
+    TNODEIDTYPE id;
     DFSCode dfscode;
     Projected projected;
-    //TNODE(): id(0), dfscode() {};
 };
 
 #endif

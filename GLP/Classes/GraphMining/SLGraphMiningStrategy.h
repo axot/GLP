@@ -27,16 +27,60 @@
 #define __GLP__SLGraphMiningStrategy__
 
 #include <iostream>
+#include <map>
 #include <Eigen/Core>
 #include "../SLUtility.h"
 
+using namespace std;
 using namespace Eigen;
+
+enum{
+    SLGRAPHMININGRESULTYPENONE  = 0,
+    SLGRAPHMININGRESULTYPEX     = 1 << 0,
+};
+
+typedef unsigned int SLGRAPHMININGRESULTYPE;
+typedef map<SLGRAPHMININGRESULTYPE, MatrixXd> SLGraphMiningResult;
+
+enum{
+    SLGRAPHMININGTASKTYPENOTDEFINED   = 0,
+    SLGRAPHMININGTASKTYPETRAIN        = 1 << 0,
+    SLGRAPHMININGTASKTYPECLASSIFY     = 1 << 1,
+};
+
+typedef unsigned int SLGRAPHMININGTASKTYPE;
+
+enum{
+    SLGRAPHMININGINNERVALUENOTDEFINED   = 0,
+    SLGRAPHMININGINNERVALUEY            = 1 << 0,
+};
+
+typedef unsigned int SLGRAPHMININGINNERVALUE;
+typedef map<SLGRAPHMININGINNERVALUE, MatrixXd> SLGraphMiningInnerValues;
 
 class SLGraphMiningStrategy
 {    
 public:
-    virtual MatrixXd& search() = 0;
+    /* Search substructure
+     * Input
+     *      residual: the residual of Y
+     *      taskType: must be specified either train or classify
+     *    resultType: type of results
+     *
+     * Return: the results stored in mapped structure.
+     */
+    virtual SLGraphMiningResult search(VectorXd residual,
+                                       SLGRAPHMININGTASKTYPE taskType,
+                                       SLGRAPHMININGRESULTYPE resultType) = 0;
     
+    /* Get Inner Values
+     * Input
+     *    type: type of results
+     *
+     * Return: the results stored in mapped structure.
+     */
+    virtual SLGraphMiningInnerValues getInnerValues(SLGRAPHMININGINNERVALUE type) = 0;
+
     /* Set Parameters:
      * Input
      *      parameters: Graph Mining assignable parameters

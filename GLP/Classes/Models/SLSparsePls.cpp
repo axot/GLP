@@ -27,7 +27,7 @@
 using namespace std;
 
 // Public Methods
-SLGlpResult SLSparsePls::train(const MatrixXd& appendedX, const MatrixXd& theY, SLGLPRESULTYPE type)
+SLModelResult SLSparsePls::train(const MatrixXd& appendedX, const MatrixXd& theY, SLMODELRESULTYPE type)
 {
     if (Y.cols() == 0 || Y.rows() == 0)
     {
@@ -49,7 +49,7 @@ SLGlpResult SLSparsePls::train(const MatrixXd& appendedX, const MatrixXd& theY, 
     
     X.conservativeResize(appendedXRows, oldXCols+appendedXCols);
     X.rightCols(appendedXCols).setZero();
-    X << X.leftCols(oldXCols), AutoScale(appendedX);
+    X << X.leftCols(oldXCols), appendedX;
     
     W.conservativeResize(oldXCols+appendedXCols, W.cols()+1);
     W.bottomRows(appendedXCols).setZero();
@@ -85,33 +85,33 @@ SLGlpResult SLSparsePls::train(const MatrixXd& appendedX, const MatrixXd& theY, 
     return getTrainResult(type);
 }
 
-SLGlpResult SLSparsePls::classify(const MatrixXd& tX, const MatrixXd& tY, SLGLPRESULTYPE type) const
+SLModelResult SLSparsePls::classify(const MatrixXd& tX, const MatrixXd& tY, SLMODELRESULTYPE type) const
 {
-    ASSERT(type != SLGLPRESULTYPENONE, "No type of result was indicated");
+    ASSERT(type != SLMODELRESULTYPENONE, "No type of result was indicated");
     
-    ASSERT(!(type & ~(SLGLPRESULTYPEBETA|SLGLPRESULTYPEQ2|SLGLPRESULTYPERSS)),
+    ASSERT(!(type & ~(SLMODELRESULTYPEBETA|SLMODELRESULTYPEQ2|SLMODELRESULTYPERSS)),
            "Only support Beta Q2 RSS for Sparse PLS.");
     
     ASSERT(meanY.cols() != 0 && meanY.rows() != 0, "Train data first");
     
-    SLGlpResult result;
+    SLModelResult result;
     
     MatrixXd autoSacaledY = tY - meanY.replicate(tY.rows(), 1);
     MatrixXd autoSacaledX = tX - meanX.replicate(tX.rows(), 1);
 
     MatrixXd tRES = autoSacaledY - autoSacaledX*Beta;
 
-    if(type & SLGLPRESULTYPEQ2)
+    if(type & SLMODELRESULTYPEQ2)
     {
-        result[SLGLPRESULTYPEQ2] = MatrixXd::Ones(1, autoSacaledY.cols()) - SSum(tRES).cwiseQuotient(SSum(autoSacaledY));
+        result[SLMODELRESULTYPEQ2] = MatrixXd::Ones(1, autoSacaledY.cols()) - SSum(tRES).cwiseQuotient(SSum(autoSacaledY));
     }
-    if(type & SLGLPRESULTYPERSS)
+    if(type & SLMODELRESULTYPERSS)
     {
-        result[SLGLPRESULTYPERSS] = SSum(tRES);
+        result[SLMODELRESULTYPERSS] = SSum(tRES);
     }
-    if(type & SLGLPRESULTYPEBETA)
+    if(type & SLMODELRESULTYPEBETA)
     {
-        result[SLGLPRESULTYPEBETA] = Beta;
+        result[SLMODELRESULTYPEBETA] = Beta;
     }
     return result;
 }
@@ -123,25 +123,28 @@ bool SLSparsePls::setParameters(SLSparsePlsParameters parameters)
 }
 
 // Private Methods
-SLGlpResult SLSparsePls::getTrainResult(SLGLPRESULTYPE type) const
+SLModelResult SLSparsePls::getTrainResult(SLMODELRESULTYPE type) const
 {
-    ASSERT(!(type & ~(SLGLPRESULTYPEBETA|SLGLPRESULTYPEQ2|SLGLPRESULTYPERSS)),
-           "Only support Beta Q2 RSS for Sparse PLS.");
+    ASSERT(!(type & ~(SLMODELRESULTYPEBETA|SLMODELRESULTYPEQ2|SLMODELRESULTYPERSS)),
+           "Only support Beta Residual Q2 RSS for Sparse PLS.");
     
     ASSERT(meanY.cols() != 0 && meanY.rows() != 0, "Train data first");
     
-    SLGlpResult result;
-    if(type & SLGLPRESULTYPEQ2)
+    SLModelResult result;
+    if(type & SLMODELRESULTYPEQ2)
     {
-        result[SLGLPRESULTYPEQ2] = MatrixXd::Ones(1, Y.cols()) - SSum(Res).cwiseQuotient(SSum(Y));
+        result[SLMODELRESULTYPEQ2] = MatrixXd::Ones(1, Y.cols()) - SSum(Res).cwiseQuotient(SSum(Y));
     }
-    if(type & SLGLPRESULTYPERSS)
+    
+    if(type & SLMODELRESULTYPERSS)
     {
-        result[SLGLPRESULTYPERSS] = SSum(Res);
+        result[SLMODELRESULTYPERSS] = SSum(Res);
     }
-    if(type & SLGLPRESULTYPEBETA)
+    
+    if(type & SLMODELRESULTYPEBETA)
     {
-        result[SLGLPRESULTYPEBETA] = Beta;
+        result[SLMODELRESULTYPEBETA] = Beta;
     }
+        
     return result;
 }
