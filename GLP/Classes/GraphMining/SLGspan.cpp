@@ -103,7 +103,8 @@ SLGraphMiningResult SLGspan::search(VectorXd residual, SLGRAPHMININGTASKTYPE tas
         {
             DFS_CODE.assign(pre->dfscode.begin(), pre->dfscode.end());
             
-            if ((pre->id == TNODEYETEXPLORE) && !can_prune(pre->projected)){
+            // before detect TNODEYETEXPLORE, must do can_prune first.
+            if ( !can_prune(pre->projected) && pre->id == TNODEYETEXPLORE ){
                 mount.push_back(pre);
             }
             ++pre;
@@ -124,9 +125,9 @@ SLGraphMiningResult SLGspan::search(VectorXd residual, SLGRAPHMININGTASKTYPE tas
             for (Projected_iterator2 elabel = fromlabel->second.begin(); elabel != fromlabel->second.end(); ++elabel)
             {
                 for (Projected_iterator1 tolabel = elabel->second.begin();tolabel != elabel->second.end(); ++tolabel) {
-                    DFS_CODE.push (0, 1, fromlabel->first, elabel->first, tolabel->first);
+                    DFS_CODE.push(0, 1, fromlabel->first, elabel->first, tolabel->first);
                     project(tolabel->second);
-                    DFS_CODE.pop ();
+                    DFS_CODE.pop();
                 }
             }
         }
@@ -306,7 +307,10 @@ bool SLGspan::can_prune(Projected& projected)
     }
     
     double g = fabs(gain);
-    if (support < minsup || max (upos, uneg) <= tau)    return true;
+    if (support < minsup || max (upos, uneg) <= tau)
+    {
+        return true;
+    }
     
     if (g > tau || (g == tau && DFS_CODE.size() < rule.size))
     {
@@ -435,22 +439,9 @@ void SLGspan::project(Projected& projected, tree<TNODE>::iterator& tnode)
         {
             return;
         }
-        
-        unsigned int support = 0;
-        unsigned int oid = UINT_MAX;
-        for (Projected::iterator it = projected.begin(); it != projected.end(); ++it)
-        {
-            if (oid != it->id)
-                ++support;
-        }
-        
-        if (support < minsup)
-        {
-            return;
-        }
-        
+                
         p = can_prune(projected);
-        if (p && tnode->id == TNODEYETEXPLORE)
+        if ( p && tnode->id == TNODEYETEXPLORE )
         {
             return;
         }
@@ -476,12 +467,12 @@ void SLGspan::project(Projected& projected, tree<TNODE>::iterator& tnode)
     tree<TNODE>::iterator child;
         
     if (!p && (tnode->id == TNODEYETEXPLORE)){
-        printf("*");
+//        printf("*");
         tnode->id = 0;
         child = tnode;  // not making a child
     }
     else{
-        printf(".");
+//        printf(".");
         TNODE tn;
         
         tn.id = 0;

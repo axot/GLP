@@ -124,8 +124,8 @@ private:
     size_t minsup;
     size_t maxpat;
     size_t topk;
-    string          gspFilename;
-    bool            doesUseMemoryBoost;
+    string gspFilename;
+    bool   doesUseMemoryBoost;
     
     // not assignable parameters
     SLGRAPHMININGTASKTYPE taskType;

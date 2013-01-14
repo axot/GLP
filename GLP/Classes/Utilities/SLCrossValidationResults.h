@@ -78,12 +78,41 @@ public:
         return output.str();
     }
     
+    /* Each Mean of Cross Vaildate Results:
+     * Input
+     *     cvType: cross validation type: (train, validation, test)
+     * resultType: type of results
+     *
+     * Return: the mean of k-fold cross validation
+     *
+     * Discussion: only one type of each cvType and resultType can be used
+     */
+    VectorXd eachMean(SLCROSSVALIDATIONRESULTYPE cvType, SLMODELRESULTYPE resultType)
+    {
+        ASSERT(SLUtility::isIncludedOnlyOneType(cvType), "only one of cross vaildate type can be calculate");
+        ASSERT(SLUtility::isIncludedOnlyOneType(resultType), "only one of cross result type can be calculate");
+        
+        SLGlpMultipleResults::iterator it = (*this)[cvType].begin();
+        
+        long cols = (*this)[cvType].size();
+        VectorXd mean(cols);
+        
+        int i = 0;
+        while ( it != (*this)[cvType].end() )
+        {
+            mean[i] = (*it)[resultType].mean();
+            ++i;
+            ++it;
+        }
+        return mean;
+    }
+
     /* Mean of Cross Vaildate Results:
      * Input
      *     cvType: cross validation type: (train, validation, test)
      * resultType: type of results
      *
-     * Return: the result mean of the cross validation type
+     * Return: the result whole mean of the cross validation type
      *
      * Discussion: only one type of each cvType and resultType can be used
      */

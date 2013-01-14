@@ -168,7 +168,7 @@ SLCrossValidationResults SLCrossValidation<T>::crossValidation(const MatrixXd& X
     {
         srand((unsigned int)time(NULL));
         randomIndexs.setLinSpaced(X.rows(), 0, (int)X.rows());
-//        random_shuffle(randomIndexs.derived().data(), randomIndexs.derived().data()+randomIndexs.derived().size());
+        random_shuffle(randomIndexs.derived().data(), randomIndexs.derived().data()+randomIndexs.derived().size());
         
         for (size_t i=0; i<kFold; ++i)
         {

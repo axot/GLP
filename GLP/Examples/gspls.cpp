@@ -120,7 +120,7 @@ int main(int argc, const char *argv[])
     SLGlpProduct<SLSparsePls, SLGspan> gspls = *SLGlpFactory<SLSparsePls, SLGspan>::create(splsParam, gspanParam);
         
     SLCrossValidation<SLSparsePls>::SLCrossValidationParameters cvParam;
-    cvParam.kFold = 59;
+    cvParam.kFold = 5;
     cvParam.resultHistorySize = 4;
     
     gspls.setCrossValidationParameters(cvParam);
@@ -155,9 +155,7 @@ int main(int argc, const char *argv[])
         SLGraphMiningResult gspanResult = gspls.search(largestResCol, SLGRAPHMININGTASKTYPETRAIN, SLGRAPHMININGRESULTYPEX);
         
         MatrixXd x = gspanResult[SLGRAPHMININGRESULTYPEX];
-        
-        cout << x << endl;
-        
+                
         SLCrossValidationResults cvResult =
             gspls.crossValidation(x, Y, SLMODELRESULTYPEQ2 | SLMODELRESULTYPERSS | SLMODELRESULTYPEBETA);
 
@@ -168,12 +166,14 @@ int main(int argc, const char *argv[])
         X.rightCols(appendedXCols).setZero();
         X << X.leftCols(oldXCols), x;
 
-        Res = Y - X*cvResult[SLCROSSVALIDATIONRESULTYPETRAIN][0][SLMODELRESULTYPEBETA];
+        int bestBetaIndex;
+        cvResult.eachMean(SLCROSSVALIDATIONRESULTYPEVALIDATION, SLMODELRESULTYPERSS).minCoeff(&bestBetaIndex);
+        Res = Y - X*cvResult[SLCROSSVALIDATIONRESULTYPETRAIN][bestBetaIndex][SLMODELRESULTYPEBETA];
         
         double Q2 = cvResult.mean(SLCROSSVALIDATIONRESULTYPEVALIDATION, SLMODELRESULTYPEQ2);
         cout << "Q2:\n"     << Q2  << endl;
         cout << "RSS:\n"    << cvResult.mean(SLCROSSVALIDATIONRESULTYPEVALIDATION, SLMODELRESULTYPERSS) << endl;
-        cout << "\nBeta:"   << cvResult.print(SLCROSSVALIDATIONRESULTYPEVALIDATION, SLMODELRESULTYPEBETA) << endl;
+
         if ( Q2 < lastQ2 )
         {
             ++overfitCount;
