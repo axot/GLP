@@ -43,7 +43,7 @@ using namespace Eigen;
 using namespace boost::xpressive;
 using namespace std;
 
-typedef SparseMatrix<int>    SMatrixXi;
+typedef SparseMatrix<int> SMatrixXi;
 
 namespace EigenExt
 {
@@ -58,26 +58,26 @@ namespace EigenExt
     bool loadMatrixFromFile(MatrixType& m, const char* filename);
 
     /* Fast Version
-       strict matrix format, but more faster
-
-       Matrix must be formated like below,
-       space can be replaced with any delimiter
-       and only signle delimiter is permitted
-
-       Matrix Sample:
-       1 2 3
-       4 5 6
-       7 8 9
-
-       Examples:
-
-       MatrixXd X;
-
-       // use single space as delimiter
-       loadMatrixFromFileFast(X, "Matrix.data", false);
-
-       // use custom delimiter
-       loadMatrixFromFileFast(X, "Matrix.data", ';', true);
+     * strict matrix format, but more faster
+     *
+     * Matrix must be formated like below,
+     * space can be replaced with any delimiter
+     * and only signle delimiter is permitted
+     *   
+     * Matrix Sample:
+     * 1 2 3
+     * 4 5 6
+     * 7 8 9
+     *
+     * Examples:
+     *
+     * MatrixXd X;
+     *
+     * // use single space as delimiter
+     * loadMatrixFromFileFast(X, "Matrix.data");
+     *
+     * // use custom delimiter
+     * loadMatrixFromFileFast(X, "Matrix.data", ';');
      */
     template<typename MatrixType>
     bool loadMatrixFromFileFast(MatrixType& m, const char* filename, bool doesUseMemoryBoost = false);
@@ -104,22 +104,19 @@ namespace EigenExt
             tripletList.push_back(Triplet<int>(row, col, real));
         }
     }
+
+    template<typename MatrixType>
+    inline void assignTripletList(vector< Triplet<int> >& tripletList, MatrixType& m)
+    {
+        return;
+    }
     
+    template<>
     inline void assignTripletList(vector< Triplet<int> >& tripletList, SMatrixXi& m)
     {
         m.setFromTriplets(tripletList.begin(), tripletList.end());
     }
     
-    inline void assignTripletList(vector< Triplet<int> >& tripletList, MatrixXd& m)
-    {
-        return;
-    }
-    
-    inline void assignTripletList(vector< Triplet<int> >& tripletList, MatrixXi& m)
-    {
-        return;
-    }
-
     template<typename MatrixType>
     bool loadMatrixFromFile(MatrixType& m, const char* filename)
     {
@@ -128,14 +125,16 @@ namespace EigenExt
         char *line = NULL;
         size_t len = 0;
         ssize_t read;
-        
-        size_t rows = 0;
-        size_t cols = 0;
+        int rows = 0;
+        int cols = 0;
     
         FILE *fp;
         fp = fopen(filename, "r");
         if (fp == NULL)
+        {
+            cerr << "open file failed: " << filename << endl;
             return false;
+        }
         
         // calc matrix size
         while ((read = getline(&line, &len, fp)) != -1)
@@ -153,7 +152,10 @@ namespace EigenExt
         rewind(fp);
         
         if (rows == 0 || cols == 0)
+        {
+            cerr << "resize matrix failed, rows: " << rows << " cols: " << cols << endl;
             return false;
+        }
         
         m.resize(rows, cols);
         
@@ -192,8 +194,8 @@ namespace EigenExt
     bool loadMatrixFromFileFast(MatrixType& m, const char* filename, const char delim, bool doesUseMemoryBoost)
     {
         size_t delimCount = 0;
-        size_t rows = 0;
-        size_t cols = 0;
+        int rows = 0;
+        int cols = 0;
         vector< Triplet<int> > tripletList;
 
         if ( doesUseMemoryBoost == false )
@@ -205,7 +207,10 @@ namespace EigenExt
 
             fp = fopen(filename, "r");
             if (fp == NULL)
+            {
+                cerr << "open file failed: " << filename << endl;
                 return false;
+            }
             
             // calc matrix size            
             while ((read = getline(&line, &len, fp)) != -1)
@@ -226,14 +231,17 @@ namespace EigenExt
             rewind(fp);
             
             if (rows == 0 || cols == 0)
+            {
+                cerr << "resize matrix failed, rows: " << rows << " cols: " << cols << endl;
                 return false;
+            }
             
             m.resize(rows, cols);
             
             // fill matrix
             int currentRow = 0;
             int currentCol = 0;
-            int beginIndex = 0;
+            size_t beginIndex = 0;
             
             while ((read = getline(&line, &len, fp)) != -1)
             {
@@ -267,19 +275,19 @@ namespace EigenExt
             char *begin, *end;
             
             if (fd == -1) {
-                cerr << "open file failed: " << filename << endl;;
+                cerr << "open file failed: " << filename << endl;
                 return false;
             }
             
             if (fstat(fd, &fs) == -1) {
-                cerr << "stat file failed: " <<  filename << endl;;
+                cerr << "stat file failed: " <<  filename << endl;
                 return false;
             }
             
             /* fs.st_size could have been 0 actually */
             buf = (size_t)mmap(0, fs.st_size, PROT_READ, MAP_SHARED, fd, 0);
             if ((void*)buf == MAP_FAILED) {
-                cerr << "mmap failed: " << filename << endl;;
+                cerr << "mmap failed: " << filename << endl;
                 close(fd);
                 return false;
             }
@@ -312,7 +320,10 @@ namespace EigenExt
             cols = delimCount + 1;
             
             if (rows == 0 || cols == 0)
+            {
+                cerr << "resize matrix failed, rows: " << rows << " cols: " << cols << endl;
                 return false;
+            }
             
             m.resize(rows, cols);
             
