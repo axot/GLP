@@ -198,8 +198,8 @@ namespace EigenExt
 
         if ( doesUseMemoryBoost == false )
         {
-            FILE *fp = NULL;
-            char *line = NULL;
+            FILE* fp = NULL;
+            char* line = NULL;
             size_t len = 0;
             ssize_t read;
 
@@ -207,27 +207,22 @@ namespace EigenExt
             if (fp == NULL)
                 return false;
             
-            // calc matrix size
-            size_t delimPos;
-            
+            // calc matrix size            
             while ((read = getline(&line, &len, fp)) != -1)
             {
                 if (!rows)
                 {
                     for (size_t i=0; i < read; ++i)
                     {
-                        delimPos = (size_t)strchr(&line[i], delim);
-                        if (delimPos)
+                        if ( line[i] == delim )
                         {
                             ++delimCount;
-                            i = delimPos - (size_t)line;
                         }
                     }
-                    cols = delimCount + 1;
                 }
                 ++rows;
             }
-            
+            cols = delimCount + 1;
             rewind(fp);
             
             if (rows == 0 || cols == 0)
@@ -238,37 +233,24 @@ namespace EigenExt
             // fill matrix
             int currentRow = 0;
             int currentCol = 0;
-            size_t doubleEnds;
+            int beginIndex = 0;
             
             while ((read = getline(&line, &len, fp)) != -1)
             {
                 currentCol = 0;
+                beginIndex = 0;
                 for (size_t i=0; i < read; ++i)
                 {
-                    delimPos = (size_t)strchr(&line[i], delim);
-                    if (!delimPos)
+                    if ( line[i] == delim )
                     {
-                        delimPos = (size_t)strchr(&line[i], '\n');
-                        if (!delimPos)
-                        {
-                            delimPos = (size_t)strchr(&line[i], '\r');
-                            if (!delimPos)
-                            {
-                                cerr << "can not find delim or newline. line: "    << currentRow+1 <<
-                                                                        " col: "   << i+1          << endl;
-                                free(line);
-                                fclose(fp);
-                                return false;
-                            }
-                        }
-                    }
-                    doubleEnds = delimPos - (size_t)line;
-                    if (doubleEnds > i)
-                    {                       
-                        setMatValue(tripletList, m, currentRow, currentCol, &line[i]);
-
+                        setMatValue(tripletList, m, currentRow, currentCol, &line[beginIndex]);
                         ++currentCol;
-                        i = doubleEnds;
+                        beginIndex = i + 1;
+                    }
+                    else if ( line[i] == '\n' || line[i] == '\r' )
+                    {
+                        setMatValue(tripletList, m, currentRow, currentCol, &line[beginIndex]);
+                        break;
                     }
                 }
                 ++currentRow;
@@ -282,7 +264,7 @@ namespace EigenExt
             int fd = open(filename, O_RDONLY);
             struct stat fs;
             size_t buf, buf_end;
-            char* begin;
+            char *begin, *end;
             
             if (fd == -1) {
                 cerr << "open file failed: " << filename << endl;;
@@ -303,28 +285,27 @@ namespace EigenExt
             }
             
             buf_end = buf + fs.st_size;
-            
             begin = (char *)buf;
             // calc matrix size
             while ( (size_t)begin < buf_end )
             {
-                if ( *begin != '\n' && *begin != '\r' )
+                if ( !rows )
                 {
-                    if ( rows == 0 && *begin == delim )
+                    if ( *begin == delim )
                     {
                         ++delimCount;
                     }
                 }
-                else
+                if ( *begin == '\n' || *begin == '\r' )
                 {
+                    ++rows;
+                    
                     /* see if we got "\r\n" or "\n\r" here */
                     if ( (size_t)begin+1 < buf_end && ( *(begin+1) == '\n' || *(begin+1) == '\r' ) )
                     {
                         ++begin;
                     }
-                    ++rows;
                 }
-                
                 ++begin;
             }
             
@@ -340,21 +321,16 @@ namespace EigenExt
             int currentCol = 0;
             
             begin = (char *)buf;
-            char* end = begin;
-            
+            end = begin;
             while ( (size_t)end < buf_end )
             {
-                if ( *end != '\n' && *end != '\r' )
+                if ( *end == delim )
                 {
-                    if ( *end == delim )
-                    {
-                        setMatValue(tripletList, m, currentRow, currentCol, begin);
-                        
-                        ++currentCol;
-                        begin = end + 1;
-                    }
+                    setMatValue(tripletList, m, currentRow, currentCol, begin);
+                    ++currentCol;
+                    begin = end + 1;
                 }
-                else
+                else if ( *end == '\n' || *end == '\r' )
                 {
                     setMatValue(tripletList, m, currentRow, currentCol, begin);
 
@@ -363,12 +339,10 @@ namespace EigenExt
                     {
                         ++end;
                     }
-                    
                     ++currentRow;
                     currentCol = 0;
                     begin = end + 1;
                 }
-                
                 ++end;
             }
             munmap((void*)buf, fs.st_size);
