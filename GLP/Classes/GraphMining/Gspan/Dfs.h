@@ -32,6 +32,7 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <algorithm>
 #include "Graph.h"
 
 using namespace std;

@@ -30,6 +30,9 @@
 #define GLP_Gspan_Graph_h
 
 #include <iostream>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <vector>
 
 struct Edge

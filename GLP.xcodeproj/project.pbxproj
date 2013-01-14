@@ -19,6 +19,7 @@
 		53C09383168DBB5D00A0ADC1 /* SLGspan.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53C09381168DBB5D00A0ADC1 /* SLGspan.cpp */; };
 		53C09388168DDEA500A0ADC1 /* gspls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53C09387168DDEA500A0ADC1 /* gspls.cpp */; };
 		53EDCB1316995691006170CE /* SparsePlsTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53388A231690B03000AF9E5E /* SparsePlsTest.cpp */; };
+		53F3157016A4A7550056C3A9 /* Makefile in Sources */ = {isa = PBXBuildFile; fileRef = 53F3156F16A4A7550056C3A9 /* Makefile */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -70,6 +71,7 @@
 		53C09381168DBB5D00A0ADC1 /* SLGspan.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SLGspan.cpp; path = Classes/GraphMining/SLGspan.cpp; sourceTree = "<group>"; };
 		53C09382168DBB5D00A0ADC1 /* SLGspan.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLGspan.h; path = Classes/GraphMining/SLGspan.h; sourceTree = "<group>"; };
 		53C09387168DDEA500A0ADC1 /* gspls.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = gspls.cpp; path = Examples/gspls.cpp; sourceTree = "<group>"; };
+		53F3156F16A4A7550056C3A9 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = SOURCE_ROOT; };
 		53FC1E3116942D8700F3FD58 /* SLCrossValidation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLCrossValidation.h; path = Classes/Utilities/SLCrossValidation.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -135,6 +137,7 @@
 			children = (
 				537123441683288A00B47D4E /* GLP */,
 				5371237E16833C2D00B47D4E /* README.md */,
+				53F3156F16A4A7550056C3A9 /* Makefile */,
 				537123421683288A00B47D4E /* Products */,
 			);
 			sourceTree = "<group>";
@@ -317,6 +320,7 @@
 				53B5D650169731C900AE0523 /* Dfs.cpp in Sources */,
 				53B5D654169733FC00AE0523 /* Utility.cpp in Sources */,
 				53C09388168DDEA500A0ADC1 /* gspls.cpp in Sources */,
+				53F3157016A4A7550056C3A9 /* Makefile in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

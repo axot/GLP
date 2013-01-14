@@ -64,7 +64,7 @@ int main(int argc, const char *argv[])
     char *gspfile = NULL;
     int verbose = 0;
 
-    if (argc < 1) {
+    if (argc < 2) {
         usage();
         return -1;
     }
@@ -120,7 +120,7 @@ int main(int argc, const char *argv[])
     SLGlpProduct<SLSparsePls, SLGspan> gspls = *SLGlpFactory<SLSparsePls, SLGspan>::create(splsParam, gspanParam);
         
     SLCrossValidation<SLSparsePls>::SLCrossValidationParameters cvParam;
-    cvParam.kFold = 5;
+    cvParam.kFold = 10;
     cvParam.resultHistorySize = 4;
     
     gspls.setCrossValidationParameters(cvParam);
@@ -139,7 +139,7 @@ int main(int argc, const char *argv[])
     Y = Y.array() - Y.mean();
     Res = Y;
     
-    double lastQ2 = -DBL_MAX;
+    double lastRSS = -DBL_MAX;
     int overfitCount = 0;
     
     unsigned int i = 0;
@@ -170,11 +170,11 @@ int main(int argc, const char *argv[])
         cvResult.eachMean(SLCROSSVALIDATIONRESULTYPEVALIDATION, SLMODELRESULTYPERSS).minCoeff(&bestBetaIndex);
         Res = Y - X*cvResult[SLCROSSVALIDATIONRESULTYPETRAIN][bestBetaIndex][SLMODELRESULTYPEBETA];
         
-        double Q2 = cvResult.mean(SLCROSSVALIDATIONRESULTYPEVALIDATION, SLMODELRESULTYPEQ2);
-        cout << "Q2:\n"     << Q2  << endl;
+        double RSS = cvResult.mean(SLCROSSVALIDATIONRESULTYPEVALIDATION, SLMODELRESULTYPERSS);
+        cout << "Q2:\n"     << cvResult.mean(SLCROSSVALIDATIONRESULTYPEVALIDATION, SLMODELRESULTYPEQ2)  << endl;
         cout << "RSS:\n"    << cvResult.mean(SLCROSSVALIDATIONRESULTYPEVALIDATION, SLMODELRESULTYPERSS) << endl;
 
-        if ( Q2 < lastQ2 )
+        if ( RSS > lastRSS )
         {
             ++overfitCount;
         }
@@ -187,7 +187,7 @@ int main(int argc, const char *argv[])
             break;
         }
         
-        lastQ2 = Q2;
+        lastRSS = RSS;
     }
     
     SLCrossValidationResults oldResult = gspls.getResultHistory().back();

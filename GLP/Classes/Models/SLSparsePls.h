@@ -27,6 +27,7 @@
 #define GLP_SLSparsePls_h
 
 #include <iostream>
+#include <cstdio>
 #include <Eigen/Core>
 #include "SLModelStrategy.h"
 #include "SLModel.h"
