@@ -126,10 +126,6 @@ int main(int argc, const char *argv[])
     gspls.setCrossValidationParameters(cvParam);
     
     MatrixXd X, Y, Res;
-
-    SMatrixXi Test;
-    EigenExt::loadMatrixFromFileFast(Test, "small.txt", true);
-    cout << "Test:\n" << Test << endl;
     
     if ( yfile != NULL )
     {
@@ -177,7 +173,7 @@ int main(int argc, const char *argv[])
         double Q2 = cvResult.mean(SLCROSSVALIDATIONRESULTYPEVALIDATION, SLMODELRESULTYPEQ2);
         cout << "Q2:\n"     << Q2  << endl;
         cout << "RSS:\n"    << cvResult.mean(SLCROSSVALIDATIONRESULTYPEVALIDATION, SLMODELRESULTYPERSS) << endl;
-        cout << "\nBeta:"         << cvResult.print(SLCROSSVALIDATIONRESULTYPEVALIDATION, SLMODELRESULTYPEBETA) << endl;
+        cout << "\nBeta:"   << cvResult.print(SLCROSSVALIDATIONRESULTYPEVALIDATION, SLMODELRESULTYPEBETA) << endl;
         if ( Q2 < lastQ2 )
         {
             ++overfitCount;

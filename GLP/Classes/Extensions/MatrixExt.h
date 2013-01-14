@@ -55,7 +55,7 @@ namespace EigenExt
      * loadMatrixFromFile(X, "Matrix.data");
      */
     template<typename MatrixType>
-    bool loadMatrixFromFile(MatrixType& m, const char* filename, bool doesUseMemoryBoost = false);
+    bool loadMatrixFromFile(MatrixType& m, const char* filename);
 
     /* Fast Version
        strict matrix format, but more faster
@@ -74,10 +74,10 @@ namespace EigenExt
        MatrixXd X;
 
        // use single space as delimiter
-       loadMatrixFromFileFast(X, "Matrix.data");
+       loadMatrixFromFileFast(X, "Matrix.data", false);
 
        // use custom delimiter
-       loadMatrixFromFileFast(X, "Matrix.data", ';');
+       loadMatrixFromFileFast(X, "Matrix.data", ';', true);
      */
     template<typename MatrixType>
     bool loadMatrixFromFileFast(MatrixType& m, const char* filename, bool doesUseMemoryBoost = false);
@@ -121,7 +121,7 @@ namespace EigenExt
     }
 
     template<typename MatrixType>
-    bool loadMatrixFromFile(MatrixType& m, const char* filename, bool doesUseMemoryBoost)
+    bool loadMatrixFromFile(MatrixType& m, const char* filename)
     {
         sregex regex = sregex::compile("[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?");
 
@@ -252,18 +252,20 @@ namespace EigenExt
                         if (!delimPos)
                         {
                             delimPos = (size_t)strchr(&line[i], '\r');
-                            if (!delimPos) return false;
+                            if (!delimPos)
+                            {
+                                cerr << "can not find delim or newline. line: "    << currentRow+1 <<
+                                                                        " col: "   << i+1          << endl;
+                                free(line);
+                                fclose(fp);
+                                return false;
+                            }
                         }
                     }
                     doubleEnds = delimPos - (size_t)line;
                     if (doubleEnds > i)
-                    {
-                        char oldDelim = *(char*)delimPos;
-                        char* end = (char*)delimPos;
-                        
-                        *end = '\0';
+                    {                       
                         setMatValue(tripletList, m, currentRow, currentCol, &line[i]);
-                        *end = oldDelim;
 
                         ++currentCol;
                         i = doubleEnds;
@@ -277,7 +279,7 @@ namespace EigenExt
         }
         else if ( doesUseMemoryBoost == true )
         {
-            int fd = open(filename, O_RDWR);
+            int fd = open(filename, O_RDONLY);
             struct stat fs;
             size_t buf, buf_end;
             char* begin;
@@ -293,7 +295,7 @@ namespace EigenExt
             }
             
             /* fs.st_size could have been 0 actually */
-            buf = (size_t)mmap(0, fs.st_size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
+            buf = (size_t)mmap(0, fs.st_size, PROT_READ, MAP_SHARED, fd, 0);
             if ((void*)buf == MAP_FAILED) {
                 cerr << "mmap failed: " << filename << endl;;
                 close(fd);
@@ -346,9 +348,7 @@ namespace EigenExt
                 {
                     if ( *end == delim )
                     {
-                        *end = '\0';
                         setMatValue(tripletList, m, currentRow, currentCol, begin);
-                        *end = delim;
                         
                         ++currentCol;
                         begin = end + 1;
@@ -356,18 +356,7 @@ namespace EigenExt
                 }
                 else
                 {
-                    if ( *end == '\n' )
-                    {
-                        *end = '\0';
-                        setMatValue(tripletList, m, currentRow, currentCol, begin);
-                        *end = '\n';
-                    }
-                    else if ( *end == '\r' )
-                    {
-                        *end = '\0';
-                        setMatValue(tripletList, m, currentRow, currentCol, begin);
-                        *end = '\r';
-                    }
+                    setMatValue(tripletList, m, currentRow, currentCol, begin);
 
                     /* see if we got "\r\n" or "\n\r" here */
                     if ( (size_t)end+1 < buf_end && ( *(end+1) == '\n' || *(end+1) == '\r' ) )
