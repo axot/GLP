@@ -185,7 +185,7 @@ MatrixXd SLSparsePls::calcACC(const MatrixXd& tX, const MatrixXd& tY) const
             }
             else
             {
-                if(realY(j,i) <= mid[i])
+                if(realY(j,i) < mid[i])
                 {
                     ++correct;
                 }

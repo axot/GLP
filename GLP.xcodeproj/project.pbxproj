@@ -50,6 +50,12 @@
 		53317441168D987B005305C8 /* SLGraphMiningStrategy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLGraphMiningStrategy.h; path = Classes/GraphMining/SLGraphMiningStrategy.h; sourceTree = "<group>"; };
 		53388A231690B03000AF9E5E /* SparsePlsTest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SparsePlsTest.cpp; path = Test/SparsePlsTest.cpp; sourceTree = "<group>"; };
 		53388A2A1690B0D500AF9E5E /* SparsePls */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SparsePls; sourceTree = BUILT_PRODUCTS_DIR; };
+		5348010516A7247500755DFB /* 1862drugs.gsp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = 1862drugs.gsp; path = Examples/datasets/1862drugs.gsp; sourceTree = "<group>"; };
+		5348010616A7247500755DFB /* 1862Y.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = 1862Y.txt; path = Examples/datasets/1862Y.txt; sourceTree = "<group>"; };
+		5348010716A7247500755DFB /* CAS.gsp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = CAS.gsp; path = Examples/datasets/CAS.gsp; sourceTree = "<group>"; };
+		5348010816A7247500755DFB /* es.gsp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = es.gsp; path = Examples/datasets/es.gsp; sourceTree = "<group>"; };
+		5348010916A7247500755DFB /* seYsmall.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = seYsmall.txt; path = Examples/datasets/seYsmall.txt; sourceTree = "<group>"; };
+		5348010A16A7247500755DFB /* sideEfDrugsAnnot.gsp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = sideEfDrugsAnnot.gsp; path = Examples/datasets/sideEfDrugsAnnot.gsp; sourceTree = "<group>"; };
 		534F58361696F1F300D2C3D3 /* SLCrossValidationResults.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SLCrossValidationResults.h; path = Classes/Utilities/SLCrossValidationResults.h; sourceTree = "<group>"; };
 		534F58381696F29300D2C3D3 /* SLCrossValidationResultHistory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SLCrossValidationResultHistory.h; path = Classes/Utilities/SLCrossValidationResultHistory.h; sourceTree = "<group>"; };
 		53578E04168D69AD002668D3 /* SLModelStrategy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLModelStrategy.h; path = Classes/Models/SLModelStrategy.h; sourceTree = "<group>"; };
@@ -101,6 +107,19 @@
 			name = Test;
 			sourceTree = "<group>";
 		};
+		5348010316A7246100755DFB /* datasets */ = {
+			isa = PBXGroup;
+			children = (
+				5348010516A7247500755DFB /* 1862drugs.gsp */,
+				5348010616A7247500755DFB /* 1862Y.txt */,
+				5348010716A7247500755DFB /* CAS.gsp */,
+				5348010816A7247500755DFB /* es.gsp */,
+				5348010916A7247500755DFB /* seYsmall.txt */,
+				5348010A16A7247500755DFB /* sideEfDrugsAnnot.gsp */,
+			);
+			name = datasets;
+			sourceTree = "<group>";
+		};
 		53578DF5168D67FC002668D3 /* Factory */ = {
 			isa = PBXGroup;
 			children = (
@@ -127,6 +146,7 @@
 		53578DFA168D6922002668D3 /* Examples */ = {
 			isa = PBXGroup;
 			children = (
+				5348010316A7246100755DFB /* datasets */,
 				53C09387168DDEA500A0ADC1 /* gspls.cpp */,
 			);
 			name = Examples;
