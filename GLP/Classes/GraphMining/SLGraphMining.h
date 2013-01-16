@@ -41,13 +41,13 @@ public:
         return aStrategy.search(residual, taskType, resultType);
     }
     
-    SLGraphMiningInnerValues getInnerValues(SLGRAPHMININGINNERVALUE type)
+    SLGraphMiningInnerValues getInnerValues(SLGRAPHMININGINNERVALUE type) const
     {
         return aStrategy.getInnerValues(type);
     }
     
     template <typename GP>
-    bool setParameters(GP modelParameters) { return aStrategy.setParameters(modelParameters); }
+    bool setParameters(GP& modelParameters) { return aStrategy.setParameters(modelParameters); }
 
 private:
     AStrategy aStrategy;

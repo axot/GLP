@@ -29,7 +29,7 @@
 using namespace std;
 
 // Public Methods
-bool SLGspan::setParameters(SLGspanParameters parameters)
+bool SLGspan::setParameters(SLGspanParameters& parameters)
 {
     ASSERT(parameters.gspFilename.empty() == false, "Parameter gspFilename is required for Gspan.");
     
@@ -47,7 +47,7 @@ bool SLGspan::setParameters(SLGspanParameters parameters)
     return true;
 }
 
-SLGraphMiningInnerValues SLGspan::getInnerValues(SLGRAPHMININGINNERVALUE type)
+SLGraphMiningInnerValues SLGspan::getInnerValues(SLGRAPHMININGINNERVALUE type) const
 {
     ASSERT( type != SLGRAPHMININGINNERVALUENOTDEFINED, "inner values must be specified");
     
@@ -55,7 +55,7 @@ SLGraphMiningInnerValues SLGspan::getInnerValues(SLGRAPHMININGINNERVALUE type)
     if ( type & SLGRAPHMININGINNERVALUEY )
     {
         MatrixXd y(transaction.size(), 1);
-        for (size_t i = 0; i < y.size(); ++i)   y.col(0)[i] = transaction[i].value;
+        for (int i = 0; i < y.size(); ++i)   y.col(0)[i] = transaction[i].value;
         
         results[SLGRAPHMININGINNERVALUEY] = y;
     }
@@ -174,7 +174,7 @@ bool SLGspan::is_min()
     Projected_map3 root;
     EdgeList       edges;
     
-    for (int from = 0; from < GRAPH_IS_MIN.size() ; ++from)
+    for (size_t from = 0; from < GRAPH_IS_MIN.size() ; ++from)
         if (Utility::get_forward_root(GRAPH_IS_MIN, GRAPH_IS_MIN[from], edges))
             for (EdgeList::iterator it = edges.begin(); it != edges.end();  ++it)
                 root[GRAPH_IS_MIN[from].label][(*it)->elabel][GRAPH_IS_MIN[(*it)->to].label].push(0, *it, 0);
@@ -200,7 +200,7 @@ bool SLGspan::project_is_min(Projected &projected)
         int newto = 0;
         
         for (int i = (int)rmpath.size()-1; !flg  && i >= 1; --i) {
-            for (int n = 0; n < projected.size(); ++n) {
+            for (size_t n = 0; n < projected.size(); ++n) {
                 PDFS *cur = &projected[n];
                 History history (GRAPH_IS_MIN, cur);
                 Edge *e = Utility::get_backward (GRAPH_IS_MIN, history[rmpath[i]], history[rmpath[0]], history);
@@ -226,7 +226,7 @@ bool SLGspan::project_is_min(Projected &projected)
         Projected_map2 root;
         EdgeList edges;
         
-        for (int n = 0; n < projected.size(); ++n) {
+        for (size_t n = 0; n < projected.size(); ++n) {
             PDFS *cur = &projected[n];
             History history (GRAPH_IS_MIN, cur);
             if (Utility::get_forward_pure (GRAPH_IS_MIN, history[rmpath[0]], minlabel, history, edges)) {
@@ -238,7 +238,7 @@ bool SLGspan::project_is_min(Projected &projected)
         }
         
         for (int i = 0; ! flg && i < (int)rmpath.size(); ++i) {
-            for (int n = 0; n < projected.size(); ++n) {
+            for (size_t n = 0; n < projected.size(); ++n) {
                 PDFS *cur = &projected[n];
                 History history (GRAPH_IS_MIN, cur);
                 if (Utility::get_forward_rmpath (GRAPH_IS_MIN, history[rmpath[i]], minlabel, history, edges)) {
@@ -379,7 +379,7 @@ void SLGspan::project(Projected& projected)
     Projected_map2 new_bck_root;
     EdgeList edges;
     
-    for (int n = 0; n < projected.size(); ++n)
+    for (size_t n = 0; n < projected.size(); ++n)
     {
         int id = projected[n].id;
         PDFS *cur = &projected[n];
@@ -507,7 +507,7 @@ void SLGspan::project(Projected& projected, tree<TNODE>::iterator& tnode)
     
     //printf("%d %d %d\n",projected.size(), child->projected.size(), child->id);
     
-    for (int n = 0; n < child->projected.size(); ++n)
+    for (size_t n = 0; n < child->projected.size(); ++n)
     {
         int id = child->projected[n].id;
         PDFS *cur = &(child->projected[n]);
@@ -571,7 +571,7 @@ void SLGspan::initDFSTree(Projected_map3 &root)
 {    
     EdgeList edges;
     
-    for (int id = 0; id < transaction.size(); ++id)
+    for (size_t id = 0; id < transaction.size(); ++id)
     {
         Graph& g = transaction[id];
         for (size_t from = 0; from < g.size(); ++from)

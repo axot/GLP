@@ -32,11 +32,14 @@
 
 #include <iostream>
 #include <Eigen/Core>
+#include <boost/typeof/typeof.hpp>
 #include "../Models/SLModelStrategy.h"
+#include "../SLUtility.h"
 #include "SLCrossValidationResults.h"
 #include "SLCrossValidationResultHistory.h"
 
 using namespace std;
+using namespace boost;
 using namespace Eigen;
 
 enum{
@@ -56,8 +59,8 @@ public:
         SLCrossValidationParameters() : kFold(10), resultHistorySize(5) {}
         
     public:
-        int kFold;
-        int resultHistorySize;
+        size_t kFold;
+        size_t resultHistorySize;
         T modelClone;
     };
 
@@ -107,7 +110,7 @@ public:
      *              | 2 |   <- the time before last of result
      *              |...|
      */
-    const SLCrossValidationResultHistory& getResultHistory()
+    const SLCrossValidationResultHistory& getResultHistory() const
     {
         return resultHistory;
     }
@@ -141,7 +144,7 @@ private:
     
 private:
     // assignable parameters via setParameters() method
-    int kFold;
+    size_t kFold;
     SLCrossValidationResultHistory resultHistory;
     T modelClone;
     
@@ -161,7 +164,7 @@ SLCrossValidationResults SLCrossValidation<T>::crossValidation(const MatrixXd& X
                                                                SLMODELRESULTYPE resultType,
                                                                SLCROSSVALIDATIONMETHODSTYPE methodType)
 {
-    ASSERT(kFold <= X.rows(), "K-Fold was too big than X rows.");
+    ASSERT(kFold <= (size_t)X.rows(), "K-Fold was too big than X rows.");
     ASSERT(kFold >= 4, "K-Fold was too small, it must bigger than 4.");
     
     if (randomIndexs.size() == 0)
@@ -173,7 +176,8 @@ SLCrossValidationResults SLCrossValidation<T>::crossValidation(const MatrixXd& X
         for (size_t i=0; i<kFold; ++i)
         {
             T model;
-            model.setParameters(modelClone.getParameters());
+            BOOST_AUTO(modelParameters, modelClone.getParameters());
+            model.setParameters(modelParameters);
             cvModels.push_back(model);
         }
     }
@@ -182,7 +186,7 @@ SLCrossValidationResults SLCrossValidation<T>::crossValidation(const MatrixXd& X
     MatrixXd shuffledY = Y;
     
 #pragma omp parallel for
-    for (size_t i=0; i<X.rows(); ++i)
+    for (int i=0; i<X.rows(); ++i)
     {
         shuffledX.row(i) = X.row(randomIndexs[i]);
         shuffledY.row(i) = Y.row(randomIndexs[i]);
@@ -219,7 +223,7 @@ MatrixXd SLCrossValidation<T>::cvSplitMatrix(MatrixXd& from, ssize_t startIndex,
     if (startIndex < 0){
         startIndex = from.rows() + startIndex;
     }
-    if (startIndex+length <= from.rows()) {
+    if ((int)(startIndex+length) <= from.rows()) {
         return from.block(startIndex, 0, length, from.cols());
     }
     size_t beginLength = startIndex+length-from.rows();

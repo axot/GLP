@@ -79,7 +79,7 @@ public:
      *
      * Return: the results stored in mapped structure.
      */
-    virtual SLGraphMiningInnerValues getInnerValues(SLGRAPHMININGINNERVALUE type) = 0;
+    virtual SLGraphMiningInnerValues getInnerValues(SLGRAPHMININGINNERVALUE type) const = 0;
 
     /* Set Parameters:
      * Input
@@ -88,7 +88,7 @@ public:
      * Return: true if sucessed.
      */
     template <typename GP>
-    bool setParameters(GP parameters) { return true; };
+    bool setParameters(GP& parameters) { return true; };
 };
 
 #endif /* defined(__GLP__SLGraphMiningStrategy__) */

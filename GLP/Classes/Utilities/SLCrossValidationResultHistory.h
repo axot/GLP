@@ -43,7 +43,7 @@ public:
     }
     
 public:
-    int resultHistorySize;
+    size_t resultHistorySize;
 };
 
 #endif

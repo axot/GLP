@@ -79,7 +79,7 @@ public:
      * Return: true if sucessed.
      */
     template <typename MP>
-    bool setParameters(MP parameters) { return true; };
+    bool setParameters(MP& parameters) { return true; };
     
     /* Get Parameters:
      *
@@ -87,7 +87,7 @@ public:
      *  Discussion: for implementng cross validation you have to override this method.
      */
     template <typename MP>
-    MP getParameters() { MP mp; return mp; }
+    MP getParameters() const { MP mp; return mp; }
 };
 
 #endif

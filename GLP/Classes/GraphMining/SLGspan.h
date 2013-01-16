@@ -90,7 +90,7 @@ public:
      *
      * Return: the results stored in mapped structure.
      */
-    virtual SLGraphMiningInnerValues getInnerValues(SLGRAPHMININGINNERVALUE type);
+    virtual SLGraphMiningInnerValues getInnerValues(SLGRAPHMININGINNERVALUE type) const;
     
     /* Set Parameters:
      * Input
@@ -98,7 +98,7 @@ public:
      *
      * Return: true if sucessed.
      */
-    bool setParameters(SLGspanParameters parameters);
+    bool setParameters(SLGspanParameters& parameters);
 
 private:
     void init();

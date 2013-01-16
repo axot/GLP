@@ -89,7 +89,7 @@ SLModelResult SLSparsePls::classify(const MatrixXd& tX, const MatrixXd& tY, SLMO
 {
     ASSERT(type != SLMODELRESULTYPENONE, "No type of result was indicated");
     
-    ASSERT(!(type & ~(SLMODELRESULTYPEBETA|SLMODELRESULTYPEQ2|SLMODELRESULTYPERSS)),
+    ASSERT(!(type & ~(SLMODELRESULTYPEBETA|SLMODELRESULTYPEQ2|SLMODELRESULTYPERSS|SLMODELRESULTYPEACC)),
            "Only support Beta Q2 RSS for Sparse PLS.");
     
     ASSERT(meanY.cols() != 0 && meanY.rows() != 0, "Train data first");
@@ -105,19 +105,27 @@ SLModelResult SLSparsePls::classify(const MatrixXd& tX, const MatrixXd& tY, SLMO
     {
         result[SLMODELRESULTYPEQ2] = MatrixXd::Ones(1, autoSacaledY.cols()) - SSum(tRES).cwiseQuotient(SSum(autoSacaledY));
     }
+    
     if(type & SLMODELRESULTYPERSS)
     {
         result[SLMODELRESULTYPERSS] = SSum(tRES);
     }
+    
     if(type & SLMODELRESULTYPEBETA)
     {
         result[SLMODELRESULTYPEBETA] = Beta;
     }
+    
+    if(type & SLMODELRESULTYPEACC)
+    {
+        result[SLMODELRESULTYPEACC] = calcACC(tX, tY);
+    }
     return result;
 }
 
-bool SLSparsePls::setParameters(SLSparsePlsParameters parameters)
+bool SLSparsePls::setParameters(SLSparsePlsParameters& parameters)
 {
+    verbose = parameters.verbose;
     param = parameters;
     return true;
 }
@@ -125,7 +133,7 @@ bool SLSparsePls::setParameters(SLSparsePlsParameters parameters)
 // Private Methods
 SLModelResult SLSparsePls::getTrainResult(SLMODELRESULTYPE type) const
 {
-    ASSERT(!(type & ~(SLMODELRESULTYPEBETA|SLMODELRESULTYPEQ2|SLMODELRESULTYPERSS)),
+    ASSERT(!(type & ~(SLMODELRESULTYPEBETA|SLMODELRESULTYPEQ2|SLMODELRESULTYPERSS|SLMODELRESULTYPEACC)),
            "Only support Beta Residual Q2 RSS for Sparse PLS.");
     
     ASSERT(meanY.cols() != 0 && meanY.rows() != 0, "Train data first");
@@ -145,6 +153,45 @@ SLModelResult SLSparsePls::getTrainResult(SLMODELRESULTYPE type) const
     {
         result[SLMODELRESULTYPEBETA] = Beta;
     }
-        
+    
+    if(type & SLMODELRESULTYPEACC)
+    {
+        result[SLMODELRESULTYPEACC] = calcACC(X, Y);
+    }
     return result;
+}
+
+MatrixXd SLSparsePls::calcACC(const MatrixXd& tX, const MatrixXd& tY) const
+{
+    MatrixXd realY    = tY + meanY.replicate(tY.rows(), 1);
+    MatrixXd predictY = tX*Beta;
+    size_t correct = 0;
+    MatrixXd acc(1,realY.cols());
+    
+    VectorXd min = realY.colwise().minCoeff();
+    VectorXd max = realY.colwise().maxCoeff();
+    VectorXd mid = (min + max) / 2;
+    for (int i=0; i < realY.cols(); ++i)
+    {
+        correct = 0;
+        for (int j=0; j < realY.rows(); ++j)
+        {
+            if (predictY(j,i) > mid[i])
+            {
+                if(realY(j,i) > mid[i])
+                {
+                    ++correct;
+                }
+            }
+            else
+            {
+                if(realY(j,i) <= mid[i])
+                {
+                    ++correct;
+                }
+            }
+        }
+        acc(0,i) = (double)correct/tY.rows();
+    }
+    return acc;
 }

@@ -40,9 +40,10 @@ public:
     class SLSparsePlsParameters
     {
     public:
-        SLSparsePlsParameters() {}
+        SLSparsePlsParameters() : verbose(false) {}
         
     public:
+        bool verbose;
     };
     
 public:
@@ -76,17 +77,18 @@ public:
      *
      * Discussion: no optional parameters for Sparse PLS
      */
-    bool setParameters(SLSparsePlsParameters parameters);
+    bool setParameters(SLSparsePlsParameters& parameters);
     
     /* Get Parameters:
      *
      * Return: current parameters.
      */
-    SLSparsePlsParameters getParameters() { return param; }
+    SLSparsePlsParameters getParameters() const { return param; }
     
 private:
     SLModelResult getTrainResult(SLMODELRESULTYPE type) const;
-
+    MatrixXd calcACC(const MatrixXd& tX, const MatrixXd& tY) const;
+    
 private:
     // assignable parameters via setParameters() method
     

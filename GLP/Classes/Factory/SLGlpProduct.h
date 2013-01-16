@@ -25,6 +25,7 @@
 #define __GLP__SLGlpProduct__
 
 #include <iostream>
+#include <typeinfo>
 #include "../Models/SLModel.h"
 #include "../Models/SLSparsePls.h"
 #include "../GraphMining/SLGraphMining.h"
@@ -66,7 +67,7 @@ public:
         return graphMining.search(residual, taskType, resultType);
     }
 
-    virtual SLGraphMiningInnerValues getInnerValues(SLGRAPHMININGINNERVALUE type)
+    virtual SLGraphMiningInnerValues getInnerValues(SLGRAPHMININGINNERVALUE type) const
     {
         return graphMining.getInnerValues(type);
     }
@@ -84,12 +85,12 @@ public:
             return cv.crossValidation(X, Y, resultType, methodType);
     }
 
-    void setCrossValidationParameters(typename SLCrossValidation<M>::SLCrossValidationParameters parameters)
+    void setCrossValidationParameters(typename SLCrossValidation<M>::SLCrossValidationParameters& parameters)
     {
         cv.setParameters(parameters);
     }
     
-    const SLCrossValidationResultHistory& getResultHistory()
+    const SLCrossValidationResultHistory& getResultHistory() const
     {
         return cv.getResultHistory();
     }

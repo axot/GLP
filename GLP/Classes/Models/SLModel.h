@@ -48,18 +48,18 @@ public:
     }
 
     template <typename MP>
-    MP getParameters()
+    MP getParameters() const
     {
         return aStrategy.getParameters();
     }
     
     template <typename MP>
-    bool setParameters(MP modelParameters)
+    bool setParameters(MP& modelParameters)
     {
         return aStrategy.setParameters(modelParameters);
     }
     
-    AStrategy getModel()
+    AStrategy getModel() const
     {
         return aStrategy;
     }

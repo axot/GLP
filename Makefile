@@ -12,12 +12,13 @@ all : gspls
 
 lib : libglp.a
 
-gspls :	 $(OBJECTS)
+gspls : $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJECTS) GLP/Examples/gspls.cpp
 	mv gspls $(BINDIR)/
 
 libglp.a : $(OBJECTS)
 	ar r $@ $(OBJECTS)
+    
 clean :
 	rm -f libglp.a
 	find $(SRCS) -name '*.o' | xargs rm

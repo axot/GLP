@@ -88,12 +88,12 @@ namespace EigenExt
     /* Implementation */
     inline void setMatValue(vector< Triplet<int> >& tripletList, MatrixXd& m, int row, int col, char* begin)
     {
-        m.row(row)[col] = atof(begin);
+        m(row,col) = atof(begin);
     }
     
     inline void setMatValue(vector< Triplet<int> >& tripletList, MatrixXi& m, int row, int col, char* begin)
     {
-        m.row(row)[col] = atoi(begin);
+        m(row,col) = atoi(begin);
     }
         
     inline void setMatValue(vector< Triplet<int> >& tripletList, SMatrixXi& m, int row, int col, char* begin)
@@ -173,7 +173,7 @@ namespace EigenExt
             for(; cur != end; ++cur)
             {
                 smatch const &what = *cur;
-                m.row(currentRow)[currentCol] = atof(what[0].str().c_str());
+                m(currentRow,currentCol) = atof(what[0].str().c_str());
                 ++currentCol;
             }
             ++currentRow;

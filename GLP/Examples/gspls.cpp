@@ -25,14 +25,14 @@
 
 #include <iostream>
 #include <time.h>
-#include <boost/format.hpp>
+#include <boost/typeof/typeof.hpp>
 #include <Eigen/Core>
 #include <cfloat>
 #include "../Classes/SLGlp.h"
 
 using namespace Eigen;
 using namespace std;
-using boost::format;
+using namespace boost;
 
 void usage()
 {
@@ -101,7 +101,7 @@ int main(int argc, const char *argv[])
     gspfile = strdup(argv[argc-1]);
     
     ++optind;
-    for (size_t i = optind; i < argc; i++)
+    for (int i = optind; i < argc; i++)
     {
         printf ("Unknown argument: %s\n", argv[i]);
         usage();
@@ -117,7 +117,7 @@ int main(int argc, const char *argv[])
     gspanParam.doesUseMemoryBoost = true;
     gspanParam.gspFilename = string(gspfile);
     
-    SLGlpProduct<SLSparsePls, SLGspan> gspls = *SLGlpFactory<SLSparsePls, SLGspan>::create(splsParam, gspanParam);
+    BOOST_AUTO(gspls, (*SLGlpFactory<SLSparsePls, SLGspan>::create(splsParam, gspanParam)));
         
     SLCrossValidation<SLSparsePls>::SLCrossValidationParameters cvParam;
     cvParam.kFold = 10;
@@ -136,17 +136,16 @@ int main(int argc, const char *argv[])
         Y = gspls.getInnerValues(SLGRAPHMININGINNERVALUEY)[SLGRAPHMININGINNERVALUEY];
     }
     
-    Y = Y.array() - Y.mean();
-    Res = Y;
+    Res = Y.array() - Y.mean();
     
     double lastRSS = -DBL_MAX;
-    int overfitCount = 0;
+    size_t overfitCount = 0;
     
     unsigned int i = 0;
     
     while ( i < n )
     {
-        cout << "\nCross Validation: n: " << ++i << endl;
+        cout << "n: " << ++i << endl;
         
         long maxSquaredNormColumn;
         SSum(Res).maxCoeff(&maxSquaredNormColumn);
@@ -157,7 +156,7 @@ int main(int argc, const char *argv[])
         MatrixXd x = gspanResult[SLGRAPHMININGRESULTYPEX];
                 
         SLCrossValidationResults cvResult =
-            gspls.crossValidation(x, Y, SLMODELRESULTYPEQ2 | SLMODELRESULTYPERSS | SLMODELRESULTYPEBETA);
+            gspls.crossValidation(x, Y, SLMODELRESULTYPEQ2 | SLMODELRESULTYPERSS | SLMODELRESULTYPEBETA | SLMODELRESULTYPEACC);
 
         long appendedXRows = x.rows();
         long appendedXCols = x.cols();
@@ -167,13 +166,28 @@ int main(int argc, const char *argv[])
         X << X.leftCols(oldXCols), x;
 
         int bestBetaIndex;
-        cvResult.eachMean(SLCROSSVALIDATIONRESULTYPEVALIDATION, SLMODELRESULTYPERSS).minCoeff(&bestBetaIndex);
+        cvResult.eachMean(SLCROSSVALIDATIONRESULTYPETRAIN, SLMODELRESULTYPERSS).minCoeff(&bestBetaIndex);
         Res = Y - X*cvResult[SLCROSSVALIDATIONRESULTYPETRAIN][bestBetaIndex][SLMODELRESULTYPEBETA];
         
         double RSS = cvResult.mean(SLCROSSVALIDATIONRESULTYPEVALIDATION, SLMODELRESULTYPERSS);
+        
+        cout << "Train:"    << endl;
+        cout << "Q2:\n"     << cvResult.mean(SLCROSSVALIDATIONRESULTYPETRAIN, SLMODELRESULTYPEQ2)  << endl;
+        cout << "RSS:\n"    << cvResult.mean(SLCROSSVALIDATIONRESULTYPETRAIN, SLMODELRESULTYPERSS) << endl;
+        cout << "ACC:\n"    << cvResult.mean(SLCROSSVALIDATIONRESULTYPETRAIN, SLMODELRESULTYPEACC) << endl;
+        
+        cout << "\nValidation:" << endl;
         cout << "Q2:\n"     << cvResult.mean(SLCROSSVALIDATIONRESULTYPEVALIDATION, SLMODELRESULTYPEQ2)  << endl;
         cout << "RSS:\n"    << cvResult.mean(SLCROSSVALIDATIONRESULTYPEVALIDATION, SLMODELRESULTYPERSS) << endl;
+        cout << "ACC:\n"    << cvResult.mean(SLCROSSVALIDATIONRESULTYPEVALIDATION, SLMODELRESULTYPEACC) << endl;
 
+        cout << "\nTest:"   << endl;
+        cout << "Q2:\n"     << cvResult.mean(SLCROSSVALIDATIONRESULTYPETEST, SLMODELRESULTYPEQ2)  << endl;
+        cout << "RSS:\n"    << cvResult.mean(SLCROSSVALIDATIONRESULTYPETEST, SLMODELRESULTYPERSS) << endl;
+        cout << "ACC:\n"    << cvResult.mean(SLCROSSVALIDATIONRESULTYPETEST, SLMODELRESULTYPEACC) << endl;
+
+        cout << endl << endl;
+        
         if ( RSS > lastRSS )
         {
             ++overfitCount;
@@ -191,9 +205,21 @@ int main(int argc, const char *argv[])
     }
     
     SLCrossValidationResults oldResult = gspls.getResultHistory().back();
-    cout << "\nHistory: n = " <<  i - cvParam.resultHistorySize + 1 << endl;
-    cout << "Q2:\n"           << oldResult.mean(SLCROSSVALIDATIONRESULTYPEVALIDATION, SLMODELRESULTYPEQ2)  << endl;
-    cout << "\nRSS:\n"        << oldResult.mean(SLCROSSVALIDATIONRESULTYPEVALIDATION, SLMODELRESULTYPERSS) << endl;
+    cout << "\nHistory: n = "   <<  i - cvParam.resultHistorySize + 1 << endl;
+    cout << "Train:"            << endl;
+    cout << "Q2:\n"             << oldResult.mean(SLCROSSVALIDATIONRESULTYPETRAIN, SLMODELRESULTYPEQ2)  << endl;
+    cout << "RSS:\n"            << oldResult.mean(SLCROSSVALIDATIONRESULTYPETRAIN, SLMODELRESULTYPERSS) << endl;
+    cout << "ACC:\n"            << oldResult.mean(SLCROSSVALIDATIONRESULTYPETRAIN, SLMODELRESULTYPEACC) << endl;
+    
+    cout << "\nValidation:"     << endl;
+    cout << "Q2:\n"             << oldResult.mean(SLCROSSVALIDATIONRESULTYPEVALIDATION, SLMODELRESULTYPEQ2)  << endl;
+    cout << "RSS:\n"            << oldResult.mean(SLCROSSVALIDATIONRESULTYPEVALIDATION, SLMODELRESULTYPERSS) << endl;
+    cout << "ACC:\n"            << oldResult.mean(SLCROSSVALIDATIONRESULTYPEVALIDATION, SLMODELRESULTYPEACC) << endl;
+    
+    cout << "\nTest:"           << endl;
+    cout << "Q2:\n"             << oldResult.mean(SLCROSSVALIDATIONRESULTYPETEST, SLMODELRESULTYPEQ2)  << endl;
+    cout << "RSS:\n"            << oldResult.mean(SLCROSSVALIDATIONRESULTYPETEST, SLMODELRESULTYPERSS) << endl;
+    cout << "ACC:\n"            << oldResult.mean(SLCROSSVALIDATIONRESULTYPETEST, SLMODELRESULTYPEACC) << endl;
 //    cout << "\nBeta:"         << oldResult.print(SLCROSSVALIDATIONRESULTYPEVALIDATION, SLMODELRESULTYPEBETA) << endl;
     return 0;
 }
