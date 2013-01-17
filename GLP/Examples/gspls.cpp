@@ -57,9 +57,9 @@ void usage()
 int main(int argc, const char *argv[])
 {
     size_t maxpat = 10;
-    size_t minsup = 2;
-    size_t n = 20;
-    size_t topk = 5;
+    size_t minsup = 1;
+    size_t n = 10;
+    size_t topk = 10;
     char *yfile = NULL;
     char *gspfile = NULL;
     int verbose = 0;
@@ -136,7 +136,8 @@ int main(int argc, const char *argv[])
         Y = gspls.getInnerValues(SLGRAPHMININGINNERVALUEY)[SLGRAPHMININGINNERVALUEY];
     }
     
-    Res = Y.array() - Y.mean();
+    Y = Y.array() - Y.mean();
+    Res = Y;
     
     double lastRSS = -DBL_MAX;
     size_t overfitCount = 0;
@@ -164,7 +165,7 @@ int main(int argc, const char *argv[])
         X.conservativeResize(appendedXRows, oldXCols+appendedXCols);
         X.rightCols(appendedXCols).setZero();
         X << X.leftCols(oldXCols), x;
-
+        
         int bestBetaIndex;
         cvResult.eachMean(SLCROSSVALIDATIONRESULTYPETRAIN, SLMODELRESULTYPERSS).minCoeff(&bestBetaIndex);
         Res = Y - X*cvResult[SLCROSSVALIDATIONRESULTYPETRAIN][bestBetaIndex][SLMODELRESULTYPEBETA];

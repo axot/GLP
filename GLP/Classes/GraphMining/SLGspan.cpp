@@ -59,6 +59,7 @@ SLGraphMiningInnerValues SLGspan::getInnerValues(SLGRAPHMININGINNERVALUE type) c
         
         results[SLGRAPHMININGINNERVALUEY] = y;
     }
+    
     return results;
 }
 
@@ -77,6 +78,7 @@ SLGraphMiningResult SLGspan::search(VectorXd residual, SLGRAPHMININGTASKTYPE tas
 
     size_t l = transaction.size();
     y.resize(l);
+    
     w = residual.array().abs();
     
     if ( taskType & SLGRAPHMININGTASKTYPETRAIN )
@@ -103,8 +105,8 @@ SLGraphMiningResult SLGspan::search(VectorXd residual, SLGRAPHMININGTASKTYPE tas
         {
             DFS_CODE.assign(pre->dfscode.begin(), pre->dfscode.end());
             
-            // before detect TNODEYETEXPLORE, must do can_prune first.
-            if ( !can_prune(pre->projected) && pre->id == TNODEYETEXPLORE ){
+            bool p = can_prune(pre->projected);
+            if ( pre->id == TNODEYETEXPLORE && !p){
                 mount.push_back(pre);
             }
             ++pre;
@@ -136,6 +138,12 @@ SLGraphMiningResult SLGspan::search(VectorXd residual, SLGRAPHMININGTASKTYPE tas
     if ( taskType == SLGRAPHMININGTASKTYPETRAIN )
     {
         entireRules.insert(entireRules.end(), rule_cache.begin(), rule_cache.end());
+        
+        cout << entireRules.size() << " Rules" << endl;
+        for(vector<Rule>::iterator it = entireRules.begin(); it != entireRules.end(); ++it)
+        {
+            cout << (*it).dfs << endl;
+        }
     }
     else if ( taskType == SLGRAPHMININGTASKTYPECLASSIFY )
     {
@@ -160,6 +168,7 @@ SLGraphMiningResult SLGspan::search(VectorXd residual, SLGRAPHMININGTASKTYPE tas
 
         result[SLGRAPHMININGRESULTYPEX] = X;
     }
+    
     return result;
 }
 
@@ -290,7 +299,7 @@ bool SLGspan::can_prune(Projected& projected)
     }
     
     size_t support = 0;
-    int oid = UINT_MAX;
+    unsigned int oid = UINT_MAX;
     int multi = (taskType & SLGRAPHMININGTASKTYPETRAIN) ? 1 : 2;
     for (Projected::iterator it = projected.begin(); it != projected.end(); ++it)
     {
@@ -322,7 +331,7 @@ bool SLGspan::can_prune(Projected& projected)
         rule.dfs = ostrs.str();
         
         rule.loc.clear ();
-        int oid = UINT_MAX;
+        unsigned int oid = UINT_MAX;
         for (Projected::iterator it = projected.begin(); it != projected.end(); ++it)
         {
             if (oid != it->id) { // remember used location using mask "oid"
