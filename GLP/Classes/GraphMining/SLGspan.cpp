@@ -299,7 +299,7 @@ bool SLGspan::can_prune(Projected& projected)
     }
     
     size_t support = 0;
-    unsigned int oid = UINT_MAX;
+    int oid = UINT_MAX;
     int multi = (taskType & SLGRAPHMININGTASKTYPETRAIN) ? 1 : 2;
     for (Projected::iterator it = projected.begin(); it != projected.end(); ++it)
     {
@@ -331,7 +331,7 @@ bool SLGspan::can_prune(Projected& projected)
         rule.dfs = ostrs.str();
         
         rule.loc.clear ();
-        unsigned int oid = UINT_MAX;
+        int oid = UINT_MAX;
         for (Projected::iterator it = projected.begin(); it != projected.end(); ++it)
         {
             if (oid != it->id) { // remember used location using mask "oid"

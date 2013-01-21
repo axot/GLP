@@ -44,9 +44,6 @@ SLModelResult SLSparsePls::train(const MatrixXd& appendedX, const MatrixXd& theY
     SSum(Res).maxCoeff(&maxSquaredNormColumn);
     VectorXd largestResCol = Res.col(maxSquaredNormColumn);
 
-    meanX.conservativeResize(1, oldXCols+appendedXCols);
-    meanX << meanX.leftCols(oldXCols), appendedX.colwise().mean();
-    
     X.conservativeResize(appendedXRows, oldXCols+appendedXCols);
     X.rightCols(appendedXCols).setZero();
     X << X.leftCols(oldXCols), appendedX;
@@ -97,9 +94,8 @@ SLModelResult SLSparsePls::classify(const MatrixXd& tX, const MatrixXd& tY, SLMO
     SLModelResult result;
     
     MatrixXd autoSacaledY = tY - meanY.replicate(tY.rows(), 1);
-    MatrixXd autoSacaledX = tX - meanX.replicate(tX.rows(), 1);
 
-    MatrixXd tRES = autoSacaledY - autoSacaledX*Beta;
+    MatrixXd tRES = autoSacaledY - tX*Beta;
 
     if(type & SLMODELRESULTYPEQ2)
     {

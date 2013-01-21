@@ -45,12 +45,12 @@ int main(int argc, const char *argv[])
     
     spls.setParameters(param);
     
-    MatrixXd X(5,3), Y(5,1);
-    X.row(0) << 1,0,0;
-    X.row(1) << 0,1,0;
-    X.row(2) << 0,0,1;
-    X.row(3) << 1,1,0;
-    X.row(4) << 1,0,1;
+    MatrixXd X(5,4), Y(5,1);
+    X.row(0) << 1,0,0,1;
+    X.row(1) << 0,1,0,1;
+    X.row(2) << 0,0,1,1;
+    X.row(3) << 1,1,0,1;
+    X.row(4) << 1,0,1,1;
     
     Y << 1,2,3,3,4;
 
@@ -64,9 +64,9 @@ int main(int argc, const char *argv[])
         cout << "Beta:\n"   << result[SLMODELRESULTYPEBETA]<< '\n' << endl;
     }
     
-    MatrixXd tX(2,3), tY(2,1);
-    tX.row(0) << 0,1,1;
-    tX.row(1) << 1,1,1;
+    MatrixXd tX(2,4), tY(2,1);
+    tX.row(0) << 0,1,1,1;
+    tX.row(1) << 1,1,1,1;
     tY << 5,6;
     
     SLModelResult tresult = spls.classify(tX, tY, SLMODELRESULTYPEQ2 | SLMODELRESULTYPERSS);
@@ -74,7 +74,7 @@ int main(int argc, const char *argv[])
     cout << "Q2: "      << tresult[SLMODELRESULTYPEQ2]  << endl;
     cout << "RSS: "     << tresult[SLMODELRESULTYPERSS] << '\n' << endl;
     
-    MatrixXd cvX(7,3), cvY(7,3);
+    MatrixXd cvX(7,4), cvY(7,3);
     cvX << X, tX;
     cvY.col(0) << Y, tY;
     cvY.col(1) << 2*cvY.col(0);
@@ -109,10 +109,4 @@ int main(int argc, const char *argv[])
         
         cout << "\nBeta:"       << results.print(SLCROSSVALIDATIONRESULTYPETEST, SLMODELRESULTYPEBETA) << endl;
     }
-    
-    SLCrossValidationResults oldResult = cv.getResultHistory()[1];
-    cout << "History: "     << endl;
-    cout << "Q2:\n"         << oldResult.mean(SLCROSSVALIDATIONRESULTYPETEST, SLMODELRESULTYPEQ2)  << endl;
-    cout << "\nRSS:\n"      << oldResult.mean(SLCROSSVALIDATIONRESULTYPETEST, SLMODELRESULTYPERSS) << endl;
-    cout << "\nBeta:"       << oldResult.print(SLCROSSVALIDATIONRESULTYPETEST, SLMODELRESULTYPEBETA) << endl;
 }
