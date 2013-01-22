@@ -32,15 +32,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
-		5371233F1683288A00B47D4E /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
-			dstSubfolderSpec = 0;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 1;
-		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -259,6 +250,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 53388A311690B0D500AF9E5E /* Build configuration list for PBXNativeTarget "SparsePls" */;
 			buildPhases = (
+				538E955516AF2F4F000F9F64 /* ShellScript */,
 				53388A261690B0D500AF9E5E /* Sources */,
 				53388A271690B0D500AF9E5E /* Frameworks */,
 				53388A281690B0D500AF9E5E /* CopyFiles */,
@@ -276,9 +268,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 5371234B1683288A00B47D4E /* Build configuration list for PBXNativeTarget "gspls" */;
 			buildPhases = (
+				538E955416AF2B68000F9F64 /* ShellScript */,
 				5371233D1683288A00B47D4E /* Sources */,
 				5371233E1683288A00B47D4E /* Frameworks */,
-				5371233F1683288A00B47D4E /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -315,6 +307,35 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		538E955416AF2B68000F9F64 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "rm -r \"${TARGET_BUILD_DIR}/GLP\"\ncp -r \"${SRCROOT}/GLP/Classes\" \"${TARGET_BUILD_DIR}/GLP\"\nfind \"${TARGET_BUILD_DIR}/GLP/\" -type f | grep -E -v \"\\.h\" | xargs rm";
+		};
+		538E955516AF2F4F000F9F64 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "rm -r \"${TARGET_BUILD_DIR}/GLP\"\ncp -r \"${SRCROOT}/GLP/Classes\" \"${TARGET_BUILD_DIR}/GLP\"\nfind \"${TARGET_BUILD_DIR}/GLP/\" -type f | grep -E -v \"\\.h\" | xargs rm";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		53388A261690B0D500AF9E5E /* Sources */ = {
@@ -353,6 +374,7 @@
 				HEADER_SEARCH_PATHS = (
 					/usr/local/include,
 					/usr/local/include/eigen3,
+					"${TARGET_BUILD_DIR}",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -364,6 +386,7 @@
 				HEADER_SEARCH_PATHS = (
 					/usr/local/include,
 					/usr/local/include/eigen3,
+					"${TARGET_BUILD_DIR}",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -429,6 +452,7 @@
 				HEADER_SEARCH_PATHS = (
 					/usr/local/include,
 					/usr/local/include/eigen3,
+					"${TARGET_BUILD_DIR}",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -440,6 +464,7 @@
 				HEADER_SEARCH_PATHS = (
 					/usr/local/include,
 					/usr/local/include/eigen3,
+					"${TARGET_BUILD_DIR}",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
