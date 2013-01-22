@@ -19,7 +19,6 @@
 		53C09383168DBB5D00A0ADC1 /* SLGspan.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53C09381168DBB5D00A0ADC1 /* SLGspan.cpp */; };
 		53C09388168DDEA500A0ADC1 /* gspls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53C09387168DDEA500A0ADC1 /* gspls.cpp */; };
 		53EDCB1316995691006170CE /* SparsePlsTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53388A231690B03000AF9E5E /* SparsePlsTest.cpp */; };
-		53F3157016A4A7550056C3A9 /* Makefile in Sources */ = {isa = PBXBuildFile; fileRef = 53F3156F16A4A7550056C3A9 /* Makefile */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -47,6 +46,12 @@
 		5348010816A7247500755DFB /* es.gsp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = es.gsp; path = Examples/datasets/es.gsp; sourceTree = "<group>"; };
 		5348010916A7247500755DFB /* seYsmall.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = seYsmall.txt; path = Examples/datasets/seYsmall.txt; sourceTree = "<group>"; };
 		5348010A16A7247500755DFB /* sideEfDrugsAnnot.gsp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = sideEfDrugsAnnot.gsp; path = Examples/datasets/sideEfDrugsAnnot.gsp; sourceTree = "<group>"; };
+		534B785C16AF439E006721F6 /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = CMakeLists.txt; path = Classes/CMakeLists.txt; sourceTree = "<group>"; };
+		534B785E16AF43B2006721F6 /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		534B785F16AF43B2006721F6 /* Common.cmake */ = {isa = PBXFileReference; lastKnownFileType = text; path = Common.cmake; sourceTree = "<group>"; };
+		534B786016AF43B2006721F6 /* FindEigen3.cmake */ = {isa = PBXFileReference; lastKnownFileType = text; path = FindEigen3.cmake; sourceTree = "<group>"; };
+		534B786116AF43BE006721F6 /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = CMakeLists.txt; path = Examples/CMakeLists.txt; sourceTree = "<group>"; };
+		534B786216AF43C9006721F6 /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = CMakeLists.txt; path = Test/CMakeLists.txt; sourceTree = "<group>"; };
 		534F58361696F1F300D2C3D3 /* SLCrossValidationResults.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SLCrossValidationResults.h; path = Classes/Utilities/SLCrossValidationResults.h; sourceTree = "<group>"; };
 		534F58381696F29300D2C3D3 /* SLCrossValidationResultHistory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SLCrossValidationResultHistory.h; path = Classes/Utilities/SLCrossValidationResultHistory.h; sourceTree = "<group>"; };
 		53578E04168D69AD002668D3 /* SLModelStrategy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLModelStrategy.h; path = Classes/Models/SLModelStrategy.h; sourceTree = "<group>"; };
@@ -93,6 +98,7 @@
 		53388A211690AFE600AF9E5E /* Test */ = {
 			isa = PBXGroup;
 			children = (
+				534B786216AF43C9006721F6 /* CMakeLists.txt */,
 				53388A231690B03000AF9E5E /* SparsePlsTest.cpp */,
 			);
 			name = Test;
@@ -123,6 +129,7 @@
 		53578DF9168D691B002668D3 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				534B785C16AF439E006721F6 /* CMakeLists.txt */,
 				53578E09168D69CB002668D3 /* SLGlp.h */,
 				53832802168D6CEF00E3B48F /* SLUtility.h */,
 				53FC1E2F16942D5100F3FD58 /* Utilities */,
@@ -137,6 +144,7 @@
 		53578DFA168D6922002668D3 /* Examples */ = {
 			isa = PBXGroup;
 			children = (
+				534B786116AF43BE006721F6 /* CMakeLists.txt */,
 				5348010316A7246100755DFB /* datasets */,
 				53C09387168DDEA500A0ADC1 /* gspls.cpp */,
 			);
@@ -165,6 +173,9 @@
 		537123441683288A00B47D4E /* GLP */ = {
 			isa = PBXGroup;
 			children = (
+				534B785E16AF43B2006721F6 /* CMakeLists.txt */,
+				534B785F16AF43B2006721F6 /* Common.cmake */,
+				534B786016AF43B2006721F6 /* FindEigen3.cmake */,
 				53578DF9168D691B002668D3 /* Classes */,
 				53578DFA168D6922002668D3 /* Examples */,
 				53388A211690AFE600AF9E5E /* Test */,
@@ -361,7 +372,6 @@
 				53B5D650169731C900AE0523 /* Dfs.cpp in Sources */,
 				53B5D654169733FC00AE0523 /* Utility.cpp in Sources */,
 				53C09388168DDEA500A0ADC1 /* gspls.cpp in Sources */,
-				53F3157016A4A7550056C3A9 /* Makefile in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

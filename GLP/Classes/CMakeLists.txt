@@ -4,7 +4,7 @@ file(GLOB_RECURSE SOURCES "*.cpp")
 
 add_library(glp SHARED ${SOURCES})
 set_target_properties(glp PROPERTIES CLEAN_DIRECT_OUTPUT 1)
-set_target_properties(glp PROPERTIES VERSION 1.0 SOVERSION 1)
+set_target_properties(glp PROPERTIES VERSION ${GLP_VERSION_MAJOR}.${GLP_VERSION_MINOR} SOVERSION ${GLP_VERSION_MAJOR})
 
 add_library(glp_static STATIC ${SOURCES})
 set_target_properties(glp_static PROPERTIES OUTPUT_NAME "glp")
@@ -16,6 +16,8 @@ add_custom_command(TARGET glp
                    COMMAND cp -r ${CMAKE_CURRENT_SOURCE_DIR}/* "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/GLP/"
                    COMMAND find "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/GLP/" -type f | grep -E -v \"\\.h\" | xargs rm)
 
-install_targets(lib glp glp_static)
-install_files(include ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/GLP)
+install_targets(/lib glp glp_static)
 
+install(DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/GLP/
+        DESTINATION include/GLP
+        FILES_MATCHING PATTERN "*.h")
