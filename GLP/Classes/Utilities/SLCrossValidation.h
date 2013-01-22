@@ -56,11 +56,12 @@ public:
     class SLCrossValidationParameters
     {
     public:
-        SLCrossValidationParameters() : kFold(10), resultHistorySize(5) {}
+        SLCrossValidationParameters() : kFold(10), resultHistorySize(5), doesShuffleData(false) {}
         
     public:
         size_t kFold;
         size_t resultHistorySize;
+        bool doesShuffleData;
         T modelClone;
     };
 
@@ -94,6 +95,7 @@ public:
      */
     void setParameters(typename SLCrossValidation<T>::SLCrossValidationParameters parameters)
     {
+        doesShuffleData = parameters.doesShuffleData;
         kFold = parameters.kFold;
         resultHistory.resultHistorySize = parameters.resultHistorySize;
         modelClone = parameters.modelClone;
@@ -144,6 +146,7 @@ private:
     
 private:
     // assignable parameters via setParameters() method
+    bool doesShuffleData;
     size_t kFold;
     SLCrossValidationResultHistory resultHistory;
     T modelClone;
@@ -171,7 +174,11 @@ SLCrossValidationResults SLCrossValidation<T>::crossValidation(const MatrixXd& X
     {
         srand((unsigned int)time(NULL));
         randomIndexs.setLinSpaced(X.rows(), 0, (int)X.rows());
-        random_shuffle(randomIndexs.derived().data(), randomIndexs.derived().data()+randomIndexs.derived().size());
+        
+        if ( doesShuffleData )
+        {
+            random_shuffle(randomIndexs.derived().data(), randomIndexs.derived().data()+randomIndexs.derived().size());
+        }
         
         for (size_t i=0; i<kFold; ++i)
         {

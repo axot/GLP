@@ -97,7 +97,6 @@ private:
     bool verbose;
     MatrixXd X;
     MatrixXd Y;
-    MatrixXd meanY;
     MatrixXd T;
     MatrixXd Beta;
     MatrixXd Res;

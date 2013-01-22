@@ -31,16 +31,15 @@ SLModelResult SLSparsePls::train(const MatrixXd& appendedX, const MatrixXd& theY
 {
     if (Y.cols() == 0 || Y.rows() == 0)
     {
-        meanY = theY.colwise().mean();
-        Y = AutoScale(theY);
+        Y = theY;
         Res = Y;
     }
     
-    long appendedXRows = appendedX.rows();
-    long appendedXCols = appendedX.cols();
-    long oldXCols      = X.cols();
+    ssize_t appendedXRows = appendedX.rows();
+    ssize_t appendedXCols = appendedX.cols();
+    ssize_t oldXCols      = X.cols();
     
-    long maxSquaredNormColumn;
+    ssize_t maxSquaredNormColumn;
     SSum(Res).maxCoeff(&maxSquaredNormColumn);
     VectorXd largestResCol = Res.col(maxSquaredNormColumn);
 
@@ -59,7 +58,10 @@ SLModelResult SLSparsePls::train(const MatrixXd& appendedX, const MatrixXd& theY
     T.rightCols(1).setZero();
     
     if(T.cols() > 1)
-        T.rightCols(1) = (MatrixXd::Identity(X.rows(),X.rows()) - T.leftCols(T.cols()-1)*(T.leftCols(T.cols()-1).transpose())) * X * W.rightCols(1);
+    {
+        size_t oldTCols = (size_t)(T.cols()-1);
+        T.rightCols(1) = (MatrixXd::Identity(X.rows(),X.rows()) - T.leftCols(oldTCols)*(T.leftCols(oldTCols).transpose())) * X * W.rightCols(1);
+    }
     else
         T.rightCols(1) = X * W.rightCols(1);
     
@@ -87,19 +89,17 @@ SLModelResult SLSparsePls::classify(const MatrixXd& tX, const MatrixXd& tY, SLMO
     ASSERT(type != SLMODELRESULTYPENONE, "No type of result was indicated");
     
     ASSERT(!(type & ~(SLMODELRESULTYPEBETA|SLMODELRESULTYPEQ2|SLMODELRESULTYPERSS|SLMODELRESULTYPEACC)),
-           "Only support Beta Q2 RSS for Sparse PLS.");
+           "Only support Beta Q2 RSS ACC for Sparse PLS.");
     
-    ASSERT(meanY.cols() != 0 && meanY.rows() != 0, "Train data first");
+    ASSERT(Beta.cols() != 0 && Beta.rows() != 0, "Train data first");
     
     SLModelResult result;
     
-    MatrixXd autoSacaledY = tY - meanY.replicate(tY.rows(), 1);
-
-    MatrixXd tRES = autoSacaledY - tX*Beta;
+    MatrixXd tRES = tY - tX*Beta;
 
     if(type & SLMODELRESULTYPEQ2)
     {
-        result[SLMODELRESULTYPEQ2] = MatrixXd::Ones(1, autoSacaledY.cols()) - SSum(tRES).cwiseQuotient(SSum(autoSacaledY));
+        result[SLMODELRESULTYPEQ2] = MatrixXd::Ones(1, tY.cols()) - SSum(tRES).cwiseQuotient(SSum(tY));
     }
     
     if(type & SLMODELRESULTYPERSS)
@@ -130,9 +130,9 @@ bool SLSparsePls::setParameters(SLSparsePlsParameters& parameters)
 SLModelResult SLSparsePls::getTrainResult(SLMODELRESULTYPE type) const
 {
     ASSERT(!(type & ~(SLMODELRESULTYPEBETA|SLMODELRESULTYPEQ2|SLMODELRESULTYPERSS|SLMODELRESULTYPEACC)),
-           "Only support Beta Residual Q2 RSS for Sparse PLS.");
+           "Only support Beta Residual Q2 RSS ACC for Sparse PLS.");
     
-    ASSERT(meanY.cols() != 0 && meanY.rows() != 0, "Train data first");
+    ASSERT(Beta.cols() != 0 && Beta.rows() != 0, "Train data first");
     
     SLModelResult result;
     if(type & SLMODELRESULTYPEQ2)
@@ -159,29 +159,28 @@ SLModelResult SLSparsePls::getTrainResult(SLMODELRESULTYPE type) const
 
 MatrixXd SLSparsePls::calcACC(const MatrixXd& tX, const MatrixXd& tY) const
 {
-    MatrixXd realY    = tY + meanY.replicate(tY.rows(), 1);
     MatrixXd predictY = tX*Beta;
     size_t correct = 0;
-    MatrixXd acc(1,realY.cols());
+    MatrixXd acc(1,tY.cols());
     
-    VectorXd min = realY.colwise().minCoeff();
-    VectorXd max = realY.colwise().maxCoeff();
+    VectorXd min = tY.colwise().minCoeff();
+    VectorXd max = tY.colwise().maxCoeff();
     VectorXd mid = (min + max) / 2;
-    for (int i=0; i < realY.cols(); ++i)
+    for (int i=0; i < tY.cols(); ++i)
     {
         correct = 0;
-        for (int j=0; j < realY.rows(); ++j)
+        for (int j=0; j < tY.rows(); ++j)
         {
             if (predictY(j,i) > mid[i])
             {
-                if(realY(j,i) > mid[i])
+                if(tY(j,i) > mid[i])
                 {
                     ++correct;
                 }
             }
             else
             {
-                if(realY(j,i) < mid[i])
+                if(tY(j,i) < mid[i])
                 {
                     ++correct;
                 }

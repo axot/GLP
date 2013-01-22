@@ -28,7 +28,7 @@
 #include <boost/typeof/typeof.hpp>
 #include <Eigen/Core>
 #include <cfloat>
-#include "../Classes/SLGlp.h"
+#include <GLP/SLGlp.h>
 
 using namespace Eigen;
 using namespace std;
@@ -120,6 +120,7 @@ int main(int argc, const char *argv[])
     BOOST_AUTO(gspls, (*SLGlpFactory<SLSparsePls, SLGspan>::create(splsParam, gspanParam)));
         
     SLCrossValidation<SLSparsePls>::SLCrossValidationParameters cvParam;
+    cvParam.doesShuffleData = false;
     cvParam.kFold = 10;
     cvParam.resultHistorySize = 4;
     
@@ -205,8 +206,14 @@ int main(int argc, const char *argv[])
         lastRSS = RSS;
     }
     
+    if ( overfitCount < cvParam.resultHistorySize-1 )
+    {
+        cerr << "can not get best result, please set a bigger value for argument n" << endl;
+        return -1;
+    }
+    
     SLCrossValidationResults oldResult = gspls.getResultHistory().back();
-    cout << "\nHistory: n = "   <<  i - cvParam.resultHistorySize + 1 << endl;
+    cout << "\nBest: n = "       <<  i - cvParam.resultHistorySize + 1 << endl;
     cout << "Train:"            << endl;
     cout << "Q2:\n"             << oldResult.mean(SLCROSSVALIDATIONRESULTYPETRAIN, SLMODELRESULTYPEQ2)  << endl;
     cout << "RSS:\n"            << oldResult.mean(SLCROSSVALIDATIONRESULTYPETRAIN, SLMODELRESULTYPERSS) << endl;
