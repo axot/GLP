@@ -18,6 +18,6 @@ add_custom_command(TARGET glp
 
 install_targets(/lib glp glp_static)
 
-install(DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/GLP/
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
         DESTINATION include/GLP
         FILES_MATCHING PATTERN "*.h")
