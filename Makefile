@@ -19,6 +19,12 @@ debug:
 	make -j4;					\
 	cd -
 
+gendoc:
+	@mkdir -p build/Documentation
+	@cd GLP/Doxygen;		\
+	doxygen Doxyfile;		\
+	cd -				\
+
 install:
 	@cd $(RELEASEBUILDIR);	\
 	make install;		\

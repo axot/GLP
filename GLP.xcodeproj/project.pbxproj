@@ -11,6 +11,7 @@
 			isa = PBXAggregateTarget;
 			buildConfigurationList = 5370791016AFC06A004FFD09 /* Build configuration list for PBXAggregateTarget "All" */;
 			buildPhases = (
+				53981D2A16AFFB5C00ED88AA /* ShellScript */,
 			);
 			dependencies = (
 				5370791816AFC07D004FFD09 /* PBXTargetDependency */,
@@ -155,6 +156,7 @@
 		53832802168D6CEF00E3B48F /* SLUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SLUtility.h; path = Classes/SLUtility.h; sourceTree = "<group>"; };
 		53832809168D767F00E3B48F /* SLModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLModel.h; path = Classes/Models/SLModel.h; sourceTree = "<group>"; };
 		53832810168D7E4E00E3B48F /* SLSparsePls.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SLSparsePls.cpp; path = Classes/Models/SLSparsePls.cpp; sourceTree = "<group>"; };
+		53981D2C16B0050800ED88AA /* AppledocSettings.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppledocSettings.plist; path = GLP/AppledocSettings.plist; sourceTree = "<group>"; };
 		53A0CF3616AFC4FD00B74AC1 /* gspls_static */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = gspls_static; sourceTree = BUILT_PRODUCTS_DIR; };
 		53B5D6451697251800AE0523 /* Graph.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Graph.h; path = Classes/GraphMining/Gspan/Graph.h; sourceTree = "<group>"; };
 		53B5D6461697271900AE0523 /* Dfs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Dfs.h; path = Classes/GraphMining/Gspan/Dfs.h; sourceTree = "<group>"; };
@@ -271,6 +273,7 @@
 			isa = PBXGroup;
 			children = (
 				5370790C16AFBCA7004FFD09 /* GLP */,
+				53981D2C16B0050800ED88AA /* AppledocSettings.plist */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -536,6 +539,19 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "mkdir -p \"${SRCROOT}/build/Headers\"\nrm -rf \"${SRCROOT}/build/Headers/GLP\"\ncp -r \"${SRCROOT}/GLP/Classes\" \"${SRCROOT}/build/Headers/GLP\"\nfind \"${SRCROOT}/build/Headers/GLP\" -type f | grep -E -v \"\\.h\" | xargs rm";
+		};
+		53981D2A16AFFB5C00ED88AA /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "#HEADER_DOC_DIR_NAME=documentation\n#HEADER_DOC_DIR=$HEADER_DOC_DIR_NAME\n#HEADER_DOC_DIR+=/\n#HEADER_DOC_DIR+=`date +%Y%m%d%k%M%S`\n#mkdir -p $HEADER_DOC_DIR\n#find . -name *.h | xargs headerdoc2html -o $HEADER_DOC_DIR\n#gatherheaderdoc $HEADER_DOC_DIR\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

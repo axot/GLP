@@ -52,13 +52,13 @@ typedef map<SLMODELRESULTYPE, MatrixXd> SLModelResult;
 class SLModelStrategy
 {
 public:    
-    /* Train:
-     * Input
-     *      X: X matrix of train data
-     *      Y: Y matrix of train data
-     *   type: type of results
+    /**
+     * @brief Train stage
+     * @param X X matrix of train data
+     * @param Y Y matrix of train data
+     * @param type type of results
      *
-     * Return: the results stored in mapped structure.
+     * @result the results stored in mapped structure.
      */
     virtual SLModelResult train(const MatrixXd& X, const MatrixXd& Y, SLMODELRESULTYPE type) = 0;
         
