@@ -1,5 +1,4 @@
-# CMake wrapper for Linux
-# for Mac OS X, use XCode instead
+# CMake wrapper 
 
 RELEASEBUILDIR=build/GLP.build/Release
 DEBUGBUILDIR=build/GLP.build/Debug

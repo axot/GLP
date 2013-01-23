@@ -1,4 +1,15 @@
-GLP 2.0 README
+GLP 1.0 README
 
-Eigen 3.0
-Boost
+# Description
+
+# Requirements:
+Cmake 2.6 or higher.
+Eigen 3.1.2 or higher.
+Boost 1.4.8 or higher.
+
+# Installation
+make
+make install
+
+# License
+GPL v2.0

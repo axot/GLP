@@ -57,7 +57,7 @@ void usage()
 int main(int argc, const char *argv[])
 {
     size_t maxpat = 10;
-    size_t minsup = 1;
+    size_t minsup = 2;
     size_t n = 10;
     size_t topk = 10;
     char *yfile = NULL;
@@ -120,7 +120,7 @@ int main(int argc, const char *argv[])
     BOOST_AUTO(gspls, (*SLGlpFactory<SLSparsePls, SLGspan>::create(splsParam, gspanParam)));
         
     SLCrossValidation<SLSparsePls>::SLCrossValidationParameters cvParam;
-    cvParam.doesShuffleData = false;
+    cvParam.doesUseShuffleData = false;
     cvParam.kFold = 10;
     cvParam.resultHistorySize = 4;
     
