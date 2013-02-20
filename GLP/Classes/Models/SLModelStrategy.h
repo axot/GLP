@@ -30,24 +30,25 @@
 #include <map>
 #include <vector>
 #include <Eigen/Core>
+#include <boost/any.hpp>
 #include "../SLUtility.h"
 
 using namespace std;
 using namespace Eigen;
 
 enum{
-    SLMODELRESULTYPENONE    = 0,
-    SLMODELRESULTYPEBETA    = 1 << 0,
-    SLMODELRESULTYPEQ2      = 1 << 1,
-    SLMODELRESULTYPERSS     = 1 << 2,
-    SLMODELRESULTYPEAUC     = 1 << 3,
-    SLMODELRESULTYPEACC     = 1 << 4,
-    SLMODELRESULTYPEAIC     = 1 << 5,
-    SLMODELRESULTYPEBIC     = 1 << 6,
+    SLModelResultTypeNone    = 0,
+    SLModelResultTypeBeta    = 1 << 0,
+    SLModelResultTypeQ2      = 1 << 1,
+    SLModelResultTypeRSS     = 1 << 2,
+    SLModelResultTypeAUC     = 1 << 3,
+    SLModelResultTypeACC     = 1 << 4,
+    SLModelResultTypeAIC     = 1 << 5,
+    SLModelResultTypeBIC     = 1 << 6,
 };
 
 typedef unsigned int SLMODELRESULTYPE;
-typedef map<SLMODELRESULTYPE, MatrixXd> SLModelResult;
+typedef map<SLMODELRESULTYPE, boost::any> SLModelResult;
 
 class SLModelStrategy
 {

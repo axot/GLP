@@ -86,9 +86,9 @@ SLModelResult SLSparsePls::train(const MatrixXd& appendedX, const MatrixXd& theY
 
 SLModelResult SLSparsePls::classify(const MatrixXd& tX, const MatrixXd& tY, SLMODELRESULTYPE type) const
 {
-    ASSERT(type != SLMODELRESULTYPENONE, "No type of result was indicated");
+    ASSERT(type != SLModelResultTypeNone, "No type of result was indicated");
     
-    ASSERT(!(type & ~(SLMODELRESULTYPEBETA|SLMODELRESULTYPEQ2|SLMODELRESULTYPERSS|SLMODELRESULTYPEACC)),
+    ASSERT(!(type & ~(SLModelResultTypeBeta | SLModelResultTypeQ2 | SLModelResultTypeRSS | SLModelResultTypeACC)),
            "Only support Beta Q2 RSS ACC for Sparse PLS.");
     
     ASSERT(Beta.cols() != 0 && Beta.rows() != 0, "Train data first");
@@ -97,24 +97,24 @@ SLModelResult SLSparsePls::classify(const MatrixXd& tX, const MatrixXd& tY, SLMO
     
     MatrixXd tRES = tY - tX*Beta;
 
-    if(type & SLMODELRESULTYPEQ2)
+    if(type & SLModelResultTypeQ2)
     {
-        result[SLMODELRESULTYPEQ2] = MatrixXd::Ones(1, tY.cols()) - SSum(tRES).cwiseQuotient(SSum(tY));
+        result[SLModelResultTypeQ2] = MatrixXd::Ones(1, tY.cols()) - SSum(tRES).cwiseQuotient(SSum(tY));
     }
     
-    if(type & SLMODELRESULTYPERSS)
+    if(type & SLModelResultTypeRSS)
     {
-        result[SLMODELRESULTYPERSS] = SSum(tRES);
+        result[SLModelResultTypeRSS] = SSum(tRES);
     }
     
-    if(type & SLMODELRESULTYPEBETA)
+    if(type & SLModelResultTypeBeta)
     {
-        result[SLMODELRESULTYPEBETA] = Beta;
+        result[SLModelResultTypeBeta] = Beta;
     }
     
-    if(type & SLMODELRESULTYPEACC)
+    if(type & SLModelResultTypeACC)
     {
-        result[SLMODELRESULTYPEACC] = calcACC(tX, tY);
+        result[SLModelResultTypeACC] = calcACC(tX, tY);
     }
     return result;
 }
@@ -129,30 +129,30 @@ bool SLSparsePls::setParameters(SLSparsePlsParameters& parameters)
 // Private Methods
 SLModelResult SLSparsePls::getTrainResult(SLMODELRESULTYPE type) const
 {
-    ASSERT(!(type & ~(SLMODELRESULTYPEBETA|SLMODELRESULTYPEQ2|SLMODELRESULTYPERSS|SLMODELRESULTYPEACC)),
+    ASSERT(!(type & ~(SLModelResultTypeBeta | SLModelResultTypeQ2 | SLModelResultTypeRSS | SLModelResultTypeACC)),
            "Only support Beta Residual Q2 RSS ACC for Sparse PLS.");
     
     ASSERT(Beta.cols() != 0 && Beta.rows() != 0, "Train data first");
     
     SLModelResult result;
-    if(type & SLMODELRESULTYPEQ2)
+    if(type & SLModelResultTypeQ2)
     {
-        result[SLMODELRESULTYPEQ2] = MatrixXd::Ones(1, Y.cols()) - SSum(Res).cwiseQuotient(SSum(Y));
+        result[SLModelResultTypeQ2] = MatrixXd::Ones(1, Y.cols()) - SSum(Res).cwiseQuotient(SSum(Y));
     }
     
-    if(type & SLMODELRESULTYPERSS)
+    if(type & SLModelResultTypeRSS)
     {
-        result[SLMODELRESULTYPERSS] = SSum(Res);
+        result[SLModelResultTypeRSS] = SSum(Res);
     }
     
-    if(type & SLMODELRESULTYPEBETA)
+    if(type & SLModelResultTypeBeta)
     {
-        result[SLMODELRESULTYPEBETA] = Beta;
+        result[SLModelResultTypeBeta] = Beta;
     }
     
-    if(type & SLMODELRESULTYPEACC)
+    if(type & SLModelResultTypeACC)
     {
-        result[SLMODELRESULTYPEACC] = calcACC(X, Y);
+        result[SLModelResultTypeACC] = calcACC(X, Y);
     }
     return result;
 }

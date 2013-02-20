@@ -29,34 +29,36 @@
 #include <iostream>
 #include <map>
 #include <Eigen/Core>
+#include <boost/any.hpp>
 #include "../SLUtility.h"
 
 using namespace std;
 using namespace Eigen;
 
 enum{
-    SLGRAPHMININGRESULTYPENONE  = 0,
-    SLGRAPHMININGRESULTYPEX     = 1 << 0,
+    SLGraphMiningResultTypeNone = 0,
+    SLGraphMiningResultTypeX    = 1 << 0,
+    SLGraphMiningResultTypeDFS  = 1 << 1,
 };
 
 typedef unsigned int SLGRAPHMININGRESULTYPE;
-typedef map<SLGRAPHMININGRESULTYPE, MatrixXd> SLGraphMiningResult;
+typedef map<SLGRAPHMININGRESULTYPE, boost::any> SLGraphMiningResult;
 
 enum{
-    SLGRAPHMININGTASKTYPENOTDEFINED   = 0,
-    SLGRAPHMININGTASKTYPETRAIN        = 1 << 0,
-    SLGRAPHMININGTASKTYPECLASSIFY     = 1 << 1,
+    SLGraphMiningTasktypeNotDefined   = 0,
+    SLGraphMiningTasktypeTrain        = 1 << 0,
+    SLGraphMiningTasktypeClassify     = 1 << 1,
 };
 
 typedef unsigned int SLGRAPHMININGTASKTYPE;
 
 enum{
-    SLGRAPHMININGINNERVALUENOTDEFINED   = 0,
-    SLGRAPHMININGINNERVALUEY            = 1 << 0,
+    SLGraphMiningInnerValueNotDefined   = 0,
+    SLGraphMiningInnerValueY            = 1 << 0,
 };
 
 typedef unsigned int SLGRAPHMININGINNERVALUE;
-typedef map<SLGRAPHMININGINNERVALUE, MatrixXd> SLGraphMiningInnerValues;
+typedef map<SLGRAPHMININGINNERVALUE, boost::any> SLGraphMiningInnerValues;
 
 class SLGraphMiningStrategy
 {    

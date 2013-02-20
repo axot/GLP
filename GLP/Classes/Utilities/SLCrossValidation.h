@@ -43,8 +43,8 @@ using namespace boost;
 using namespace Eigen;
 
 enum{
-    SLCROSSVALIDATIONMETHODSUSINGWHOLEDATA                  = 0,
-    SLCROSSVALIDATIONMETHODSUSINGAPPENDEDXASCLASSIFYDATA    = 1 << 0,
+    SLCrossValidationMethodsUsingWholeData                  = 0,
+    SLCrossValidationMethodsUsingAppendedXAsClassifyData    = 1 << 0,
 };
 
 typedef unsigned int SLCROSSVALIDATIONMETHODSTYPE;
@@ -86,7 +86,7 @@ public:
     SLCrossValidationResults crossValidation(const MatrixXd& X,
                                              const MatrixXd& Y,
                                              SLMODELRESULTYPE resultType,
-                                             SLCROSSVALIDATIONMETHODSTYPE methodType = SLCROSSVALIDATIONMETHODSUSINGWHOLEDATA);
+                                             SLCROSSVALIDATIONMETHODSTYPE methodType = SLCrossValidationMethodsUsingWholeData);
     
     /* Set Parameters:
      * Input
@@ -173,7 +173,7 @@ SLCrossValidationResults SLCrossValidation<T>::crossValidation(const MatrixXd& X
     if (randomIndexs.size() == 0)
     {
         srand((unsigned int)time(NULL));
-        randomIndexs.setLinSpaced(X.rows(), 0, (int)X.rows());
+        randomIndexs.setLinSpaced(X.rows(), 0, X.rows());
         
         if ( doesUseShuffleData )
         {
@@ -213,9 +213,9 @@ SLCrossValidationResults SLCrossValidation<T>::crossValidation(const MatrixXd& X
         MatrixXd testY = cvSplitMatrix(shuffledY, shuffledY.rows()-oneUnitLength*(i+1), oneUnitLength);
         
         SLCrossValidationResults eachResult;
-        eachResult[SLCROSSVALIDATIONRESULTYPETRAIN]      = crossValidationTrain(i, trainX, trainY, resultType, methodType);
-        eachResult[SLCROSSVALIDATIONRESULTYPEVALIDATION] = crossValidationValidationClassify(i, validationX, validationY, resultType, methodType);
-        eachResult[SLCROSSVALIDATIONRESULTYPETEST]       = crossValidationTestClassify(i, testX, testY, resultType, methodType);
+        eachResult[SLCrossValidationResultTypeTrain]      = crossValidationTrain(i, trainX, trainY, resultType, methodType);
+        eachResult[SLCrossValidationResultTypeValidation] = crossValidationValidationClassify(i, validationX, validationY, resultType, methodType);
+        eachResult[SLCrossValidationResultTypeTest]       = crossValidationTestClassify(i, testX, testY, resultType, methodType);
         
         result += eachResult;
     }
@@ -260,7 +260,7 @@ SLGlpMultipleResults SLCrossValidation<T>::crossValidationValidationClassify(con
                                                                              SLCROSSVALIDATIONMETHODSTYPE methodType)
 {
     SLGlpMultipleResults result;
-    if ( methodType & SLCROSSVALIDATIONMETHODSUSINGAPPENDEDXASCLASSIFYDATA )
+    if ( methodType & SLCrossValidationMethodsUsingAppendedXAsClassifyData )
     {
         if(cvXValidationData.size() < cvModels.size()){
             cvXValidationData.push_back(X);
@@ -288,7 +288,7 @@ SLGlpMultipleResults SLCrossValidation<T>::crossValidationTestClassify(const siz
                                                                        SLCROSSVALIDATIONMETHODSTYPE methodType)
 {
     SLGlpMultipleResults result;
-    if ( methodType & SLCROSSVALIDATIONMETHODSUSINGAPPENDEDXASCLASSIFYDATA )
+    if ( methodType & SLCrossValidationMethodsUsingAppendedXAsClassifyData )
     {
         if(cvXTestData.size() < cvModels.size()){
             cvXTestData.push_back(X);

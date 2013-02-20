@@ -125,29 +125,24 @@
 
 /* Begin PBXFileReference section */
 		53317438168D9764005305C8 /* SLGlpFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLGlpFactory.h; path = Classes/Factory/SLGlpFactory.h; sourceTree = "<group>"; };
-		5331743B168D97B1005305C8 /* SLGlpProduct.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLGlpProduct.h; path = Classes/Factory/SLGlpProduct.h; sourceTree = "<group>"; };
 		5331743E168D9861005305C8 /* SLGraphMining.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLGraphMining.h; path = Classes/GraphMining/SLGraphMining.h; sourceTree = "<group>"; };
 		53317441168D987B005305C8 /* SLGraphMiningStrategy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLGraphMiningStrategy.h; path = Classes/GraphMining/SLGraphMiningStrategy.h; sourceTree = "<group>"; };
 		53388A231690B03000AF9E5E /* SparsePlsTest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SparsePlsTest.cpp; path = Test/SparsePlsTest.cpp; sourceTree = "<group>"; };
 		53388A2A1690B0D500AF9E5E /* SparsePlsTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SparsePlsTest; sourceTree = BUILT_PRODUCTS_DIR; };
-		5348010516A7247500755DFB /* 1862drugs.gsp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = 1862drugs.gsp; path = Examples/datasets/1862drugs.gsp; sourceTree = "<group>"; };
-		5348010616A7247500755DFB /* 1862Y.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = 1862Y.txt; path = Examples/datasets/1862Y.txt; sourceTree = "<group>"; };
-		5348010716A7247500755DFB /* CAS.gsp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = CAS.gsp; path = Examples/datasets/CAS.gsp; sourceTree = "<group>"; };
-		5348010816A7247500755DFB /* es.gsp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = es.gsp; path = Examples/datasets/es.gsp; sourceTree = "<group>"; };
-		5348010916A7247500755DFB /* seYsmall.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = seYsmall.txt; path = Examples/datasets/seYsmall.txt; sourceTree = "<group>"; };
-		5348010A16A7247500755DFB /* sideEfDrugsAnnot.gsp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = sideEfDrugsAnnot.gsp; path = Examples/datasets/sideEfDrugsAnnot.gsp; sourceTree = "<group>"; };
 		534B785C16AF439E006721F6 /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = CMakeLists.txt; path = Classes/CMakeLists.txt; sourceTree = "<group>"; };
 		534B785E16AF43B2006721F6 /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		534B785F16AF43B2006721F6 /* Common.cmake */ = {isa = PBXFileReference; lastKnownFileType = text; path = Common.cmake; sourceTree = "<group>"; };
 		534B786016AF43B2006721F6 /* FindEigen3.cmake */ = {isa = PBXFileReference; lastKnownFileType = text; path = FindEigen3.cmake; sourceTree = "<group>"; };
 		534B786116AF43BE006721F6 /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = CMakeLists.txt; path = Examples/CMakeLists.txt; sourceTree = "<group>"; };
 		534B786216AF43C9006721F6 /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = CMakeLists.txt; path = Test/CMakeLists.txt; sourceTree = "<group>"; };
-		534F58361696F1F300D2C3D3 /* SLCrossValidationResults.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SLCrossValidationResults.h; path = Classes/Utilities/SLCrossValidationResults.h; sourceTree = "<group>"; };
 		534F58381696F29300D2C3D3 /* SLCrossValidationResultHistory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SLCrossValidationResultHistory.h; path = Classes/Utilities/SLCrossValidationResultHistory.h; sourceTree = "<group>"; };
 		53578E04168D69AD002668D3 /* SLModelStrategy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLModelStrategy.h; path = Classes/Models/SLModelStrategy.h; sourceTree = "<group>"; };
 		53578E05168D69AD002668D3 /* SLSparsePls.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLSparsePls.h; path = Classes/Models/SLSparsePls.h; sourceTree = "<group>"; };
 		53578E07168D69B9002668D3 /* MatrixExt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MatrixExt.h; path = Classes/Extensions/MatrixExt.h; sourceTree = "<group>"; };
 		53578E09168D69CB002668D3 /* SLGlp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLGlp.h; path = Classes/SLGlp.h; sourceTree = "<group>"; };
+		536D3AEF16D55E910086DCE9 /* SLGlpProduct.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLGlpProduct.h; path = Classes/Factory/SLGlpProduct.h; sourceTree = "<group>"; };
+		536D3AF016D55F820086DCE9 /* SLCrossValidationResults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLCrossValidationResults.h; path = Classes/Utilities/SLCrossValidationResults.h; sourceTree = "<group>"; };
+		536D3AF216D55FF00086DCE9 /* SLCrossValidation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLCrossValidation.h; path = Classes/Utilities/SLCrossValidation.h; sourceTree = "<group>"; };
 		537078BC16AFA7C7004FFD09 /* libglp.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libglp.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		537078C516AFA7DD004FFD09 /* libglp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libglp.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		5370790C16AFBCA7004FFD09 /* GLP */ = {isa = PBXFileReference; lastKnownFileType = folder; name = GLP; path = build/Headers/GLP; sourceTree = "<group>"; };
@@ -156,7 +151,6 @@
 		53832802168D6CEF00E3B48F /* SLUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SLUtility.h; path = Classes/SLUtility.h; sourceTree = "<group>"; };
 		53832809168D767F00E3B48F /* SLModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLModel.h; path = Classes/Models/SLModel.h; sourceTree = "<group>"; };
 		53832810168D7E4E00E3B48F /* SLSparsePls.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SLSparsePls.cpp; path = Classes/Models/SLSparsePls.cpp; sourceTree = "<group>"; };
-		53981D2C16B0050800ED88AA /* AppledocSettings.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppledocSettings.plist; path = GLP/AppledocSettings.plist; sourceTree = "<group>"; };
 		53A0CF3616AFC4FD00B74AC1 /* gspls_static */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = gspls_static; sourceTree = BUILT_PRODUCTS_DIR; };
 		53B5D6451697251800AE0523 /* Graph.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Graph.h; path = Classes/GraphMining/Gspan/Graph.h; sourceTree = "<group>"; };
 		53B5D6461697271900AE0523 /* Dfs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Dfs.h; path = Classes/GraphMining/Gspan/Dfs.h; sourceTree = "<group>"; };
@@ -169,7 +163,6 @@
 		53C09382168DBB5D00A0ADC1 /* SLGspan.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLGspan.h; path = Classes/GraphMining/SLGspan.h; sourceTree = "<group>"; };
 		53C09387168DDEA500A0ADC1 /* gspls.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = gspls.cpp; path = Examples/gspls.cpp; sourceTree = "<group>"; };
 		53F3156F16A4A7550056C3A9 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = SOURCE_ROOT; };
-		53FC1E3116942D8700F3FD58 /* SLCrossValidation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLCrossValidation.h; path = Classes/Utilities/SLCrossValidation.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -222,24 +215,11 @@
 			name = Test;
 			sourceTree = "<group>";
 		};
-		5348010316A7246100755DFB /* datasets */ = {
-			isa = PBXGroup;
-			children = (
-				5348010516A7247500755DFB /* 1862drugs.gsp */,
-				5348010616A7247500755DFB /* 1862Y.txt */,
-				5348010716A7247500755DFB /* CAS.gsp */,
-				5348010816A7247500755DFB /* es.gsp */,
-				5348010916A7247500755DFB /* seYsmall.txt */,
-				5348010A16A7247500755DFB /* sideEfDrugsAnnot.gsp */,
-			);
-			name = datasets;
-			sourceTree = "<group>";
-		};
 		53578DF5168D67FC002668D3 /* Factory */ = {
 			isa = PBXGroup;
 			children = (
+				536D3AEF16D55E910086DCE9 /* SLGlpProduct.h */,
 				53317438168D9764005305C8 /* SLGlpFactory.h */,
-				5331743B168D97B1005305C8 /* SLGlpProduct.h */,
 			);
 			name = Factory;
 			sourceTree = "<group>";
@@ -263,7 +243,6 @@
 			isa = PBXGroup;
 			children = (
 				534B786116AF43BE006721F6 /* CMakeLists.txt */,
-				5348010316A7246100755DFB /* datasets */,
 				53C09387168DDEA500A0ADC1 /* gspls.cpp */,
 			);
 			name = Examples;
@@ -273,7 +252,6 @@
 			isa = PBXGroup;
 			children = (
 				5370790C16AFBCA7004FFD09 /* GLP */,
-				53981D2C16B0050800ED88AA /* AppledocSettings.plist */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -378,8 +356,8 @@
 		53FC1E2F16942D5100F3FD58 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
-				53FC1E3116942D8700F3FD58 /* SLCrossValidation.h */,
-				534F58361696F1F300D2C3D3 /* SLCrossValidationResults.h */,
+				536D3AF216D55FF00086DCE9 /* SLCrossValidation.h */,
+				536D3AF016D55F820086DCE9 /* SLCrossValidationResults.h */,
 				534F58381696F29300D2C3D3 /* SLCrossValidationResultHistory.h */,
 			);
 			name = Utilities;
@@ -501,7 +479,7 @@
 		537123381683288A00B47D4E /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0450;
+				LastUpgradeCheck = 0460;
 				ORGANIZATIONNAME = "Saigo Laboratoire";
 			};
 			buildConfigurationList = 5371233B1683288A00B47D4E /* Build configuration list for PBXProject "GLP" */;
@@ -658,6 +636,7 @@
 		53388A321690B0D500AF9E5E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = (
 					/usr/local/include,
 					/usr/local/include/eigen3,
@@ -670,6 +649,7 @@
 		53388A331690B0D500AF9E5E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = (
 					/usr/local/include,
 					/usr/local/include/eigen3,
@@ -682,7 +662,9 @@
 		537078BD16AFA7C7004FFD09 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				EXECUTABLE_PREFIX = lib;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = (
 					/usr/local/include,
 					/usr/local/include/eigen3,
@@ -694,7 +676,9 @@
 		537078BE16AFA7C7004FFD09 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				EXECUTABLE_PREFIX = lib;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = (
 					/usr/local/include,
 					/usr/local/include/eigen3,
@@ -706,7 +690,9 @@
 		537078C716AFA7DD004FFD09 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				EXECUTABLE_PREFIX = lib;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = (
 					/usr/local/include,
 					/usr/local/include/eigen3,
@@ -718,7 +704,9 @@
 		537078C816AFA7DD004FFD09 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				EXECUTABLE_PREFIX = lib;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = (
 					/usr/local/include,
 					/usr/local/include/eigen3,
@@ -730,6 +718,8 @@
 		5370791116AFC06A004FFD09 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -737,6 +727,8 @@
 		5370791216AFC06A004FFD09 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -746,6 +738,9 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_ANALYZER_SECURITY_FLOATLOOPCOUNTER = YES;
+				CLANG_ANALYZER_SECURITY_INSECUREAPI_RAND = YES;
+				CLANG_ANALYZER_SECURITY_INSECUREAPI_STRCPY = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -761,7 +756,6 @@
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
@@ -776,6 +770,9 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_ANALYZER_SECURITY_FLOATLOOPCOUNTER = YES;
+				CLANG_ANALYZER_SECURITY_INSECUREAPI_RAND = YES;
+				CLANG_ANALYZER_SECURITY_INSECUREAPI_STRCPY = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -786,7 +783,6 @@
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
@@ -798,6 +794,7 @@
 		5371234C1683288A00B47D4E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = (
 					/usr/local/include,
 					/usr/local/include/eigen3,
@@ -810,6 +807,7 @@
 		5371234D1683288A00B47D4E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = (
 					/usr/local/include,
 					/usr/local/include/eigen3,
@@ -822,6 +820,7 @@
 		53A0CF3416AFC4FD00B74AC1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = (
 					/usr/local/include,
 					/usr/local/include/eigen3,
@@ -835,6 +834,7 @@
 		53A0CF3516AFC4FD00B74AC1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = (
 					/usr/local/include,
 					/usr/local/include/eigen3,

@@ -76,11 +76,11 @@ public:
     SLCrossValidationResults crossValidation(const MatrixXd& X,
                                              const MatrixXd& Y,
                                              SLMODELRESULTYPE resultType,
-                                             SLCROSSVALIDATIONMETHODSTYPE methodType = SLCROSSVALIDATIONMETHODSUSINGWHOLEDATA)
+                                             SLCROSSVALIDATIONMETHODSTYPE methodType = SLCrossValidationMethodsUsingWholeData)
     {
         // C++ does not support partial specialization of member function
         if ( typeid(model) == typeid(SLModel<SLSparsePls>) )
-            return cv.crossValidation(X, Y, resultType, SLCROSSVALIDATIONMETHODSUSINGAPPENDEDXASCLASSIFYDATA|methodType);
+            return cv.crossValidation(X, Y, resultType, SLCrossValidationMethodsUsingAppendedXAsClassifyData|methodType);
         else
             return cv.crossValidation(X, Y, resultType, methodType);
     }

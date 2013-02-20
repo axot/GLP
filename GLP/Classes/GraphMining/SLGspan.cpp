@@ -49,15 +49,15 @@ bool SLGspan::setParameters(SLGspanParameters& parameters)
 
 SLGraphMiningInnerValues SLGspan::getInnerValues(SLGRAPHMININGINNERVALUE type) const
 {
-    ASSERT( type != SLGRAPHMININGINNERVALUENOTDEFINED, "inner values must be specified");
+    ASSERT( type != SLGraphMiningInnerValueNotDefined, "inner values must be specified");
     
     SLGraphMiningInnerValues results;
-    if ( type & SLGRAPHMININGINNERVALUEY )
+    if ( type & SLGraphMiningInnerValueY )
     {
         MatrixXd y(transaction.size(), 1);
         for (int i = 0; i < y.size(); ++i)   y.col(0)[i] = transaction[i].value;
         
-        results[SLGRAPHMININGINNERVALUEY] = y;
+        results[SLGraphMiningInnerValueY] = y;
     }
     
     return results;
@@ -65,7 +65,7 @@ SLGraphMiningInnerValues SLGspan::getInnerValues(SLGRAPHMININGINNERVALUE type) c
 
 SLGraphMiningResult SLGspan::search(VectorXd residual, SLGRAPHMININGTASKTYPE taskType, SLGRAPHMININGRESULTYPE resultType)
 {
-    ASSERT(taskType != SLGRAPHMININGTASKTYPENOTDEFINED &&
+    ASSERT(taskType != SLGraphMiningTasktypeNotDefined &&
            SLUtility::isIncludedOnlyOneType(taskType),
            "taskType must be specified either train or classify");
     
@@ -81,7 +81,7 @@ SLGraphMiningResult SLGspan::search(VectorXd residual, SLGRAPHMININGTASKTYPE tas
     
     w = residual.array().abs();
     
-    if ( taskType & SLGRAPHMININGTASKTYPETRAIN )
+    if ( taskType & SLGraphMiningTasktypeTrain )
     {
         for (size_t i = 0; i < l; ++i)
         {
@@ -135,23 +135,17 @@ SLGraphMiningResult SLGspan::search(VectorXd residual, SLGRAPHMININGTASKTYPE tas
         }
     }
     
-    if ( taskType == SLGRAPHMININGTASKTYPETRAIN )
+    if ( taskType == SLGraphMiningTasktypeTrain )
     {
         entireRules.insert(entireRules.end(), rule_cache.begin(), rule_cache.end());
-        
-        cout << entireRules.size() << " Rules" << endl;
-        for(vector<Rule>::iterator it = entireRules.begin(); it != entireRules.end(); ++it)
-        {
-            cout << (*it).dfs << endl;
-        }
     }
-    else if ( taskType == SLGRAPHMININGTASKTYPECLASSIFY )
+    else if ( taskType == SLGraphMiningTasktypeClassify )
     {
         
     }
     
     SLGraphMiningResult result;
-    if ( resultType & SLGRAPHMININGRESULTYPEX )
+    if ( resultType & SLGraphMiningResultTypeX )
     {
         MatrixXd X(residual.rows(), topk);
         X.setConstant(0.0f);
@@ -166,8 +160,19 @@ SLGraphMiningResult SLGspan::search(VectorXd residual, SLGRAPHMININGTASKTYPE tas
             ++j;
         }
 
-        result[SLGRAPHMININGRESULTYPEX] = X;
+        result[SLGraphMiningResultTypeX] = X;
     }
+    
+//    if ( resultType & SLGRAPHMININGRESULTYPEDFS )
+//    {
+        ofstream outDFS("DFS.txt", ios::out);
+        
+        for(vector<Rule>::iterator it = entireRules.begin(); it != entireRules.end(); ++it)
+        {
+            outDFS << (*it).dfs << endl;
+        }
+        outDFS.close();
+//    }
     
     return result;
 }
@@ -291,7 +296,7 @@ bool SLGspan::can_prune(Projected& projected)
     double upos = 0;
     double uneg = 0;
     
-    if( taskType & SLGRAPHMININGTASKTYPECLASSIFY )
+    if( taskType & SLGraphMiningTasktypeClassify )
     {
         gain = -wbias;
         upos = -wbias;
@@ -300,7 +305,7 @@ bool SLGspan::can_prune(Projected& projected)
     
     size_t support = 0;
     int oid = UINT_MAX;
-    int multi = (taskType & SLGRAPHMININGTASKTYPETRAIN) ? 1 : 2;
+    int multi = (taskType & SLGraphMiningTasktypeTrain) ? 1 : 2;
     for (Projected::iterator it = projected.begin(); it != projected.end(); ++it)
     {
         if (oid != it->id)
@@ -355,7 +360,7 @@ bool SLGspan::can_prune(Projected& projected)
 
 void SLGspan::project(Projected& projected)
 {
-    if ( taskType == SLGRAPHMININGTASKTYPETRAIN )
+    if ( taskType == SLGraphMiningTasktypeTrain )
     {
         if (!is_min ()                  ||
             maxpat == DFS_CODE.size()   ||
@@ -364,7 +369,7 @@ void SLGspan::project(Projected& projected)
             return;
         }
     }
-    else if ( taskType == SLGRAPHMININGTASKTYPECLASSIFY )
+    else if ( taskType == SLGraphMiningTasktypeClassify )
     {
         ostringstream ostrs;
         DFS_CODE.write (ostrs);
@@ -442,7 +447,7 @@ void SLGspan::project(Projected& projected)
 void SLGspan::project(Projected& projected, tree<TNODE>::iterator& tnode)
 {
     bool p = false;
-    if ( taskType == SLGRAPHMININGTASKTYPETRAIN )
+    if ( taskType == SLGraphMiningTasktypeTrain )
     {
         if (!is_min() || maxpat == DFS_CODE.size())
         {
@@ -455,7 +460,7 @@ void SLGspan::project(Projected& projected, tree<TNODE>::iterator& tnode)
             return;
         }
     }
-    else if ( taskType == SLGRAPHMININGTASKTYPECLASSIFY )
+    else if ( taskType == SLGraphMiningTasktypeClassify )
     {
         ostringstream ostrs;
         DFS_CODE.write (ostrs);

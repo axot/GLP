@@ -33,11 +33,12 @@
 
 using namespace std;
 using namespace Eigen;
+using namespace boost;
 
 enum{
-    SLCROSSVALIDATIONRESULTYPETRAIN      = 1 << 0,
-    SLCROSSVALIDATIONRESULTYPEVALIDATION = 1 << 1,
-    SLCROSSVALIDATIONRESULTYPETEST       = 1 << 2,
+    SLCrossValidationResultTypeTrain      = 1 << 0,
+    SLCrossValidationResultTypeValidation = 1 << 1,
+    SLCrossValidationResultTypeTest       = 1 << 2,
 };
 
 typedef unsigned int SLCROSSVALIDATIONRESULTYPE;
@@ -72,7 +73,7 @@ public:
         for ( it = (*this)[cvType].begin(); it != (*this)[cvType].end(); ++it )
         {
             output << "\n[" << i << "]:"  << endl;
-            output << (*it)[resultType]   << endl;
+            output << any_cast<string>((*it)[resultType])   << endl;
             ++i;
         }
         return output.str();
@@ -100,7 +101,7 @@ public:
         int i = 0;
         while ( it != (*this)[cvType].end() )
         {
-            mean[i] = (*it)[resultType].mean();
+            mean[i] = any_cast<MatrixXd>((*it)[resultType]).mean();
             ++i;
             ++it;
         }
@@ -123,11 +124,11 @@ public:
 
         SLGlpMultipleResults::iterator it = (*this)[cvType].begin();
         
-        MatrixXd sum = (*it)[resultType];
+        MatrixXd sum = any_cast<MatrixXd>((*it)[resultType]);
         ++it;
         while ( it != (*this)[cvType].end() )
         {
-            sum += (*it)[resultType];
+            sum += any_cast<MatrixXd>((*it)[resultType]);
             ++it;
         }
         return sum.mean()/(*this)[cvType].size();
