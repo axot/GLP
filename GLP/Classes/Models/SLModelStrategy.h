@@ -30,7 +30,7 @@
 #include <map>
 #include <vector>
 #include <Eigen/Core>
-#include <boost/any.hpp>
+#include <boost/variant.hpp>
 #include "../SLUtility.h"
 
 using namespace std;
@@ -48,7 +48,7 @@ enum{
 };
 
 typedef unsigned int SLMODELRESULTYPE;
-typedef map<SLMODELRESULTYPE, boost::any> SLModelResult;
+typedef map<SLMODELRESULTYPE, boost::variant< VectorXd, MatrixXd, string > > SLModelResult;
 
 class SLModelStrategy
 {

@@ -99,17 +99,17 @@ SLModelResult SLSparsePls::classify(const MatrixXd& tX, const MatrixXd& tY, SLMO
 
     if(type & SLModelResultTypeQ2)
     {
-        result[SLModelResultTypeQ2] = MatrixXd::Ones(1, tY.cols()) - SSum(tRES).cwiseQuotient(SSum(tY));
+        result[SLModelResultTypeQ2] = (MatrixXd)(MatrixXd::Ones(1, tY.cols()) - SSum(tRES).cwiseQuotient(SSum(tY)));
     }
     
     if(type & SLModelResultTypeRSS)
     {
-        result[SLModelResultTypeRSS] = SSum(tRES);
+        result[SLModelResultTypeRSS] = (MatrixXd)SSum(tRES);
     }
     
     if(type & SLModelResultTypeBeta)
     {
-        result[SLModelResultTypeBeta] = Beta;
+        result[SLModelResultTypeBeta] = (MatrixXd)(Beta);
     }
     
     if(type & SLModelResultTypeACC)
@@ -137,17 +137,17 @@ SLModelResult SLSparsePls::getTrainResult(SLMODELRESULTYPE type) const
     SLModelResult result;
     if(type & SLModelResultTypeQ2)
     {
-        result[SLModelResultTypeQ2] = MatrixXd::Ones(1, Y.cols()) - SSum(Res).cwiseQuotient(SSum(Y));
+        result[SLModelResultTypeQ2] = (MatrixXd)(MatrixXd::Ones(1, Y.cols()) - SSum(Res).cwiseQuotient(SSum(Y)));
     }
     
     if(type & SLModelResultTypeRSS)
     {
-        result[SLModelResultTypeRSS] = SSum(Res);
+        result[SLModelResultTypeRSS] = (MatrixXd)SSum(Res);
     }
     
     if(type & SLModelResultTypeBeta)
     {
-        result[SLModelResultTypeBeta] = Beta;
+        result[SLModelResultTypeBeta] = (MatrixXd)Beta;
     }
     
     if(type & SLModelResultTypeACC)

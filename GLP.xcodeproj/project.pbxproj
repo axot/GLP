@@ -36,8 +36,6 @@
 		537078F816AFB756004FFD09 /* Graph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53B5D64C169730DD00AE0523 /* Graph.cpp */; };
 		537078F916AFB759004FFD09 /* Dfs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53B5D64F169731C900AE0523 /* Dfs.cpp */; };
 		537078FA16AFB75E004FFD09 /* Utility.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53B5D652169733FC00AE0523 /* Utility.cpp */; };
-		5370790D16AFBCAA004FFD09 /* GLP in Headers */ = {isa = PBXBuildFile; fileRef = 5370790C16AFBCA7004FFD09 /* GLP */; settings = {ATTRIBUTES = (Public, ); }; };
-		5370790E16AFBCAD004FFD09 /* GLP in Headers */ = {isa = PBXBuildFile; fileRef = 5370790C16AFBCA7004FFD09 /* GLP */; settings = {ATTRIBUTES = (Public, ); }; };
 		53A0CF2A16AFC4EC00B74AC1 /* libglp.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 537078BC16AFA7C7004FFD09 /* libglp.dylib */; };
 		53A0CF2B16AFC4F100B74AC1 /* libglp.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 537078BC16AFA7C7004FFD09 /* libglp.dylib */; };
 		53A0CF3016AFC4FD00B74AC1 /* gspls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53C09387168DDEA500A0ADC1 /* gspls.cpp */; };
@@ -145,7 +143,6 @@
 		536D3AF216D55FF00086DCE9 /* SLCrossValidation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLCrossValidation.h; path = Classes/Utilities/SLCrossValidation.h; sourceTree = "<group>"; };
 		537078BC16AFA7C7004FFD09 /* libglp.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libglp.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		537078C516AFA7DD004FFD09 /* libglp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libglp.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		5370790C16AFBCA7004FFD09 /* GLP */ = {isa = PBXFileReference; lastKnownFileType = folder; name = GLP; path = build/Headers/GLP; sourceTree = "<group>"; };
 		537123411683288A00B47D4E /* gspls */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = gspls; sourceTree = BUILT_PRODUCTS_DIR; };
 		5371237E16833C2D00B47D4E /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = SOURCE_ROOT; };
 		53832802168D6CEF00E3B48F /* SLUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SLUtility.h; path = Classes/SLUtility.h; sourceTree = "<group>"; };
@@ -251,7 +248,6 @@
 		5370790316AFB980004FFD09 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				5370790C16AFBCA7004FFD09 /* GLP */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -370,7 +366,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5370790D16AFBCAA004FFD09 /* GLP in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -378,7 +373,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5370790E16AFBCAD004FFD09 /* GLP in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -516,7 +510,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "mkdir -p \"${SRCROOT}/build/Headers\"\nrm -rf \"${SRCROOT}/build/Headers/GLP\"\ncp -r \"${SRCROOT}/GLP/Classes\" \"${SRCROOT}/build/Headers/GLP\"\nfind \"${SRCROOT}/build/Headers/GLP\" -type f | grep -E -v \"\\.h\" | xargs rm";
+			shellScript = "mkdir -p \"${SRCROOT}/build/Headers\"\nrm -rf \"${SRCROOT}/build/Headers/GLP\"\nln -s \"${SRCROOT}/GLP/Classes\" \"${SRCROOT}/build/Headers/GLP\"\nfind \"${SRCROOT}/build/Headers/GLP\" -type f | grep -E -v \"\\.h\" | xargs rm";
 		};
 		53981D2A16AFFB5C00ED88AA /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;

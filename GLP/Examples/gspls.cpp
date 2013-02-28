@@ -38,7 +38,7 @@ using namespace boost;
 void usage()
 {
     cerr <<
-"Usage: gspls [-mLnkyv] [-t train data] [-o output model]\n\n"
+"Usage: gspls [-mLnkyvb] [-t train data] [-o output model]\n\n"
 "Options: \n"
 "           [-m minsup, default:1]\n"
 "           [-L maxpat, default:10]\n"
@@ -46,10 +46,10 @@ void usage()
 "           [-k topk, default:10]\n"
 "           [-f folds of cross validation, default:4]\n"
 "           [-y Y matrix file, if not use Y values which included in gsp file]\n"
-"           [-v verbose: default:0 range:0-1]\n"
-"           [-t train data]\n"
-"           [-o model output]\n\n"
-"GLP v2.0 2012.12.20\n"
+"           [-b use memory boosting]\n"
+"           [-v verbose]\n"
+"           [-t train data]\n\n"
+"GLP v2.0 2013.02.28\n"
 "  Author: Zheng Shao\n"
 " Contact: axot@axot.org\n"
 "Homepage: http://saigo-www.bio.kyutech.ac.jp/\n"
@@ -65,7 +65,8 @@ int main(int argc, const char *argv[])
     size_t fold = 4;
     char *yfile = NULL;
     char *gspfile = NULL;
-    int verbose = 0;
+    bool verbose = false;
+    bool boost = false;
 
     if (argc < 2) {
         usage();
@@ -73,30 +74,33 @@ int main(int argc, const char *argv[])
     }
     
     int opt;
-    while ((opt = getopt(argc, (char **)argv, "L:m:n:k:f:y:v:")) != -1)
+    while ((opt = getopt(argc, (char **)argv, "L:m:n:k:f:y:vb")) != -1)
     {
         switch(opt)
         {
             case 'L':
-                maxpat = atoi (optarg);
+                maxpat = atoi(optarg);
                 break;
             case 'm':
-                minsup = atoi (optarg);
+                minsup = atoi(optarg);
                 break;
             case 'n':
-                n = atoi (optarg);
+                n = atoi(optarg);
                 break;
             case 'k':
-                topk = atoi (optarg);
+                topk = atoi(optarg);
                 break;
             case 'f':
-                fold = atoi (optarg);
+                fold = atoi(optarg);
                 break;
             case 'y':
                 yfile = strdup(optarg);
                 break;
             case 'v':
-                verbose = atoi (optarg);
+                verbose = true;
+                break;
+            case 'b':
+                boost = true;
                 break;
             default:
                 usage();
@@ -120,7 +124,7 @@ int main(int argc, const char *argv[])
     gspanParam.minsup = minsup;
     gspanParam.maxpat = maxpat;
     gspanParam.topk   = topk;
-    gspanParam.doesUseMemoryBoost = true;
+    gspanParam.doesUseMemoryBoost = boost;
     gspanParam.gspFilename = string(gspfile);
     
     BOOST_AUTO(gspls, (*SLGlpFactory<SLSparsePls, SLGspan>::create(splsParam, gspanParam)));
@@ -140,7 +144,7 @@ int main(int argc, const char *argv[])
     }
     else
     {
-        Y = any_cast<MatrixXd>(gspls.getInnerValues(SLGraphMiningInnerValueY)[SLGraphMiningInnerValueY]);
+        Y = get<MatrixXd>(gspls.getInnerValues(SLGraphMiningInnerValueY)[SLGraphMiningInnerValueY]);
     }
     
     Y = Y.array() - Y.mean();
@@ -150,7 +154,7 @@ int main(int argc, const char *argv[])
     size_t overfitCount = 0;
     
     unsigned int i = 0;
-    
+    SLGraphMiningResult gspanResult;
     while ( i < n )
     {
         cout << "n: " << ++i << endl;
@@ -159,9 +163,9 @@ int main(int argc, const char *argv[])
         SSum(Res).maxCoeff(&maxSquaredNormColumn);
         VectorXd largestResCol = Res.col(maxSquaredNormColumn);
         
-        SLGraphMiningResult gspanResult = gspls.search(largestResCol, SLGraphMiningTasktypeTrain, SLGraphMiningResultTypeX);
+        gspanResult = gspls.search(largestResCol, SLGraphMiningTasktypeTrain, SLGraphMiningResultTypeX | SLGraphMiningResultTypeDFS);
         
-        MatrixXd x = any_cast<MatrixXd>(gspanResult[SLGraphMiningResultTypeX]);
+        MatrixXd x = get<MatrixXd>(gspanResult[SLGraphMiningResultTypeX]);
                 
         SLCrossValidationResults cvResult =
             gspls.crossValidation(x, Y, SLModelResultTypeQ2 | SLModelResultTypeRSS | SLModelResultTypeBeta | SLModelResultTypeACC);
@@ -175,27 +179,12 @@ int main(int argc, const char *argv[])
                 
         int bestBetaIndex;
         cvResult.eachMean(SLCrossValidationResultTypeTrain, SLModelResultTypeRSS).minCoeff(&bestBetaIndex);
-        Res = Y - X*any_cast<MatrixXd>(cvResult[SLCrossValidationResultTypeTrain][bestBetaIndex][SLModelResultTypeBeta]);
+        Res = Y - X*get<MatrixXd>(cvResult[SLCrossValidationResultTypeTrain][bestBetaIndex][SLModelResultTypeBeta]);
+        
+        cvResult.show(SLModelResultTypeQ2 | SLModelResultTypeRSS | SLModelResultTypeACC);
         
         double RSS = cvResult.mean(SLCrossValidationResultTypeValidation, SLModelResultTypeRSS);
-        
-        cout << "Train:"    << endl;
-        cout << "Q2:\t"     << cvResult.mean(SLCrossValidationResultTypeTrain, SLModelResultTypeQ2);
-        cout << "\tRSS:\t"    << cvResult.mean(SLCrossValidationResultTypeTrain, SLModelResultTypeRSS);
-        cout << "\tACC:\t"    << cvResult.mean(SLCrossValidationResultTypeTrain, SLModelResultTypeACC) << endl;
-        
-        cout << "Validation:" << endl;
-        cout << "Q2:\t"     << cvResult.mean(SLCrossValidationResultTypeValidation, SLModelResultTypeQ2);
-        cout << "\tRSS:\t"    << cvResult.mean(SLCrossValidationResultTypeValidation, SLModelResultTypeRSS);
-        cout << "\tACC:\t"    << cvResult.mean(SLCrossValidationResultTypeValidation, SLModelResultTypeACC) << endl;
-
-        cout << "Test:"   << endl;
-        cout << "Q2:\t"     << cvResult.mean(SLCrossValidationResultTypeTest, SLModelResultTypeQ2);
-        cout << "\tRSS:\t"    << cvResult.mean(SLCrossValidationResultTypeTest, SLModelResultTypeRSS);
-        cout << "\tACC:\t"    << cvResult.mean(SLCrossValidationResultTypeTest, SLModelResultTypeACC) << endl;
-
-        cout << endl << endl;
-        
+                
         if ( RSS > lastRSS )
         {
             ++overfitCount;
@@ -219,29 +208,33 @@ int main(int argc, const char *argv[])
     }
     
     SLCrossValidationResults oldResult = gspls.getResultHistory().back();
-    cout << "\nBest: n = "       <<  i - cvParam.resultHistorySize + 1 << endl;
-    cout << "Train:"            << endl;
-    cout << "Q2:\t"             << oldResult.mean(SLCrossValidationResultTypeTrain, SLModelResultTypeQ2);
-    cout << "\tRSS:\t"            << oldResult.mean(SLCrossValidationResultTypeTrain, SLModelResultTypeRSS);
-    cout << "\tACC:\t"            << oldResult.mean(SLCrossValidationResultTypeTrain, SLModelResultTypeACC) << endl;
-    
-    cout << "Validation:"     << endl;
-    cout << "Q2:\t"             << oldResult.mean(SLCrossValidationResultTypeValidation, SLModelResultTypeQ2);
-    cout << "\tRSS:\n"            << oldResult.mean(SLCrossValidationResultTypeValidation, SLModelResultTypeRSS);
-    cout << "\tACC:\t"            << oldResult.mean(SLCrossValidationResultTypeValidation, SLModelResultTypeACC) << endl;
-    
-    cout << "Test:"           << endl;
-    cout << "Q2:\t"             << oldResult.mean(SLCrossValidationResultTypeTest, SLModelResultTypeQ2);
-    cout << "\tRSS:\t"            << oldResult.mean(SLCrossValidationResultTypeTest, SLModelResultTypeRSS);
-    cout << "\tACC:\t"            << oldResult.mean(SLCrossValidationResultTypeTest, SLModelResultTypeACC) << endl;
+    int best = i - cvParam.resultHistorySize + 1;
+    cout << "Best: n = " <<  best << endl;
+    oldResult.show(SLModelResultTypeQ2 | SLModelResultTypeRSS | SLModelResultTypeACC);
     
     ofstream outX("X.txt", ios::out);
     outX << X.leftCols(X.cols()-(cvParam.resultHistorySize-1)*topk) << endl;
     outX.close();
     
     ofstream outBeta("Beta.txt", ios::out);
-    outBeta << oldResult.print(SLCrossValidationResultTypeValidation, SLModelResultTypeBeta) << endl;
-//    cout << "\nBeta:"         << oldResult.print(SLCROSSVALIDATIONRESULTYPEVALIDATION, SLMODELRESULTYPEBETA) << endl;
+    long bestBetaIndex;
+    VectorXd ACCs(fold);
+    
+    for ( int j = 0; j < ACCs.size(); ++j )
+    {
+        ACCs[j] = get<MatrixXd>(oldResult[SLCrossValidationResultTypeTest][j][SLModelResultTypeACC]).mean();
+    }
+    
+    ACCs.maxCoeff(&bestBetaIndex);
+    outBeta << get<MatrixXd>(oldResult[SLCrossValidationResultTypeTest][bestBetaIndex][SLModelResultTypeBeta]) << endl;
     outBeta.close();
+    
+    ofstream outDFS("DFS.txt", ios::out);
+    for (int i = 0; i < topk*best; ++i)
+    {
+        outDFS << get< vector<string> >(gspanResult[SLGraphMiningResultTypeDFS])[i] << endl;
+    }
+    outDFS.close();
+    
     return 0;
 }

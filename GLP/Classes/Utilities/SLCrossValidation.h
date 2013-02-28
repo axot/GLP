@@ -116,7 +116,7 @@ public:
     {
         return resultHistory;
     }
-    
+        
 private:
     /* Split method for cross validation:
      *
@@ -125,7 +125,7 @@ private:
      *            return merged 2 blocks, one part is the begining of the matrix
      */
     MatrixXd cvSplitMatrix(MatrixXd& from, ssize_t startIndex, size_t length) const;
-    
+        
     SLGlpMultipleResults crossValidationTrain(const size_t index,
                                               const MatrixXd& X,
                                               const MatrixXd& Y,
@@ -217,7 +217,7 @@ SLCrossValidationResults SLCrossValidation<T>::crossValidation(const MatrixXd& X
         eachResult[SLCrossValidationResultTypeValidation] = crossValidationValidationClassify(i, validationX, validationY, resultType, methodType);
         eachResult[SLCrossValidationResultTypeTest]       = crossValidationTestClassify(i, testX, testY, resultType, methodType);
         
-        result += eachResult;
+        result += eachResult;        
     }
     
     resultHistory.push_front(result);

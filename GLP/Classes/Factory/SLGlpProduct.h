@@ -94,7 +94,7 @@ public:
     {
         return cv.getResultHistory();
     }
-
+    
 private:
     SLModel<M> model;
     SLGraphMining<G> graphMining;

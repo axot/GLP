@@ -52,6 +52,49 @@ public:
         *this = *this + b;
         return *this;
     }
+
+    /* Display Results of Model
+     * Input
+     *      results: Cross Validation Results
+     *   resultType: type of results
+     */
+    void show(SLMODELRESULTYPE resultType)
+    {
+        cout << "Train:"    << endl;
+        if ( resultType & SLModelResultTypeQ2 )
+            cout << "\tQ2:\t"   << mean(SLCrossValidationResultTypeTrain, SLModelResultTypeQ2);
+        
+        if ( resultType & SLModelResultTypeRSS )
+            cout << "\tRSS:\t"  << mean(SLCrossValidationResultTypeTrain, SLModelResultTypeRSS);
+        
+        if ( resultType & SLModelResultTypeACC )
+            cout << "\tACC:\t"  << mean(SLCrossValidationResultTypeTrain, SLModelResultTypeACC);
+        cout << endl;
+        
+        cout << "Validation:"    << endl;
+        if ( resultType & SLModelResultTypeQ2 )
+            cout << "\tQ2:\t"   << mean(SLCrossValidationResultTypeValidation, SLModelResultTypeQ2);
+        
+        if ( resultType & SLModelResultTypeRSS )
+            cout << "\tRSS:\t"  << mean(SLCrossValidationResultTypeValidation, SLModelResultTypeRSS);
+        
+        if ( resultType & SLModelResultTypeACC )
+            cout << "\tACC:\t"  << mean(SLCrossValidationResultTypeValidation, SLModelResultTypeACC);
+        cout << endl;
+        
+        cout << "Test:"    << endl;
+        if ( resultType & SLModelResultTypeQ2 )
+            cout << "\tQ2:\t"   << mean(SLCrossValidationResultTypeTest, SLModelResultTypeQ2);
+        
+        if ( resultType & SLModelResultTypeRSS )
+            cout << "\tRSS:\t"  << mean(SLCrossValidationResultTypeTest, SLModelResultTypeRSS);
+        
+        if ( resultType & SLModelResultTypeACC )
+            cout << "\tACC:\t"  << mean(SLCrossValidationResultTypeTest, SLModelResultTypeACC);
+        cout << endl;
+        
+        cout << endl;
+    }
     
     /* Print Cross Vaildate Results:
      * Input
@@ -68,12 +111,13 @@ public:
         ASSERT(SLUtility::isIncludedOnlyOneType(resultType), "only one of cross result type can be calculate");
 
         stringstream output;
+        output.precision(12);
         SLGlpMultipleResults::iterator it;
         size_t i = 0;
         for ( it = (*this)[cvType].begin(); it != (*this)[cvType].end(); ++it )
         {
             output << "\n[" << i << "]:"  << endl;
-            output << any_cast<string>((*it)[resultType])   << endl;
+            output << get<MatrixXd>((*it)[resultType]) << endl;
             ++i;
         }
         return output.str();
@@ -101,7 +145,7 @@ public:
         int i = 0;
         while ( it != (*this)[cvType].end() )
         {
-            mean[i] = any_cast<MatrixXd>((*it)[resultType]).mean();
+            mean[i] = get<MatrixXd>((*it)[resultType]).mean();
             ++i;
             ++it;
         }
@@ -124,11 +168,12 @@ public:
 
         SLGlpMultipleResults::iterator it = (*this)[cvType].begin();
         
-        MatrixXd sum = any_cast<MatrixXd>((*it)[resultType]);
+        MatrixXd sum = get<MatrixXd>((*it)[resultType]);
+
         ++it;
         while ( it != (*this)[cvType].end() )
         {
-            sum += any_cast<MatrixXd>((*it)[resultType]);
+            sum += get<MatrixXd>((*it)[resultType]);
             ++it;
         }
         return sum.mean()/(*this)[cvType].size();

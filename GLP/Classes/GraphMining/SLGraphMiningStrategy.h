@@ -28,8 +28,9 @@
 
 #include <iostream>
 #include <map>
+#include <vector>
 #include <Eigen/Core>
-#include <boost/any.hpp>
+#include <boost/variant.hpp>
 #include "../SLUtility.h"
 
 using namespace std;
@@ -42,7 +43,7 @@ enum{
 };
 
 typedef unsigned int SLGRAPHMININGRESULTYPE;
-typedef map<SLGRAPHMININGRESULTYPE, boost::any> SLGraphMiningResult;
+typedef map<SLGRAPHMININGRESULTYPE, boost::variant< VectorXd, MatrixXd, string, vector<string> > > SLGraphMiningResult;
 
 enum{
     SLGraphMiningTasktypeNotDefined   = 0,
@@ -58,7 +59,7 @@ enum{
 };
 
 typedef unsigned int SLGRAPHMININGINNERVALUE;
-typedef map<SLGRAPHMININGINNERVALUE, boost::any> SLGraphMiningInnerValues;
+typedef map<SLGRAPHMININGINNERVALUE, boost::variant< VectorXd, MatrixXd > > SLGraphMiningInnerValues;
 
 class SLGraphMiningStrategy
 {    

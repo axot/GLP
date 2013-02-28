@@ -145,6 +145,7 @@ SLGraphMiningResult SLGspan::search(VectorXd residual, SLGRAPHMININGTASKTYPE tas
     }
     
     SLGraphMiningResult result;
+    vector<string> vDFS;
     if ( resultType & SLGraphMiningResultTypeX )
     {
         MatrixXd X(residual.rows(), topk);
@@ -163,16 +164,17 @@ SLGraphMiningResult SLGspan::search(VectorXd residual, SLGRAPHMININGTASKTYPE tas
         result[SLGraphMiningResultTypeX] = X;
     }
     
-//    if ( resultType & SLGRAPHMININGRESULTYPEDFS )
-//    {
-        ofstream outDFS("DFS.txt", ios::out);
-        
+    if ( resultType & SLGraphMiningResultTypeDFS )
+    {
+        ostringstream osdfs;
+    
         for(vector<Rule>::iterator it = entireRules.begin(); it != entireRules.end(); ++it)
         {
-            outDFS << (*it).dfs << endl;
+            vDFS.push_back((*it).dfs);
+//            osdfs << (*it).dfs << endl;
         }
-        outDFS.close();
-//    }
+        result[SLGraphMiningResultTypeDFS] = vDFS;
+    }
     
     return result;
 }

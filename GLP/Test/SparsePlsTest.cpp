@@ -56,12 +56,12 @@ int main(int argc, const char *argv[])
 
     for ( int i = 0; i < X.cols(); ++i)
     {
-        SLModelResult result = spls.train(X.col(i), Y, SLMODELRESULTYPEQ2 | SLMODELRESULTYPERSS | SLMODELRESULTYPEBETA);
+        SLModelResult result = spls.train(X.col(i), Y, SLModelResultTypeQ2 | SLModelResultTypeRSS | SLModelResultTypeBeta);
         
         cout << "Training: "<< endl;
-        cout << "Q2: "      << result[SLMODELRESULTYPEQ2]  << endl;
-        cout << "RSS: "     << result[SLMODELRESULTYPERSS] << endl;
-        cout << "Beta:\n"   << result[SLMODELRESULTYPEBETA]<< '\n' << endl;
+        cout << "Q2: "      << result[SLModelResultTypeQ2]  << endl;
+        cout << "RSS: "     << result[SLModelResultTypeRSS] << endl;
+        cout << "Beta:\n"   << result[SLModelResultTypeBeta]<< '\n' << endl;
     }
     
     MatrixXd tX(2,3), tY(2,1);
@@ -69,10 +69,10 @@ int main(int argc, const char *argv[])
     tX.row(1) << 1,1,1;
     tY << 5,6;
     
-    SLModelResult tresult = spls.classify(tX, tY, SLMODELRESULTYPEQ2 | SLMODELRESULTYPERSS);
+    SLModelResult tresult = spls.classify(tX, tY, SLModelResultTypeQ2 | SLModelResultTypeRSS);
     cout << "Classify: "<< endl;
-    cout << "Q2: "      << tresult[SLMODELRESULTYPEQ2]  << endl;
-    cout << "RSS: "     << tresult[SLMODELRESULTYPERSS] << '\n' << endl;
+    cout << "Q2: "      << tresult[SLModelResultTypeQ2]  << endl;
+    cout << "RSS: "     << tresult[SLModelResultTypeRSS] << '\n' << endl;
     
     MatrixXd cvX(7,3), cvY(7,3);
     cvX << X, tX;
@@ -92,21 +92,9 @@ int main(int argc, const char *argv[])
         cout << "\nCross Validation: n: " << i+1 << endl;
         SLCrossValidationResults results = cv.crossValidation(cvX.col(i),
                                                               cvY,
-                                                              SLMODELRESULTYPEQ2 | SLMODELRESULTYPERSS | SLMODELRESULTYPEBETA,
-                                                              SLCROSSVALIDATIONMETHODSUSINGAPPENDEDXASCLASSIFYDATA);
+                                                              SLModelResultTypeQ2 | SLModelResultTypeRSS | SLModelResultTypeBeta,
+                                                              SLCrossValidationMethodsUsingAppendedXAsClassifyData);
         
-        cout << "Training: "    << endl;
-        cout << "Q2:\n"         << results.mean(SLCROSSVALIDATIONRESULTYPETRAIN, SLMODELRESULTYPEQ2)  << endl;
-        cout << "\nRSS:\n"      << results.mean(SLCROSSVALIDATIONRESULTYPETRAIN, SLMODELRESULTYPERSS) << endl;
-        
-        cout << "\nValidation:" << endl;
-        cout << "Q2:\n"         << results.mean(SLCROSSVALIDATIONRESULTYPEVALIDATION, SLMODELRESULTYPEQ2)  << endl;
-        cout << "\nRSS:\n"      << results.mean(SLCROSSVALIDATIONRESULTYPEVALIDATION, SLMODELRESULTYPERSS) << endl;
-
-        cout << "\nTest: "      << endl;
-        cout << "Q2:\n"         << results.mean(SLCROSSVALIDATIONRESULTYPETEST, SLMODELRESULTYPEQ2)  << endl;
-        cout << "\nRSS:\n"      << results.mean(SLCROSSVALIDATIONRESULTYPETEST, SLMODELRESULTYPERSS) << endl;
-        
-        cout << "\nBeta:"       << results.print(SLCROSSVALIDATIONRESULTYPETEST, SLMODELRESULTYPEBETA) << endl;
+        results.show(SLModelResultTypeQ2 | SLModelResultTypeRSS | SLModelResultTypeBeta);
     }
 }
