@@ -37,7 +37,7 @@ clean:
 		cd -;					\
 	fi
 	@if test -f $(DEBUGBUILDIR)/Makefile; then	\
-	     	cd $(DEBUGBUILDIR);			\
-	     	make clean;				\
+	    	cd $(DEBUGBUILDIR);			\
+	    	make clean;				\
 		cd -;					\
 	fi

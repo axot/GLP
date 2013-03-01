@@ -217,6 +217,8 @@ int main(int argc, const char *argv[])
     outX.close();
     
     ofstream outBeta("Beta.txt", ios::out);
+    outBeta.precision(12);
+    outBeta.flags(ios::left);
     long bestBetaIndex;
     VectorXd ACCs(fold);
     
@@ -230,7 +232,7 @@ int main(int argc, const char *argv[])
     outBeta.close();
     
     ofstream outDFS("DFS.txt", ios::out);
-    for (int i = 0; i < topk*best; ++i)
+    for ( size_t i = 0; i < topk*best; ++i )
     {
         outDFS << get< vector<string> >(gspanResult[SLGraphMiningResultTypeDFS])[i] << endl;
     }

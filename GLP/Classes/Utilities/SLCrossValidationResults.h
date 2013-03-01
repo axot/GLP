@@ -28,6 +28,7 @@
 
 #include <map>
 #include <iostream>
+#include <boost/format.hpp>
 #include <Eigen/Core>
 #include "../SLUtility.h"
 
@@ -60,40 +61,38 @@ public:
      */
     void show(SLMODELRESULTYPE resultType)
     {
-        cout << "Train:"    << endl;
+        cout << "Train:" << endl;
         if ( resultType & SLModelResultTypeQ2 )
-            cout << "\tQ2:\t"   << mean(SLCrossValidationResultTypeTrain, SLModelResultTypeQ2);
+            cout << format("%8s: %11.8f") % "Q2" % mean(SLCrossValidationResultTypeTrain, SLModelResultTypeQ2);
         
         if ( resultType & SLModelResultTypeRSS )
-            cout << "\tRSS:\t"  << mean(SLCrossValidationResultTypeTrain, SLModelResultTypeRSS);
+            cout << format("%8s: %11.8f") % "RSS" % mean(SLCrossValidationResultTypeTrain, SLModelResultTypeRSS);
         
         if ( resultType & SLModelResultTypeACC )
-            cout << "\tACC:\t"  << mean(SLCrossValidationResultTypeTrain, SLModelResultTypeACC);
+            cout << format("%8s: %11.8f") % "ACC" % mean(SLCrossValidationResultTypeTrain, SLModelResultTypeACC);
         cout << endl;
         
-        cout << "Validation:"    << endl;
+        cout << "Validation:" << endl;
         if ( resultType & SLModelResultTypeQ2 )
-            cout << "\tQ2:\t"   << mean(SLCrossValidationResultTypeValidation, SLModelResultTypeQ2);
+            cout << format("%8s: %11.8f") % "Q2" % mean(SLCrossValidationResultTypeValidation, SLModelResultTypeQ2);
         
         if ( resultType & SLModelResultTypeRSS )
-            cout << "\tRSS:\t"  << mean(SLCrossValidationResultTypeValidation, SLModelResultTypeRSS);
+            cout << format("%8s: %11.8f") % "RSS" % mean(SLCrossValidationResultTypeValidation, SLModelResultTypeRSS);
         
         if ( resultType & SLModelResultTypeACC )
-            cout << "\tACC:\t"  << mean(SLCrossValidationResultTypeValidation, SLModelResultTypeACC);
+            cout << format("%8s: %11.8f") % "ACC" % mean(SLCrossValidationResultTypeValidation, SLModelResultTypeACC);
         cout << endl;
         
-        cout << "Test:"    << endl;
+        cout << "Test:" << endl;
         if ( resultType & SLModelResultTypeQ2 )
-            cout << "\tQ2:\t"   << mean(SLCrossValidationResultTypeTest, SLModelResultTypeQ2);
+            cout << format("%8s: %11.8f") % "Q2" % mean(SLCrossValidationResultTypeTest, SLModelResultTypeQ2);
         
         if ( resultType & SLModelResultTypeRSS )
-            cout << "\tRSS:\t"  << mean(SLCrossValidationResultTypeTest, SLModelResultTypeRSS);
+            cout << format("%8s: %11.8f") % "RSS" % mean(SLCrossValidationResultTypeTest, SLModelResultTypeRSS);
         
         if ( resultType & SLModelResultTypeACC )
-            cout << "\tACC:\t"  << mean(SLCrossValidationResultTypeTest, SLModelResultTypeACC);
-        cout << endl;
-        
-        cout << endl;
+            cout << format("%8s: %11.8f") % "ACC" % mean(SLCrossValidationResultTypeTest, SLModelResultTypeACC);
+        cout << endl << endl;
     }
     
     /* Print Cross Vaildate Results:

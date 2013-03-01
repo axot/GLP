@@ -4,7 +4,9 @@ GLP 1.0 README
 
 # Requirements:
 Cmake 2.6 or higher.
+
 Eigen 3.1.2 or higher.
+
 Boost 1.4.8 or higher.
 
 # Installation
