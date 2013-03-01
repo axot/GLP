@@ -132,6 +132,10 @@ public:
         return (*this).dfs == dfs;
     }
 
+    bool operator == (const Rule &r1)
+    {
+        return (*this).dfs == r1.dfs;
+    }
 };
 
 class Projected: public vector<PDFS>

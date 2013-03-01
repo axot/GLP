@@ -347,13 +347,16 @@ bool SLGspan::can_prune(Projected& projected)
             oid = it->id;
         }
         
-        rule_cache.insert (rule);
-        if(rule_cache.size() > topk)
+        if (find(entireRules.begin(), entireRules.end(), rule) == entireRules.end())
         {
-            set<Rule>::iterator it = rule_cache.begin();
-            rule_cache.erase(it);
-            ++it;
-            tau = fabs(it->gain);
+            rule_cache.insert (rule);
+            if(rule_cache.size() > topk)
+            {
+                set<Rule>::iterator it = rule_cache.begin();
+                rule_cache.erase(it);
+                ++it;
+                tau = fabs(it->gain);
+            }
         }
     }
     

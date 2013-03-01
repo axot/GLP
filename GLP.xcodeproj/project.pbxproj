@@ -510,7 +510,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "mkdir -p \"${SRCROOT}/build/Headers\"\nrm -rf \"${SRCROOT}/build/Headers/GLP\"\nln -s \"${SRCROOT}/GLP/Classes\" \"${SRCROOT}/build/Headers/GLP\"\nfind \"${SRCROOT}/build/Headers/GLP\" -type f | grep -E -v \"\\.h\" | xargs rm";
+			shellScript = "mkdir -p \"${SRCROOT}/build/Headers\"\nrm -rf \"${SRCROOT}/build/Headers/GLP\"\nln -s \"${SRCROOT}/GLP/Classes\" \"${SRCROOT}/build/Headers/GLP\"\n#find \"${SRCROOT}/build/Headers/GLP\" -type f | grep -E -v \"\\.h\" | xargs rm";
 		};
 		53981D2A16AFFB5C00ED88AA /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
