@@ -21,9 +21,9 @@
 //  02111-1307, USA
 //
 
-#include "SLGspan.h"
 #include <fstream>
 #include <utility>
+#include "SLGspan.h"
 #include "../SLUtility.h"
 
 using namespace std;

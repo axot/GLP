@@ -31,7 +31,6 @@
 #endif
 
 #include <iostream>
-#include <Eigen/Core>
 #include <boost/typeof/typeof.hpp>
 #include "../Models/SLModelStrategy.h"
 #include "../SLUtility.h"
@@ -56,12 +55,12 @@ public:
     class SLCrossValidationParameters
     {
     public:
-        SLCrossValidationParameters() : kFold(10), resultHistorySize(5), doesUseShuffleData(false) {}
+        SLCrossValidationParameters() : kFold(10), resultHistorySize(5), useShuffledData(false) {}
         
     public:
         size_t kFold;
         size_t resultHistorySize;
-        bool doesUseShuffleData;
+        bool useShuffledData;
         T modelClone;
     };
 
@@ -95,7 +94,7 @@ public:
      */
     void setParameters(typename SLCrossValidation<T>::SLCrossValidationParameters parameters)
     {
-        doesUseShuffleData = parameters.doesUseShuffleData;
+        useShuffledData = parameters.useShuffledData;
         kFold = parameters.kFold;
         resultHistory.resultHistorySize = parameters.resultHistorySize;
         modelClone = parameters.modelClone;
@@ -146,7 +145,7 @@ private:
     
 private:
     // assignable parameters via setParameters() method
-    bool doesUseShuffleData;
+    bool useShuffledData;
     size_t kFold;
     SLCrossValidationResultHistory resultHistory;
     T modelClone;
@@ -175,7 +174,7 @@ SLCrossValidationResults SLCrossValidation<T>::crossValidation(const MatrixXd& X
         srand((unsigned int)time(NULL));
         randomIndexs.setLinSpaced(X.rows(), 0, X.rows());
         
-        if ( doesUseShuffleData )
+        if ( useShuffledData )
         {
             random_shuffle(randomIndexs.derived().data(), randomIndexs.derived().data()+randomIndexs.derived().size());
         }
@@ -192,11 +191,14 @@ SLCrossValidationResults SLCrossValidation<T>::crossValidation(const MatrixXd& X
     MatrixXd shuffledX = X;
     MatrixXd shuffledY = Y;
     
-#pragma omp parallel for
-    for (int i=0; i<X.rows(); ++i)
+    if ( useShuffledData )
     {
-        shuffledX.row(i) = X.row(randomIndexs[i]);
-        shuffledY.row(i) = Y.row(randomIndexs[i]);
+#pragma omp parallel for
+        for (int i=0; i<X.rows(); ++i)
+        {
+            shuffledX.row(i) = X.row(randomIndexs[i]);
+            shuffledY.row(i) = Y.row(randomIndexs[i]);
+        }
     }
     
     size_t oneUnitLength = shuffledX.rows()/kFold;

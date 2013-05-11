@@ -29,7 +29,6 @@
 #include <iostream>
 #include <map>
 #include <vector>
-#include <Eigen/Core>
 #include <boost/variant.hpp>
 #include "../SLUtility.h"
 

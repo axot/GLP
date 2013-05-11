@@ -23,6 +23,7 @@
 
 #include <Eigen/QR>
 #include "SLSparsePls.h"
+#include "../SLUtility.h"
 
 using namespace std;
 
@@ -99,12 +100,12 @@ SLModelResult SLSparsePls::classify(const MatrixXd& tX, const MatrixXd& tY, SLMO
 
     if(type & SLModelResultTypeQ2)
     {
-        result[SLModelResultTypeQ2] = (MatrixXd)(MatrixXd::Ones(1, tY.cols()) - SSum(tRES).cwiseQuotient(SSum(tY)));
+        result[SLModelResultTypeQ2] = getQ2(tRES, tY);
     }
     
     if(type & SLModelResultTypeRSS)
     {
-        result[SLModelResultTypeRSS] = (MatrixXd)SSum(tRES);
+        result[SLModelResultTypeRSS] = getRSS(tRES);
     }
     
     if(type & SLModelResultTypeBeta)
@@ -114,7 +115,7 @@ SLModelResult SLSparsePls::classify(const MatrixXd& tX, const MatrixXd& tY, SLMO
     
     if(type & SLModelResultTypeACC)
     {
-        result[SLModelResultTypeACC] = calcACC(tX, tY);
+        result[SLModelResultTypeACC] = getACC(tX, tY);
     }
     return result;
 }
@@ -137,12 +138,12 @@ SLModelResult SLSparsePls::getTrainResult(SLMODELRESULTYPE type) const
     SLModelResult result;
     if(type & SLModelResultTypeQ2)
     {
-        result[SLModelResultTypeQ2] = (MatrixXd)(MatrixXd::Ones(1, Y.cols()) - SSum(Res).cwiseQuotient(SSum(Y)));
+        result[SLModelResultTypeQ2] = getQ2(Res, Y);
     }
     
     if(type & SLModelResultTypeRSS)
     {
-        result[SLModelResultTypeRSS] = (MatrixXd)SSum(Res);
+        result[SLModelResultTypeRSS] = getRSS(Res);
     }
     
     if(type & SLModelResultTypeBeta)
@@ -152,12 +153,22 @@ SLModelResult SLSparsePls::getTrainResult(SLMODELRESULTYPE type) const
     
     if(type & SLModelResultTypeACC)
     {
-        result[SLModelResultTypeACC] = calcACC(X, Y);
+        result[SLModelResultTypeACC] = getACC(X, Y);
     }
     return result;
 }
 
-MatrixXd SLSparsePls::calcACC(const MatrixXd& tX, const MatrixXd& tY) const
+MatrixXd SLSparsePls::getRSS(const MatrixXd& RES) const
+{
+    return (MatrixXd)SSum(RES);
+}
+
+MatrixXd SLSparsePls::getQ2(const MatrixXd& RES, const MatrixXd& tY) const
+{
+    return (MatrixXd)(MatrixXd::Ones(1, tY.cols()) - SSum(RES).cwiseQuotient(SSum(Center(tY))));
+}
+
+MatrixXd SLSparsePls::getACC(const MatrixXd& tX, const MatrixXd& tY) const
 {
     MatrixXd predictY = tX*Beta;
     size_t correct = 0;

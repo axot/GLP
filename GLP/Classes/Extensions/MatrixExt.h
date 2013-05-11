@@ -39,14 +39,14 @@
 #include <Eigen/Sparse>
 #include <boost/xpressive/xpressive.hpp>
 
-using namespace Eigen;
-using namespace boost::xpressive;
-using namespace std;
-
-typedef SparseMatrix<int> SMatrixXi;
-
 namespace EigenExt
 {
+    using namespace std;
+    using namespace Eigen;
+    using namespace boost::xpressive;
+    
+    typedef SparseMatrix<int> SMatrixXi;
+
     /* RegEx Version: flexible matrix format, but slower
      * 
      * Example:
@@ -85,6 +85,9 @@ namespace EigenExt
     template<typename MatrixType>
     bool loadMatrixFromFileFast(MatrixType& m, const char* filename, const char delim, bool doesUseMemoryBoost = false);
 
+    template<typename MatrixType>
+    MatrixType centering(MatrixType& m);
+    
     /* Implementation */
     inline void setMatValue(vector< Triplet<int> >& tripletList, MatrixXd& m, int row, int col, char* begin)
     {
@@ -362,6 +365,12 @@ namespace EigenExt
         
         assignTripletList(tripletList, m);
         return true;
+    }
+    
+    template<typename MatrixType>
+    inline MatrixType centering(MatrixType& m)
+    {
+        return (m.rows()>1) ? (m - m.colwise().mean().replicate(m.rows(), 1)) : m;
     }
 };
 #endif

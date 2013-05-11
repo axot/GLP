@@ -27,29 +27,26 @@
 #include <fstream>
 #include <time.h>
 #include <boost/typeof/typeof.hpp>
-#include <Eigen/Core>
 #include <cfloat>
 #include <GLP/SLGlp.h>
 
-using namespace Eigen;
 using namespace std;
 using namespace boost;
 
 void usage()
 {
     cerr <<
-"Usage: gspls [-mLnkyvb] [-t train data] [-o output model]\n\n"
+"Usage: gspls [-mLnkyvb] [train data]\n\n"
 "Options: \n"
 "           [-m minsup, default:1]\n"
 "           [-L maxpat, default:10]\n"
 "           [-n components, default:10]\n"
 "           [-k topk, default:10]\n"
 "           [-f folds of cross validation, default:4]\n"
-"           [-y Y matrix file, if not use Y values which included in gsp file]\n"
+"           [-y response Y matrix file]\n"
 "           [-b use memory boosting]\n"
 "           [-v verbose]\n"
-"           [-t train data]\n\n"
-"GLP v2.0 2013.02.28\n"
+"GLP v1.0\n"
 "  Author: Zheng Shao\n"
 " Contact: axot@axot.org\n"
 "Homepage: http://saigo-www.bio.kyutech.ac.jp/\n"
@@ -130,7 +127,7 @@ int main(int argc, const char *argv[])
     BOOST_AUTO(gspls, (*SLGlpFactory<SLSparsePls, SLGspan>::create(splsParam, gspanParam)));
         
     SLCrossValidation<SLSparsePls>::SLCrossValidationParameters cvParam;
-    cvParam.doesUseShuffleData = false;
+    cvParam.useShuffledData = false;
     cvParam.kFold = fold;
     cvParam.resultHistorySize = 4;
     
@@ -139,15 +136,11 @@ int main(int argc, const char *argv[])
     MatrixXd X, Y, Res;
     
     if ( yfile != NULL )
-    {
         EigenExt::loadMatrixFromFile(Y, yfile);
-    }
     else
-    {
         Y = get<MatrixXd>(gspls.getInnerValues(SLGraphMiningInnerValueY)[SLGraphMiningInnerValueY]);
-    }
     
-    Y = Y.array() - Y.mean();
+    Y = Center(Y);
     Res = Y;
     
     double lastRSS = -DBL_MAX;
@@ -186,17 +179,10 @@ int main(int argc, const char *argv[])
         double RSS = cvResult.mean(SLCrossValidationResultTypeValidation, SLModelResultTypeRSS);
                 
         if ( RSS > lastRSS )
-        {
             ++overfitCount;
-        }
         else
-        {
             overfitCount = 0;
-        }
-        if ( overfitCount >= cvParam.resultHistorySize-1 )
-        {
-            break;
-        }
+        if ( overfitCount >= cvParam.resultHistorySize-1 ) break;
         
         lastRSS = RSS;
     }
@@ -223,9 +209,7 @@ int main(int argc, const char *argv[])
     VectorXd ACCs(fold);
     
     for ( int j = 0; j < ACCs.size(); ++j )
-    {
         ACCs[j] = get<MatrixXd>(oldResult[SLCrossValidationResultTypeTest][j][SLModelResultTypeACC]).mean();
-    }
     
     ACCs.maxCoeff(&bestBetaIndex);
     outBeta << get<MatrixXd>(oldResult[SLCrossValidationResultTypeTest][bestBetaIndex][SLModelResultTypeBeta]) << endl;
@@ -233,9 +217,8 @@ int main(int argc, const char *argv[])
     
     ofstream outDFS("DFS.txt", ios::out);
     for ( size_t i = 0; i < topk*best; ++i )
-    {
         outDFS << get< vector<string> >(gspanResult[SLGraphMiningResultTypeDFS])[i] << endl;
-    }
+
     outDFS.close();
     
     return 0;

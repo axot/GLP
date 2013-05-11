@@ -87,7 +87,9 @@ public:
     
 private:
     SLModelResult getTrainResult(SLMODELRESULTYPE type) const;
-    MatrixXd calcACC(const MatrixXd& tX, const MatrixXd& tY) const;
+    MatrixXd getRSS(const MatrixXd& RES) const;
+    MatrixXd getQ2(const MatrixXd& RES, const MatrixXd& tY) const;
+    MatrixXd getACC(const MatrixXd& tX, const MatrixXd& tY) const;
     
 private:
     // assignable parameters via setParameters() method

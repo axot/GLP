@@ -29,7 +29,6 @@
 #include <map>
 #include <iostream>
 #include <boost/format.hpp>
-#include <Eigen/Core>
 #include "../SLUtility.h"
 
 using namespace std;
@@ -63,35 +62,35 @@ public:
     {
         cout << "Train:" << endl;
         if ( resultType & SLModelResultTypeQ2 )
-            cout << format("%8s: %11.8f") % "Q2" % mean(SLCrossValidationResultTypeTrain, SLModelResultTypeQ2);
+            cout << format("%8s: %14.8f") % "Q2" % mean(SLCrossValidationResultTypeTrain, SLModelResultTypeQ2);
         
         if ( resultType & SLModelResultTypeRSS )
-            cout << format("%8s: %11.8f") % "RSS" % mean(SLCrossValidationResultTypeTrain, SLModelResultTypeRSS);
+            cout << format("%8s: %14.8f") % "RSS" % mean(SLCrossValidationResultTypeTrain, SLModelResultTypeRSS);
         
         if ( resultType & SLModelResultTypeACC )
-            cout << format("%8s: %11.8f") % "ACC" % mean(SLCrossValidationResultTypeTrain, SLModelResultTypeACC);
+            cout << format("%8s: %14.8f") % "ACC" % mean(SLCrossValidationResultTypeTrain, SLModelResultTypeACC);
         cout << endl;
         
         cout << "Validation:" << endl;
         if ( resultType & SLModelResultTypeQ2 )
-            cout << format("%8s: %11.8f") % "Q2" % mean(SLCrossValidationResultTypeValidation, SLModelResultTypeQ2);
+            cout << format("%8s: %14.8f") % "Q2" % mean(SLCrossValidationResultTypeValidation, SLModelResultTypeQ2);
         
         if ( resultType & SLModelResultTypeRSS )
-            cout << format("%8s: %11.8f") % "RSS" % mean(SLCrossValidationResultTypeValidation, SLModelResultTypeRSS);
+            cout << format("%8s: %14.8f") % "RSS" % mean(SLCrossValidationResultTypeValidation, SLModelResultTypeRSS);
         
         if ( resultType & SLModelResultTypeACC )
-            cout << format("%8s: %11.8f") % "ACC" % mean(SLCrossValidationResultTypeValidation, SLModelResultTypeACC);
+            cout << format("%8s: %14.8f") % "ACC" % mean(SLCrossValidationResultTypeValidation, SLModelResultTypeACC);
         cout << endl;
         
         cout << "Test:" << endl;
         if ( resultType & SLModelResultTypeQ2 )
-            cout << format("%8s: %11.8f") % "Q2" % mean(SLCrossValidationResultTypeTest, SLModelResultTypeQ2);
+            cout << format("%8s: %14.8f") % "Q2" % mean(SLCrossValidationResultTypeTest, SLModelResultTypeQ2);
         
         if ( resultType & SLModelResultTypeRSS )
-            cout << format("%8s: %11.8f") % "RSS" % mean(SLCrossValidationResultTypeTest, SLModelResultTypeRSS);
+            cout << format("%8s: %14.8f") % "RSS" % mean(SLCrossValidationResultTypeTest, SLModelResultTypeRSS);
         
         if ( resultType & SLModelResultTypeACC )
-            cout << format("%8s: %11.8f") % "ACC" % mean(SLCrossValidationResultTypeTest, SLModelResultTypeACC);
+            cout << format("%8s: %14.8f") % "ACC" % mean(SLCrossValidationResultTypeTest, SLModelResultTypeACC);
         cout << endl << endl;
     }
     
@@ -162,8 +161,8 @@ public:
      */
     double mean(SLCROSSVALIDATIONRESULTYPE cvType, SLMODELRESULTYPE resultType)
     {
-        ASSERT(SLUtility::isIncludedOnlyOneType(cvType), "only one of cross vaildate type can be calculate");
-        ASSERT(SLUtility::isIncludedOnlyOneType(resultType), "only one of cross result type can be calculate");
+        ASSERT(SLUtility::isIncludedOnlyOneType(cvType), "only one of cross vaildate type can be calculated");
+        ASSERT(SLUtility::isIncludedOnlyOneType(resultType), "only one of cross result type can be calculated");
 
         SLGlpMultipleResults::iterator it = (*this)[cvType].begin();
         

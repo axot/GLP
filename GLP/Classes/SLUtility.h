@@ -22,13 +22,14 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //  02111-1307, USA
 //
-
 #ifndef __GLP__SLUtility__
 #define __GLP__SLUtility__
 
+#include "Extensions/MatrixExt.h"
+
 #define LOG(x)          cout << #x << ":\n" << x << '\n' << endl;
 #define SSum(x)         x.colwise().squaredNorm()
-#define AutoScale(x)    (x - x.colwise().mean().replicate(x.rows(), 1))
+#define Center(x)       EigenExt::centering(x)
 
 #define ASSERT(condition, message) \
 do { \

@@ -28,18 +28,18 @@
 /* Begin PBXBuildFile section */
 		537078CD16AFB2FA004FFD09 /* SLSparsePls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53832810168D7E4E00E3B48F /* SLSparsePls.cpp */; };
 		537078CE16AFB2FF004FFD09 /* SLGspan.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53C09381168DBB5D00A0ADC1 /* SLGspan.cpp */; };
-		537078DD16AFB34E004FFD09 /* SLSparsePls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53832810168D7E4E00E3B48F /* SLSparsePls.cpp */; };
-		537078DE16AFB352004FFD09 /* SLGspan.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53C09381168DBB5D00A0ADC1 /* SLGspan.cpp */; };
 		537078F116AFB722004FFD09 /* Graph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53B5D64C169730DD00AE0523 /* Graph.cpp */; };
 		537078F216AFB725004FFD09 /* Dfs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53B5D64F169731C900AE0523 /* Dfs.cpp */; };
 		537078F316AFB728004FFD09 /* Utility.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53B5D652169733FC00AE0523 /* Utility.cpp */; };
-		537078F816AFB756004FFD09 /* Graph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53B5D64C169730DD00AE0523 /* Graph.cpp */; };
-		537078F916AFB759004FFD09 /* Dfs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53B5D64F169731C900AE0523 /* Dfs.cpp */; };
-		537078FA16AFB75E004FFD09 /* Utility.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53B5D652169733FC00AE0523 /* Utility.cpp */; };
 		53A0CF2A16AFC4EC00B74AC1 /* libglp.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 537078BC16AFA7C7004FFD09 /* libglp.dylib */; };
 		53A0CF2B16AFC4F100B74AC1 /* libglp.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 537078BC16AFA7C7004FFD09 /* libglp.dylib */; };
 		53A0CF3016AFC4FD00B74AC1 /* gspls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53C09387168DDEA500A0ADC1 /* gspls.cpp */; };
 		53C09388168DDEA500A0ADC1 /* gspls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53C09387168DDEA500A0ADC1 /* gspls.cpp */; };
+		53E4CCF2173EA94D00C0F204 /* SLSparsePls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53832810168D7E4E00E3B48F /* SLSparsePls.cpp */; };
+		53E4CCF3173EA94D00C0F204 /* Graph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53B5D64C169730DD00AE0523 /* Graph.cpp */; };
+		53E4CCF4173EA94D00C0F204 /* Dfs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53B5D64F169731C900AE0523 /* Dfs.cpp */; };
+		53E4CCF5173EA94D00C0F204 /* Utility.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53B5D652169733FC00AE0523 /* Utility.cpp */; };
+		53E4CCF6173EA94D00C0F204 /* SLGspan.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53C09381168DBB5D00A0ADC1 /* SLGspan.cpp */; };
 		53EDCB1316995691006170CE /* SparsePlsTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53388A231690B03000AF9E5E /* SparsePlsTest.cpp */; };
 /* End PBXBuildFile section */
 
@@ -109,18 +109,6 @@
 		};
 /* End PBXContainerItemProxy section */
 
-/* Begin PBXCopyFilesBuildPhase section */
-		53388A281690B0D500AF9E5E /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
-			dstSubfolderSpec = 0;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 1;
-		};
-/* End PBXCopyFilesBuildPhase section */
-
 /* Begin PBXFileReference section */
 		53317438168D9764005305C8 /* SLGlpFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLGlpFactory.h; path = Classes/Factory/SLGlpFactory.h; sourceTree = "<group>"; };
 		5331743E168D9861005305C8 /* SLGraphMining.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLGraphMining.h; path = Classes/GraphMining/SLGraphMining.h; sourceTree = "<group>"; };
@@ -133,6 +121,7 @@
 		534B786016AF43B2006721F6 /* FindEigen3.cmake */ = {isa = PBXFileReference; lastKnownFileType = text; path = FindEigen3.cmake; sourceTree = "<group>"; };
 		534B786116AF43BE006721F6 /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = CMakeLists.txt; path = Examples/CMakeLists.txt; sourceTree = "<group>"; };
 		534B786216AF43C9006721F6 /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = CMakeLists.txt; path = Test/CMakeLists.txt; sourceTree = "<group>"; };
+		534C164D173E75480085C295 /* headfiles.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = headfiles.sh; sourceTree = "<group>"; };
 		534F58381696F29300D2C3D3 /* SLCrossValidationResultHistory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SLCrossValidationResultHistory.h; path = Classes/Utilities/SLCrossValidationResultHistory.h; sourceTree = "<group>"; };
 		53578E04168D69AD002668D3 /* SLModelStrategy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLModelStrategy.h; path = Classes/Models/SLModelStrategy.h; sourceTree = "<group>"; };
 		53578E05168D69AD002668D3 /* SLSparsePls.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLSparsePls.h; path = Classes/Models/SLSparsePls.h; sourceTree = "<group>"; };
@@ -281,6 +270,7 @@
 				534B785E16AF43B2006721F6 /* CMakeLists.txt */,
 				534B785F16AF43B2006721F6 /* Common.cmake */,
 				534B786016AF43B2006721F6 /* FindEigen3.cmake */,
+				534C164D173E75480085C295 /* headfiles.sh */,
 				53578DF9168D691B002668D3 /* Classes */,
 				53578DFA168D6922002668D3 /* Examples */,
 				53388A211690AFE600AF9E5E /* Test */,
@@ -385,7 +375,6 @@
 			buildPhases = (
 				53388A261690B0D500AF9E5E /* Sources */,
 				53388A271690B0D500AF9E5E /* Frameworks */,
-				53388A281690B0D500AF9E5E /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -510,7 +499,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "mkdir -p \"${SRCROOT}/build/Headers\"\nrm -rf \"${SRCROOT}/build/Headers/GLP\"\nln -s \"${SRCROOT}/GLP/Classes\" \"${SRCROOT}/build/Headers/GLP\"\n#find \"${SRCROOT}/build/Headers/GLP\" -type f | grep -E -v \"\\.h\" | xargs rm";
+			shellScript = "#rm -rf \"${SRCROOT}/build/Headers/\"\nif [ ! -d \"${SRCROOT}/build/Headers/GLP\" ]; then\n    echo \"Create symbol link of header files...\"\n    mkdir -p \"${SRCROOT}/build/Headers\"\n    cd \"${SRCROOT}/build/Headers\"\n    ln -hfs \"../../GLP/Classes\" \"GLP\"\n    cd -\nfi";
 		};
 		53981D2A16AFFB5C00ED88AA /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -552,11 +541,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				537078FA16AFB75E004FFD09 /* Utility.cpp in Sources */,
-				537078F916AFB759004FFD09 /* Dfs.cpp in Sources */,
-				537078DD16AFB34E004FFD09 /* SLSparsePls.cpp in Sources */,
-				537078DE16AFB352004FFD09 /* SLGspan.cpp in Sources */,
-				537078F816AFB756004FFD09 /* Graph.cpp in Sources */,
+				53E4CCF2173EA94D00C0F204 /* SLSparsePls.cpp in Sources */,
+				53E4CCF3173EA94D00C0F204 /* Graph.cpp in Sources */,
+				53E4CCF4173EA94D00C0F204 /* Dfs.cpp in Sources */,
+				53E4CCF5173EA94D00C0F204 /* Utility.cpp in Sources */,
+				53E4CCF6173EA94D00C0F204 /* SLGspan.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

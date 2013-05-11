@@ -31,7 +31,6 @@
 #include <map>
 #include <set>
 #include <list>
-#include <Eigen/Core>
 #include "SLGraphMiningStrategy.h"
 #include "Gspan/Graph.h"
 #include "Gspan/Dfs.h"
@@ -39,7 +38,6 @@
 #include "Gspan/tree.hh"
 
 using namespace std;
-using namespace Eigen;
 
 typedef map<int, Projected>         Projected_map1;
 typedef map<int, Projected_map1>    Projected_map2;

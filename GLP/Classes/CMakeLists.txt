@@ -11,11 +11,9 @@ set_target_properties(glp_static PROPERTIES OUTPUT_NAME "glp")
 set_target_properties(glp_static PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 
 add_custom_command(TARGET glp
-                   POST_BUILD
-                   COMMAND mkdir -p "${CMAKE_SOURCE_DIR}/../build/Headers/GLP"
-                   COMMAND rm -rf "${CMAKE_SOURCE_DIR}/../build/Headers/GLP"
-                   COMMAND cp -r ${CMAKE_CURRENT_SOURCE_DIR} "${CMAKE_SOURCE_DIR}/../build/Headers/GLP"
-                   COMMAND find "${CMAKE_SOURCE_DIR}/../build/Headers/GLP/" -type f | grep -E -v \"\\.h\" | xargs rm)
+                   PRE_BUILD
+                   COMMAND sh "${PROJECT_SOURCE_DIR}/headfiles.sh"
+                   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
 install_targets(/lib glp glp_static)
 

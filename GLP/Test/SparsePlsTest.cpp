@@ -23,10 +23,8 @@
 //  02111-1307, USA
 //
 
-#include <Eigen/Core>
 #include <GLP/SLGlp.h>
 
-using namespace Eigen;
 using namespace std;
 
 int main(int argc, const char *argv[])
@@ -95,6 +93,7 @@ int main(int argc, const char *argv[])
                                                               SLModelResultTypeQ2 | SLModelResultTypeRSS | SLModelResultTypeBeta,
                                                               SLCrossValidationMethodsUsingAppendedXAsClassifyData);
         
-        results.show(SLModelResultTypeQ2 | SLModelResultTypeRSS | SLModelResultTypeBeta);
+        results.show(SLModelResultTypeQ2 | SLModelResultTypeRSS);
+        cout << "Beta:\n" << get<MatrixXd>(results[SLCrossValidationResultTypeTest][0][SLModelResultTypeBeta]) << endl;
     }
 }
