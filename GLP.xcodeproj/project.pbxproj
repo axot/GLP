@@ -18,6 +18,8 @@
 				5370791A16AFC07F004FFD09 /* PBXTargetDependency */,
 				5370791416AFC072004FFD09 /* PBXTargetDependency */,
 				53A0CF3A16AFC58000B74AC1 /* PBXTargetDependency */,
+				53795B8B17421B90001811B6 /* PBXTargetDependency */,
+				53795B8D17421B92001811B6 /* PBXTargetDependency */,
 				5370791616AFC073004FFD09 /* PBXTargetDependency */,
 			);
 			name = All;
@@ -31,6 +33,9 @@
 		537078F116AFB722004FFD09 /* Graph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53B5D64C169730DD00AE0523 /* Graph.cpp */; };
 		537078F216AFB725004FFD09 /* Dfs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53B5D64F169731C900AE0523 /* Dfs.cpp */; };
 		537078F316AFB728004FFD09 /* Utility.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53B5D652169733FC00AE0523 /* Utility.cpp */; };
+		53795B7B17421B5C001811B6 /* libglp.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 537078BC16AFA7C7004FFD09 /* libglp.dylib */; };
+		53795B8E17421B9D001811B6 /* gspan.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53795B54174219DD001811B6 /* gspan.cpp */; };
+		53795B8F17421BA2001811B6 /* gspan.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53795B54174219DD001811B6 /* gspan.cpp */; };
 		53A0CF2A16AFC4EC00B74AC1 /* libglp.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 537078BC16AFA7C7004FFD09 /* libglp.dylib */; };
 		53A0CF2B16AFC4F100B74AC1 /* libglp.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 537078BC16AFA7C7004FFD09 /* libglp.dylib */; };
 		53A0CF3016AFC4FD00B74AC1 /* gspls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53C09387168DDEA500A0ADC1 /* gspls.cpp */; };
@@ -95,12 +100,40 @@
 			remoteGlobalIDString = 537078BB16AFA7C7004FFD09;
 			remoteInfo = glp;
 		};
-		53A0CF2E16AFC4FD00B74AC1 /* PBXContainerItemProxy */ = {
+		53795B7717421B5C001811B6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 537123381683288A00B47D4E /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 537078BB16AFA7C7004FFD09;
 			remoteInfo = glp;
+		};
+		53795B8A17421B90001811B6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 537123381683288A00B47D4E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 53795B7517421B5C001811B6;
+			remoteInfo = gspan;
+		};
+		53795B8C17421B92001811B6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 537123381683288A00B47D4E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 53795B8017421B5F001811B6;
+			remoteInfo = gspan_static;
+		};
+		53795B9017421BB3001811B6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 537123381683288A00B47D4E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 537078C416AFA7DD004FFD09;
+			remoteInfo = glp_static;
+		};
+		53795B9217421BB7001811B6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 537123381683288A00B47D4E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 537078C416AFA7DD004FFD09;
+			remoteInfo = glp_static;
 		};
 		53A0CF3916AFC58000B74AC1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -135,6 +168,9 @@
 		537078C516AFA7DD004FFD09 /* libglp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libglp.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		537123411683288A00B47D4E /* gspls */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = gspls; sourceTree = BUILT_PRODUCTS_DIR; };
 		5371237E16833C2D00B47D4E /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = SOURCE_ROOT; };
+		53795B54174219DD001811B6 /* gspan.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = gspan.cpp; path = Examples/gspan.cpp; sourceTree = "<group>"; };
+		53795B7F17421B5C001811B6 /* gspan */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = gspan; sourceTree = BUILT_PRODUCTS_DIR; };
+		53795B8917421B5F001811B6 /* gspan_static */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = gspan_static; sourceTree = BUILT_PRODUCTS_DIR; };
 		53832802168D6CEF00E3B48F /* SLUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SLUtility.h; path = Classes/SLUtility.h; sourceTree = "<group>"; };
 		53832809168D767F00E3B48F /* SLModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLModel.h; path = Classes/Models/SLModel.h; sourceTree = "<group>"; };
 		53832810168D7E4E00E3B48F /* SLSparsePls.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SLSparsePls.cpp; path = Classes/Models/SLSparsePls.cpp; sourceTree = "<group>"; };
@@ -182,6 +218,21 @@
 			buildActionMask = 2147483647;
 			files = (
 				53A0CF2A16AFC4EC00B74AC1 /* libglp.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		53795B7A17421B5C001811B6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				53795B7B17421B5C001811B6 /* libglp.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		53795B8517421B5F001811B6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -234,6 +285,7 @@
 			children = (
 				534B786116AF43BE006721F6 /* CMakeLists.txt */,
 				53C09387168DDEA500A0ADC1 /* gspls.cpp */,
+				53795B54174219DD001811B6 /* gspan.cpp */,
 			);
 			name = Examples;
 			sourceTree = "<group>";
@@ -264,6 +316,8 @@
 				537078BC16AFA7C7004FFD09 /* libglp.dylib */,
 				537078C516AFA7DD004FFD09 /* libglp.a */,
 				53A0CF3616AFC4FD00B74AC1 /* gspls_static */,
+				53795B7F17421B5C001811B6 /* gspan */,
+				53795B8917421B5F001811B6 /* gspan_static */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -443,6 +497,40 @@
 			productReference = 537123411683288A00B47D4E /* gspls */;
 			productType = "com.apple.product-type.tool";
 		};
+		53795B7517421B5C001811B6 /* gspan */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 53795B7C17421B5C001811B6 /* Build configuration list for PBXNativeTarget "gspan" */;
+			buildPhases = (
+				53795B7817421B5C001811B6 /* Sources */,
+				53795B7A17421B5C001811B6 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				53795B7617421B5C001811B6 /* PBXTargetDependency */,
+			);
+			name = gspan;
+			productName = GLP;
+			productReference = 53795B7F17421B5C001811B6 /* gspan */;
+			productType = "com.apple.product-type.tool";
+		};
+		53795B8017421B5F001811B6 /* gspan_static */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 53795B8617421B5F001811B6 /* Build configuration list for PBXNativeTarget "gspan_static" */;
+			buildPhases = (
+				53795B8317421B5F001811B6 /* Sources */,
+				53795B8517421B5F001811B6 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				53795B9317421BB7001811B6 /* PBXTargetDependency */,
+			);
+			name = gspan_static;
+			productName = GLP;
+			productReference = 53795B8917421B5F001811B6 /* gspan_static */;
+			productType = "com.apple.product-type.tool";
+		};
 		53A0CF2C16AFC4FD00B74AC1 /* gspls_static */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 53A0CF3316AFC4FD00B74AC1 /* Build configuration list for PBXNativeTarget "gspls_static" */;
@@ -453,7 +541,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				53A0CF2D16AFC4FD00B74AC1 /* PBXTargetDependency */,
+				53795B9117421BB3001811B6 /* PBXTargetDependency */,
 			);
 			name = gspls_static;
 			productName = GLP;
@@ -486,6 +574,8 @@
 				537078C416AFA7DD004FFD09 /* glp_static */,
 				537123401683288A00B47D4E /* gspls */,
 				53A0CF2C16AFC4FD00B74AC1 /* gspls_static */,
+				53795B7517421B5C001811B6 /* gspan */,
+				53795B8017421B5F001811B6 /* gspan_static */,
 				53388A291690B0D500AF9E5E /* SparsePlsTest */,
 			);
 		};
@@ -563,6 +653,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		53795B7817421B5C001811B6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				53795B8E17421B9D001811B6 /* gspan.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		53795B8317421B5F001811B6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				53795B8F17421BA2001811B6 /* gspan.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		53A0CF2F16AFC4FD00B74AC1 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -609,10 +715,30 @@
 			target = 537078BB16AFA7C7004FFD09 /* glp */;
 			targetProxy = 5370791F16AFC1C7004FFD09 /* PBXContainerItemProxy */;
 		};
-		53A0CF2D16AFC4FD00B74AC1 /* PBXTargetDependency */ = {
+		53795B7617421B5C001811B6 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 537078BB16AFA7C7004FFD09 /* glp */;
-			targetProxy = 53A0CF2E16AFC4FD00B74AC1 /* PBXContainerItemProxy */;
+			targetProxy = 53795B7717421B5C001811B6 /* PBXContainerItemProxy */;
+		};
+		53795B8B17421B90001811B6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 53795B7517421B5C001811B6 /* gspan */;
+			targetProxy = 53795B8A17421B90001811B6 /* PBXContainerItemProxy */;
+		};
+		53795B8D17421B92001811B6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 53795B8017421B5F001811B6 /* gspan_static */;
+			targetProxy = 53795B8C17421B92001811B6 /* PBXContainerItemProxy */;
+		};
+		53795B9117421BB3001811B6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 537078C416AFA7DD004FFD09 /* glp_static */;
+			targetProxy = 53795B9017421BB3001811B6 /* PBXContainerItemProxy */;
+		};
+		53795B9317421BB7001811B6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 537078C416AFA7DD004FFD09 /* glp_static */;
+			targetProxy = 53795B9217421BB7001811B6 /* PBXContainerItemProxy */;
 		};
 		53A0CF3A16AFC58000B74AC1 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -806,6 +932,60 @@
 			};
 			name = Release;
 		};
+		53795B7D17421B5C001811B6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				HEADER_SEARCH_PATHS = (
+					/usr/local/include,
+					/usr/local/include/eigen3,
+					"${SRCROOT}/build/Headers",
+				);
+				PRODUCT_NAME = gspan;
+			};
+			name = Debug;
+		};
+		53795B7E17421B5C001811B6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				HEADER_SEARCH_PATHS = (
+					/usr/local/include,
+					/usr/local/include/eigen3,
+					"${SRCROOT}/build/Headers",
+				);
+				PRODUCT_NAME = gspan;
+			};
+			name = Release;
+		};
+		53795B8717421B5F001811B6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				HEADER_SEARCH_PATHS = (
+					/usr/local/include,
+					/usr/local/include/eigen3,
+					"${SRCROOT}/build/Headers",
+				);
+				OTHER_LDFLAGS = "${TARGET_BUILD_DIR}/libglp.a";
+				PRODUCT_NAME = gspan_static;
+			};
+			name = Debug;
+		};
+		53795B8817421B5F001811B6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				HEADER_SEARCH_PATHS = (
+					/usr/local/include,
+					/usr/local/include/eigen3,
+					"${SRCROOT}/build/Headers",
+				);
+				OTHER_LDFLAGS = "${TARGET_BUILD_DIR}/libglp.a";
+				PRODUCT_NAME = gspan_static;
+			};
+			name = Release;
+		};
 		53A0CF3416AFC4FD00B74AC1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -887,6 +1067,24 @@
 			buildConfigurations = (
 				5371234C1683288A00B47D4E /* Debug */,
 				5371234D1683288A00B47D4E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		53795B7C17421B5C001811B6 /* Build configuration list for PBXNativeTarget "gspan" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				53795B7D17421B5C001811B6 /* Debug */,
+				53795B7E17421B5C001811B6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		53795B8617421B5F001811B6 /* Build configuration list for PBXNativeTarget "gspan_static" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				53795B8717421B5F001811B6 /* Debug */,
+				53795B8817421B5F001811B6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

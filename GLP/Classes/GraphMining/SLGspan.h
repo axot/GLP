@@ -73,7 +73,8 @@ public:
     
     /* Search substructure
      * Input
-     *      residual: the residual of Y
+     *      residual: the residual of response Y.
+     *                Spectial mode when residual is empty, search all patterns.
      *      taskType: must be specified either train or classify
      *    resultType: type of results
      *

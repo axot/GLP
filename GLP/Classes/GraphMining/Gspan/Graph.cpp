@@ -72,7 +72,6 @@ istream &Graph::read (istream &is)
     clear ();
     
     while (true) {
-        
         size_t pos = is.tellg ();
         if (! is.getline (line, 1024)) break;
         result.clear ();
@@ -97,6 +96,7 @@ istream &Graph::read (istream &is)
             int elabel = atoi (result[3].c_str());
             
             if ((int)size () <= from || (int)size () <= to) {
+                cerr << "Error at:\n" << line << endl;
                 cerr << "Fromat Error:  define vertex lists before edges" << endl;
                 exit (-1);
             }

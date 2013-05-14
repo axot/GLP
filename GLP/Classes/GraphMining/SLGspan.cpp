@@ -79,8 +79,14 @@ SLGraphMiningResult SLGspan::search(VectorXd residual, SLGRAPHMININGTASKTYPE tas
     size_t l = transaction.size();
     y.resize(l);
     
-    w = residual.array().abs();
+    if (!residual.size())
+    {
+        topk = 0;
+        residual.resize(l);
+        residual.setOnes();
+    }
     
+    w = residual.array().abs();
     if ( taskType & SLGraphMiningTasktypeTrain )
     {
         for (size_t i = 0; i < l; ++i)
@@ -148,7 +154,7 @@ SLGraphMiningResult SLGspan::search(VectorXd residual, SLGRAPHMININGTASKTYPE tas
     vector<string> vDFS;
     if ( resultType & SLGraphMiningResultTypeX )
     {
-        MatrixXd X(residual.rows(), topk);
+        MatrixXd X(residual.rows(), rule_cache.size());
         X.setConstant(0.0f);
         
         size_t j = 0;
@@ -350,7 +356,7 @@ bool SLGspan::can_prune(Projected& projected)
         if (find(entireRules.begin(), entireRules.end(), rule) == entireRules.end())
         {
             rule_cache.insert (rule);
-            if(rule_cache.size() > topk)
+            if( topk >0 && rule_cache.size() > topk)
             {
                 set<Rule>::iterator it = rule_cache.begin();
                 rule_cache.erase(it);

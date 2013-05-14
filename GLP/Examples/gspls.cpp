@@ -36,14 +36,15 @@ using namespace boost;
 void usage()
 {
     cerr <<
-"Usage: gspls [-mLnkyvb] [train data]\n\n"
+"Usage: gspls [-mLnkfysbv] [gsp file]\n\n"
 "Options: \n"
-"           [-m minsup, default: 1]\n"
+"           [-m minsup, default: 2]\n"
 "           [-L maxpat, default: 10]\n"
-"           [-n components, default: 100]\n"
+"           [-n max components, default: 100]\n"
 "           [-k topk, default: 5]\n"
 "           [-f folds of cross validation, default: 10]\n"
 "           [-y distinct response Y matrix file]\n"
+"           [-s shuffle data]\n"
 "           [-b use memory boosting]\n"
 "           [-v verbose]\n"
 "GLP v1.0\n"
@@ -64,6 +65,7 @@ int main(int argc, const char *argv[])
     char *gspfile = NULL;
     bool verbose = false;
     bool boost = false;
+    bool useShuffledData = false;
 
     if (argc < 2) {
         usage();
@@ -71,7 +73,7 @@ int main(int argc, const char *argv[])
     }
     
     int opt;
-    while ((opt = getopt(argc, (char **)argv, "L:m:n:k:f:y:vb")) != -1)
+    while ((opt = getopt(argc, (char **)argv, "L:m:n:k:f:y:vbs")) != -1)
     {
         switch(opt)
         {
@@ -98,6 +100,9 @@ int main(int argc, const char *argv[])
                 break;
             case 'b':
                 boost = true;
+                break;
+            case 's':
+                useShuffledData = true;
                 break;
             default:
                 usage();
@@ -127,7 +132,7 @@ int main(int argc, const char *argv[])
     BOOST_AUTO(gspls, (*SLGlpFactory<SLSparsePls, SLGspan>::create(splsParam, gspanParam)));
         
     SLCrossValidation<SLSparsePls>::SLCrossValidationParameters cvParam;
-    cvParam.useShuffledData = false;
+    cvParam.useShuffledData = useShuffledData;
     cvParam.kFold = fold;
     cvParam.resultHistorySize = 4;
     
