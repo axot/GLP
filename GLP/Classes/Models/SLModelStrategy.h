@@ -33,7 +33,6 @@
 #include "../SLUtility.h"
 
 using namespace std;
-using namespace Eigen;
 
 enum{
     SLModelResultTypeNone    = 0,
@@ -88,6 +87,18 @@ public:
      */
     template <typename MP>
     MP getParameters() const { MP mp; return mp; }
+    
+    virtual MatrixXd getRSS(const MatrixXd& RES) const;
+    virtual MatrixXd getQ2 (const MatrixXd& RES, const MatrixXd& Y) const;
+    virtual MatrixXd getACC(const MatrixXd& Y, const MatrixXd& predictY) const;
+    virtual MatrixXd getAUC(const MatrixXd& Y, const MatrixXd& predictY) const;
+    
+private:
+    template <typename T1, typename T2>
+    struct ypcmp: public binary_function<bool, T1, T2> {
+        bool operator () (const std::pair <T1, T2> &x1, const std::pair<T1, T2> &x2) {
+            return x1.second > x2.second;
+        }
+    };
 };
-
 #endif

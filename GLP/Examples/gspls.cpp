@@ -38,12 +38,12 @@ void usage()
     cerr <<
 "Usage: gspls [-mLnkyvb] [train data]\n\n"
 "Options: \n"
-"           [-m minsup, default:1]\n"
-"           [-L maxpat, default:10]\n"
-"           [-n components, default:10]\n"
-"           [-k topk, default:10]\n"
-"           [-f folds of cross validation, default:4]\n"
-"           [-y response Y matrix file]\n"
+"           [-m minsup, default: 1]\n"
+"           [-L maxpat, default: 10]\n"
+"           [-n components, default: 100]\n"
+"           [-k topk, default: 5]\n"
+"           [-f folds of cross validation, default: 10]\n"
+"           [-y distinct response Y matrix file]\n"
 "           [-b use memory boosting]\n"
 "           [-v verbose]\n"
 "GLP v1.0\n"
@@ -57,9 +57,9 @@ int main(int argc, const char *argv[])
 {
     size_t maxpat = 10;
     size_t minsup = 2;
-    size_t n = 10;
-    size_t topk = 10;
-    size_t fold = 4;
+    size_t n = 100;
+    size_t topk = 5;
+    size_t fold = 10;
     char *yfile = NULL;
     char *gspfile = NULL;
     bool verbose = false;
@@ -161,7 +161,12 @@ int main(int argc, const char *argv[])
         MatrixXd x = get<MatrixXd>(gspanResult[SLGraphMiningResultTypeX]);
                 
         SLCrossValidationResults cvResult =
-            gspls.crossValidation(x, Y, SLModelResultTypeQ2 | SLModelResultTypeRSS | SLModelResultTypeBeta | SLModelResultTypeACC);
+            gspls.crossValidation(x, Y,
+                                  SLModelResultTypeQ2   |
+                                  SLModelResultTypeRSS  |
+                                  SLModelResultTypeBeta |
+                                  SLModelResultTypeACC  |
+                                  SLModelResultTypeAUC);
 
         long appendedXRows = x.rows();
         long appendedXCols = x.cols();
@@ -174,7 +179,7 @@ int main(int argc, const char *argv[])
         cvResult.eachMean(SLCrossValidationResultTypeTrain, SLModelResultTypeRSS).minCoeff(&bestBetaIndex);
         Res = Y - X*get<MatrixXd>(cvResult[SLCrossValidationResultTypeTrain][bestBetaIndex][SLModelResultTypeBeta]);
         
-        cvResult.show(SLModelResultTypeQ2 | SLModelResultTypeRSS | SLModelResultTypeACC);
+        cvResult.show(SLModelResultTypeQ2 | SLModelResultTypeRSS | SLModelResultTypeACC | SLModelResultTypeAUC);
         
         double RSS = cvResult.mean(SLCrossValidationResultTypeValidation, SLModelResultTypeRSS);
                 
@@ -196,7 +201,7 @@ int main(int argc, const char *argv[])
     SLCrossValidationResults oldResult = gspls.getResultHistory().back();
     int best = i - cvParam.resultHistorySize + 1;
     cout << "Best: n = " <<  best << endl;
-    oldResult.show(SLModelResultTypeQ2 | SLModelResultTypeRSS | SLModelResultTypeACC);
+    oldResult.show(SLModelResultTypeQ2 | SLModelResultTypeRSS | SLModelResultTypeACC | SLModelResultTypeAUC);
     
     ofstream outX("X.txt", ios::out);
     outX << X.leftCols(X.cols()-(cvParam.resultHistorySize-1)*topk) << endl;

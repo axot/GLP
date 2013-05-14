@@ -27,6 +27,7 @@
 
 #include "Extensions/MatrixExt.h"
 
+using namespace Eigen;
 #define LOG(x)          cout << #x << ":\n" << x << '\n' << endl;
 #define SSum(x)         x.colwise().squaredNorm()
 #define Center(x)       EigenExt::centering(x)

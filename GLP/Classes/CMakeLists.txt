@@ -1,5 +1,3 @@
-include("${PROJECT_SOURCE_DIR}/Common.cmake")
-
 file(GLOB_RECURSE SOURCES "*.cpp")
 
 add_library(glp SHARED ${SOURCES})

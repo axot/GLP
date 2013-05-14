@@ -60,37 +60,29 @@ public:
      */
     void show(SLMODELRESULTYPE resultType)
     {
-        cout << "Train:" << endl;
-        if ( resultType & SLModelResultTypeQ2 )
-            cout << format("%8s: %14.8f") % "Q2" % mean(SLCrossValidationResultTypeTrain, SLModelResultTypeQ2);
+        vector < string > stage(3);
+        stage[0] = "Train";
+        stage[1] = "Validation";
+        stage[2] = "Test";
         
-        if ( resultType & SLModelResultTypeRSS )
-            cout << format("%8s: %14.8f") % "RSS" % mean(SLCrossValidationResultTypeTrain, SLModelResultTypeRSS);
-        
-        if ( resultType & SLModelResultTypeACC )
-            cout << format("%8s: %14.8f") % "ACC" % mean(SLCrossValidationResultTypeTrain, SLModelResultTypeACC);
-        cout << endl;
-        
-        cout << "Validation:" << endl;
-        if ( resultType & SLModelResultTypeQ2 )
-            cout << format("%8s: %14.8f") % "Q2" % mean(SLCrossValidationResultTypeValidation, SLModelResultTypeQ2);
-        
-        if ( resultType & SLModelResultTypeRSS )
-            cout << format("%8s: %14.8f") % "RSS" % mean(SLCrossValidationResultTypeValidation, SLModelResultTypeRSS);
-        
-        if ( resultType & SLModelResultTypeACC )
-            cout << format("%8s: %14.8f") % "ACC" % mean(SLCrossValidationResultTypeValidation, SLModelResultTypeACC);
-        cout << endl;
-        
-        cout << "Test:" << endl;
-        if ( resultType & SLModelResultTypeQ2 )
-            cout << format("%8s: %14.8f") % "Q2" % mean(SLCrossValidationResultTypeTest, SLModelResultTypeQ2);
-        
-        if ( resultType & SLModelResultTypeRSS )
-            cout << format("%8s: %14.8f") % "RSS" % mean(SLCrossValidationResultTypeTest, SLModelResultTypeRSS);
-        
-        if ( resultType & SLModelResultTypeACC )
-            cout << format("%8s: %14.8f") % "ACC" % mean(SLCrossValidationResultTypeTest, SLModelResultTypeACC);
+        unsigned int currentStage = SLCrossValidationResultTypeTrain;
+        for ( int i = 0; i < 3; i++, currentStage <<= 1)
+        {
+            cout << stage[i] << " " << endl;
+            if ( resultType & SLModelResultTypeQ2 )
+                cout << format("%8s: %2.8f") % "Q2" % mean(currentStage, SLModelResultTypeQ2);
+            
+            if ( resultType & SLModelResultTypeRSS )
+                cout << format("%8s: %14.8f") % "RSS" % mean(currentStage, SLModelResultTypeRSS);
+            
+            if ( resultType & SLModelResultTypeACC )
+                cout << format("%8s: %2.8f") % "ACC" % mean(currentStage, SLModelResultTypeACC);
+            
+            if ( resultType & SLModelResultTypeAUC )
+                cout << format("%8s: %2.8f") % "AUC" % mean(currentStage, SLModelResultTypeAUC);
+
+            cout << endl;
+        }
         cout << endl << endl;
     }
     

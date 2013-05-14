@@ -89,8 +89,12 @@ SLModelResult SLSparsePls::classify(const MatrixXd& tX, const MatrixXd& tY, SLMO
 {
     ASSERT(type != SLModelResultTypeNone, "No type of result was indicated");
     
-    ASSERT(!(type & ~(SLModelResultTypeBeta | SLModelResultTypeQ2 | SLModelResultTypeRSS | SLModelResultTypeACC)),
-           "Only support Beta Q2 RSS ACC for Sparse PLS.");
+    ASSERT(!(type & ~(SLModelResultTypeBeta |
+                      SLModelResultTypeQ2   |
+                      SLModelResultTypeRSS  |
+                      SLModelResultTypeACC  |
+                      SLModelResultTypeAUC)),
+           "Only support Beta Q2 RSS ACC AUC for Sparse PLS.");
     
     ASSERT(Beta.cols() != 0 && Beta.rows() != 0, "Train data first");
     
@@ -115,8 +119,14 @@ SLModelResult SLSparsePls::classify(const MatrixXd& tX, const MatrixXd& tY, SLMO
     
     if(type & SLModelResultTypeACC)
     {
-        result[SLModelResultTypeACC] = getACC(tX, tY);
+        result[SLModelResultTypeACC] = getACC(tY, tX*Beta);
     }
+    
+    if(type & SLModelResultTypeAUC)
+    {
+        result[SLModelResultTypeAUC] = getAUC(tY, tX*Beta);
+    }
+    
     return result;
 }
 
@@ -130,8 +140,12 @@ bool SLSparsePls::setParameters(SLSparsePlsParameters& parameters)
 // Private Methods
 SLModelResult SLSparsePls::getTrainResult(SLMODELRESULTYPE type) const
 {
-    ASSERT(!(type & ~(SLModelResultTypeBeta | SLModelResultTypeQ2 | SLModelResultTypeRSS | SLModelResultTypeACC)),
-           "Only support Beta Residual Q2 RSS ACC for Sparse PLS.");
+    ASSERT(!(type & ~(SLModelResultTypeBeta |
+                      SLModelResultTypeQ2   |
+                      SLModelResultTypeRSS  |
+                      SLModelResultTypeACC  |
+                      SLModelResultTypeAUC)),
+           "Only support Beta Q2 RSS ACC AUC for Sparse PLS.");
     
     ASSERT(Beta.cols() != 0 && Beta.rows() != 0, "Train data first");
     
@@ -153,51 +167,13 @@ SLModelResult SLSparsePls::getTrainResult(SLMODELRESULTYPE type) const
     
     if(type & SLModelResultTypeACC)
     {
-        result[SLModelResultTypeACC] = getACC(X, Y);
+        result[SLModelResultTypeACC] = getACC(Y, X*Beta);
     }
-    return result;
-}
-
-MatrixXd SLSparsePls::getRSS(const MatrixXd& RES) const
-{
-    return (MatrixXd)SSum(RES);
-}
-
-MatrixXd SLSparsePls::getQ2(const MatrixXd& RES, const MatrixXd& tY) const
-{
-    return (MatrixXd)(MatrixXd::Ones(1, tY.cols()) - SSum(RES).cwiseQuotient(SSum(Center(tY))));
-}
-
-MatrixXd SLSparsePls::getACC(const MatrixXd& tX, const MatrixXd& tY) const
-{
-    MatrixXd predictY = tX*Beta;
-    size_t correct = 0;
-    MatrixXd acc(1,tY.cols());
     
-    VectorXd min = tY.colwise().minCoeff();
-    VectorXd max = tY.colwise().maxCoeff();
-    VectorXd mid = (min + max) / 2;
-    for (int i=0; i < tY.cols(); ++i)
+    if(type & SLModelResultTypeAUC)
     {
-        correct = 0;
-        for (int j=0; j < tY.rows(); ++j)
-        {
-            if (predictY(j,i) > mid[i])
-            {
-                if(tY(j,i) > mid[i])
-                {
-                    ++correct;
-                }
-            }
-            else
-            {
-                if(tY(j,i) < mid[i])
-                {
-                    ++correct;
-                }
-            }
-        }
-        acc(0,i) = (double)correct/tY.rows();
+        result[SLModelResultTypeAUC] = getAUC(Y, X*Beta);
     }
-    return acc;
+    
+    return result;
 }

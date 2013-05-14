@@ -1,5 +1,3 @@
-include("${PROJECT_SOURCE_DIR}/Common.cmake")
-
 add_executable(gspls gspls.cpp)
 add_executable(gspls_static gspls.cpp)
 

@@ -141,7 +141,7 @@ SLGraphMiningResult SLGspan::search(VectorXd residual, SLGRAPHMININGTASKTYPE tas
     }
     else if ( taskType == SLGraphMiningTasktypeClassify )
     {
-        
+        // TODO:
     }
     
     SLGraphMiningResult result;

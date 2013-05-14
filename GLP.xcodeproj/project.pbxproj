@@ -41,6 +41,8 @@
 		53E4CCF5173EA94D00C0F204 /* Utility.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53B5D652169733FC00AE0523 /* Utility.cpp */; };
 		53E4CCF6173EA94D00C0F204 /* SLGspan.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53C09381168DBB5D00A0ADC1 /* SLGspan.cpp */; };
 		53EDCB1316995691006170CE /* SparsePlsTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53388A231690B03000AF9E5E /* SparsePlsTest.cpp */; };
+		53FF08D41741526400859543 /* SLModelStrategy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53FF08D31741526400859543 /* SLModelStrategy.cpp */; };
+		53FF08D51741526400859543 /* SLModelStrategy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53FF08D31741526400859543 /* SLModelStrategy.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -117,7 +119,6 @@
 		53388A2A1690B0D500AF9E5E /* SparsePlsTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SparsePlsTest; sourceTree = BUILT_PRODUCTS_DIR; };
 		534B785C16AF439E006721F6 /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = CMakeLists.txt; path = Classes/CMakeLists.txt; sourceTree = "<group>"; };
 		534B785E16AF43B2006721F6 /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
-		534B785F16AF43B2006721F6 /* Common.cmake */ = {isa = PBXFileReference; lastKnownFileType = text; path = Common.cmake; sourceTree = "<group>"; };
 		534B786016AF43B2006721F6 /* FindEigen3.cmake */ = {isa = PBXFileReference; lastKnownFileType = text; path = FindEigen3.cmake; sourceTree = "<group>"; };
 		534B786116AF43BE006721F6 /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = CMakeLists.txt; path = Examples/CMakeLists.txt; sourceTree = "<group>"; };
 		534B786216AF43C9006721F6 /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = CMakeLists.txt; path = Test/CMakeLists.txt; sourceTree = "<group>"; };
@@ -148,7 +149,9 @@
 		53C09381168DBB5D00A0ADC1 /* SLGspan.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SLGspan.cpp; path = Classes/GraphMining/SLGspan.cpp; sourceTree = "<group>"; };
 		53C09382168DBB5D00A0ADC1 /* SLGspan.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLGspan.h; path = Classes/GraphMining/SLGspan.h; sourceTree = "<group>"; };
 		53C09387168DDEA500A0ADC1 /* gspls.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = gspls.cpp; path = Examples/gspls.cpp; sourceTree = "<group>"; };
+		53CFE23517406DAC00989250 /* GspanTest.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = GspanTest.cpp; path = Test/GspanTest.cpp; sourceTree = "<group>"; };
 		53F3156F16A4A7550056C3A9 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = SOURCE_ROOT; };
+		53FF08D31741526400859543 /* SLModelStrategy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SLModelStrategy.cpp; path = Classes/Models/SLModelStrategy.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -197,6 +200,7 @@
 			children = (
 				534B786216AF43C9006721F6 /* CMakeLists.txt */,
 				53388A231690B03000AF9E5E /* SparsePlsTest.cpp */,
+				53CFE23517406DAC00989250 /* GspanTest.cpp */,
 			);
 			name = Test;
 			sourceTree = "<group>";
@@ -268,7 +272,6 @@
 			isa = PBXGroup;
 			children = (
 				534B785E16AF43B2006721F6 /* CMakeLists.txt */,
-				534B785F16AF43B2006721F6 /* Common.cmake */,
 				534B786016AF43B2006721F6 /* FindEigen3.cmake */,
 				534C164D173E75480085C295 /* headfiles.sh */,
 				53578DF9168D691B002668D3 /* Classes */,
@@ -294,6 +297,7 @@
 				53832812168D7F6200E3B48F /* Concrete */,
 				53832809168D767F00E3B48F /* SLModel.h */,
 				53578E04168D69AD002668D3 /* SLModelStrategy.h */,
+				53FF08D31741526400859543 /* SLModelStrategy.cpp */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -534,6 +538,7 @@
 				537078F116AFB722004FFD09 /* Graph.cpp in Sources */,
 				537078CD16AFB2FA004FFD09 /* SLSparsePls.cpp in Sources */,
 				537078CE16AFB2FF004FFD09 /* SLGspan.cpp in Sources */,
+				53FF08D41741526400859543 /* SLModelStrategy.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -546,6 +551,7 @@
 				53E4CCF4173EA94D00C0F204 /* Dfs.cpp in Sources */,
 				53E4CCF5173EA94D00C0F204 /* Utility.cpp in Sources */,
 				53E4CCF6173EA94D00C0F204 /* SLGspan.cpp in Sources */,
+				53FF08D51741526400859543 /* SLModelStrategy.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

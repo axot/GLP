@@ -229,10 +229,12 @@ SLCrossValidationResults SLCrossValidation<T>::crossValidation(const MatrixXd& X
 template <typename T>
 MatrixXd SLCrossValidation<T>::cvSplitMatrix(MatrixXd& from, ssize_t startIndex, size_t length) const
 {
-    if (startIndex < 0){
+    if (startIndex < 0)
+    {
         startIndex = from.rows() + startIndex;
     }
-    if ((int)(startIndex+length) <= from.rows()) {
+    if ((int)(startIndex+length) <= from.rows())
+    {
         return from.block(startIndex, 0, length, from.cols());
     }
     size_t beginLength = startIndex+length-from.rows();
