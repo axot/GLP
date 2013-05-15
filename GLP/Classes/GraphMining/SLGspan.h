@@ -59,7 +59,7 @@ public:
     public:
         // assignable parameters
         size_t minsup;
-        size_t maxpat;
+        size_t maxpat;  // upper bound on node count
         size_t topk;
         
         bool    doesUseMemoryBoost;

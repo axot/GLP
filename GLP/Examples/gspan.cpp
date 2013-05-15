@@ -104,7 +104,7 @@ int main(int argc, const char *argv[])
     ofstream outDFS("DFS.txt", ios::out);
     vector<string> dfs = get< vector<string> >(gspanResult[SLGraphMiningResultTypeDFS]);
     for ( size_t i = 0; i < dfs.size(); ++i )
-        outDFS << get< vector<string> >(gspanResult[SLGraphMiningResultTypeDFS])[i] << endl;
+        outDFS << dfs[i] << endl;
     outDFS.close();
     
     return 0;

@@ -25,12 +25,12 @@
 
 MatrixXd SLModelStrategy::getRSS(const MatrixXd& RES) const
 {
-    return (MatrixXd)SSum(RES);
+    return (MatrixXd)ColSSum(RES);
 }
 
 MatrixXd SLModelStrategy::getQ2(const MatrixXd& RES, const MatrixXd& Y) const
 {
-    return (MatrixXd)(MatrixXd::Ones(1, Y.cols()) - SSum(RES).cwiseQuotient(SSum(Center(Y))));
+    return (MatrixXd)(MatrixXd::Ones(1, Y.cols()) - ColSSum(RES).cwiseQuotient(ColSSum(Center(Y))));
 }
 
 MatrixXd SLModelStrategy::getACC(const MatrixXd& Y, const MatrixXd& predictY) const
@@ -101,3 +101,27 @@ MatrixXd SLModelStrategy::getAUC(const MatrixXd& Y, const MatrixXd& predictY) co
     }
     return acc;
 }
+
+#define _PI acos(-1.0)
+MatrixXd SLModelStrategy::getAIC(const MatrixXd& Y, const MatrixXd& predictY, const size_t numOfParams) const
+{
+    MatrixXd rss  = ColSSum(Y - predictY);
+    
+    MatrixXd logL = -Y.rows()/2.0*(rss/Y.rows()).array().log()
+                    -Y.rows()/2.0*log(2.0*_PI)
+                    -Y.rows()/2.0;
+
+    return -2.0*logL.array() + 2.0*numOfParams;
+}
+
+MatrixXd SLModelStrategy::getBIC(const MatrixXd& Y, const MatrixXd& predictY, const size_t numOfParams) const
+{
+    MatrixXd rss = ColSSum(Y - predictY);
+    
+    MatrixXd logL = -Y.rows()/2.0*(rss/Y.rows()).array().log()
+                    -Y.rows()/2.0*log(2.0*_PI)
+                    -Y.rows()/2.0;
+    
+    return -2.0*logL.array() + numOfParams*log(Y.rows());
+}
+

@@ -158,7 +158,7 @@ int main(int argc, const char *argv[])
         cout << "n: " << ++i << endl;
         
         long maxSquaredNormColumn;
-        SSum(Res).maxCoeff(&maxSquaredNormColumn);
+        ColSSum(Res).maxCoeff(&maxSquaredNormColumn);
         VectorXd largestResCol = Res.col(maxSquaredNormColumn);
         
         gspanResult = gspls.search(largestResCol, SLGraphMiningTasktypeTrain, SLGraphMiningResultTypeX | SLGraphMiningResultTypeDFS);
@@ -171,7 +171,9 @@ int main(int argc, const char *argv[])
                                   SLModelResultTypeRSS  |
                                   SLModelResultTypeBeta |
                                   SLModelResultTypeACC  |
-                                  SLModelResultTypeAUC);
+                                  SLModelResultTypeAUC  |
+                                  SLModelResultTypeAIC  |
+                                  SLModelResultTypeBIC);
 
         long appendedXRows = x.rows();
         long appendedXCols = x.cols();
@@ -184,7 +186,12 @@ int main(int argc, const char *argv[])
         cvResult.eachMean(SLCrossValidationResultTypeTrain, SLModelResultTypeRSS).minCoeff(&bestBetaIndex);
         Res = Y - X*get<MatrixXd>(cvResult[SLCrossValidationResultTypeTrain][bestBetaIndex][SLModelResultTypeBeta]);
         
-        cvResult.show(SLModelResultTypeQ2 | SLModelResultTypeRSS | SLModelResultTypeACC | SLModelResultTypeAUC);
+        cvResult.show(SLModelResultTypeQ2  |
+                      SLModelResultTypeRSS |
+                      SLModelResultTypeACC |
+                      SLModelResultTypeAUC |
+                      SLModelResultTypeAIC |
+                      SLModelResultTypeBIC);
         
         double RSS = cvResult.mean(SLCrossValidationResultTypeValidation, SLModelResultTypeRSS);
                 
@@ -206,7 +213,12 @@ int main(int argc, const char *argv[])
     SLCrossValidationResults oldResult = gspls.getResultHistory().back();
     int best = i - cvParam.resultHistorySize + 1;
     cout << "Best: n = " <<  best << endl;
-    oldResult.show(SLModelResultTypeQ2 | SLModelResultTypeRSS | SLModelResultTypeACC | SLModelResultTypeAUC);
+    oldResult.show(SLModelResultTypeQ2  |
+                   SLModelResultTypeRSS |
+                   SLModelResultTypeACC |
+                   SLModelResultTypeAUC |
+                   SLModelResultTypeAIC |
+                   SLModelResultTypeBIC);
     
     ofstream outX("X.txt", ios::out);
     outX << X.leftCols(X.cols()-(cvParam.resultHistorySize-1)*topk) << endl;

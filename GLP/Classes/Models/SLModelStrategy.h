@@ -92,7 +92,9 @@ public:
     virtual MatrixXd getQ2 (const MatrixXd& RES, const MatrixXd& Y) const;
     virtual MatrixXd getACC(const MatrixXd& Y, const MatrixXd& predictY) const;
     virtual MatrixXd getAUC(const MatrixXd& Y, const MatrixXd& predictY) const;
-    
+    virtual MatrixXd getAIC(const MatrixXd& Y, const MatrixXd& predictY, const size_t numOfParams) const;
+    virtual MatrixXd getBIC(const MatrixXd& Y, const MatrixXd& predictY, const size_t numOfParams) const;
+
 private:
     template <typename T1, typename T2>
     struct ypcmp: public binary_function<bool, T1, T2> {

@@ -41,7 +41,7 @@ SLModelResult SLSparsePls::train(const MatrixXd& appendedX, const MatrixXd& theY
     ssize_t oldXCols      = X.cols();
     
     ssize_t maxSquaredNormColumn;
-    SSum(Res).maxCoeff(&maxSquaredNormColumn);
+    ColSSum(Res).maxCoeff(&maxSquaredNormColumn);
     VectorXd largestResCol = Res.col(maxSquaredNormColumn);
 
     X.conservativeResize(appendedXRows, oldXCols+appendedXCols);
@@ -93,8 +93,10 @@ SLModelResult SLSparsePls::classify(const MatrixXd& tX, const MatrixXd& tY, SLMO
                       SLModelResultTypeQ2   |
                       SLModelResultTypeRSS  |
                       SLModelResultTypeACC  |
-                      SLModelResultTypeAUC)),
-           "Only support Beta Q2 RSS ACC AUC for Sparse PLS.");
+                      SLModelResultTypeAUC  |
+                      SLModelResultTypeAIC  |
+                      SLModelResultTypeBIC)),
+           "Only support Beta Q2 RSS ACC AUC AIC BIC for Sparse PLS.");
     
     ASSERT(Beta.cols() != 0 && Beta.rows() != 0, "Train data first");
     
@@ -127,6 +129,16 @@ SLModelResult SLSparsePls::classify(const MatrixXd& tX, const MatrixXd& tY, SLMO
         result[SLModelResultTypeAUC] = getAUC(tY, tX*Beta);
     }
     
+    if(type & SLModelResultTypeAIC)
+    {
+        result[SLModelResultTypeAIC] = getAIC(tY, tX*Beta, X.cols());
+    }
+
+    if(type & SLModelResultTypeBIC)
+    {
+        result[SLModelResultTypeBIC] = getBIC(tY, tX*Beta, X.cols());
+    }
+
     return result;
 }
 
@@ -144,8 +156,10 @@ SLModelResult SLSparsePls::getTrainResult(SLMODELRESULTYPE type) const
                       SLModelResultTypeQ2   |
                       SLModelResultTypeRSS  |
                       SLModelResultTypeACC  |
-                      SLModelResultTypeAUC)),
-           "Only support Beta Q2 RSS ACC AUC for Sparse PLS.");
+                      SLModelResultTypeAUC  |
+                      SLModelResultTypeAIC  |
+                      SLModelResultTypeBIC)),
+           "Only support Beta Q2 RSS ACC AUC AIC BIC for Sparse PLS.");
     
     ASSERT(Beta.cols() != 0 && Beta.rows() != 0, "Train data first");
     
@@ -175,5 +189,15 @@ SLModelResult SLSparsePls::getTrainResult(SLMODELRESULTYPE type) const
         result[SLModelResultTypeAUC] = getAUC(Y, X*Beta);
     }
     
+    if(type & SLModelResultTypeAIC)
+    {
+        result[SLModelResultTypeAIC] = getAIC(Y, X*Beta, X.cols());
+    }
+    
+    if(type & SLModelResultTypeBIC)
+    {
+        result[SLModelResultTypeBIC] = getBIC(Y, X*Beta, X.cols());
+    }
+
     return result;
 }

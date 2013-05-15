@@ -80,6 +80,13 @@ public:
             
             if ( resultType & SLModelResultTypeAUC )
                 cout << format("%8s: %2.8f") % "AUC" % mean(currentStage, SLModelResultTypeAUC);
+            
+            if ( resultType & SLModelResultTypeAIC )
+                cout << format("%8s: %2.8f") % "AIC" % mean(currentStage, SLModelResultTypeAIC);
+
+            if ( resultType & SLModelResultTypeBIC )
+                cout << format("%8s: %2.8f") % "BIC" % mean(currentStage, SLModelResultTypeBIC);
+
 
             cout << endl;
         }
