@@ -123,16 +123,16 @@ public:
 public:
     friend bool operator < (const Rule &r1, const Rule &r2)
     {
-        return r1.dfs < r2.dfs;
-//        return fabs(r1.gain) < fabs(r2.gain);
+//        return r1.dfs < r2.dfs;
+        return fabs(r1.gain) < fabs(r2.gain);
     }
     
-    bool operator == (const string &dfs)
+    bool operator == (const string &dfs) const
     {
         return (*this).dfs == dfs;
     }
 
-    bool operator == (const Rule &r1)
+    bool operator == (const Rule &r1) const
     {
         return (*this).dfs == r1.dfs;
     }

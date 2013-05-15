@@ -36,7 +36,7 @@ MatrixXd SLModelStrategy::getQ2(const MatrixXd& RES, const MatrixXd& Y) const
 MatrixXd SLModelStrategy::getACC(const MatrixXd& Y, const MatrixXd& predictY) const
 {
     size_t correct = 0;
-    MatrixXd acc(1,Y.cols());
+    MatrixXd ACC(1,Y.cols());
     
     VectorXd min = Y.colwise().minCoeff();
     VectorXd max = Y.colwise().maxCoeff();
@@ -61,19 +61,19 @@ MatrixXd SLModelStrategy::getACC(const MatrixXd& Y, const MatrixXd& predictY) co
                 }
             }
         }
-        acc(0,i) = (double)correct/Y.rows();
+        ACC(0,i) = (double)correct/Y.rows();
     }
-    return acc;
+    return ACC;
 }
 
 MatrixXd SLModelStrategy::getAUC(const MatrixXd& Y, const MatrixXd& predictY) const
 {
-    vector < pair < double, double > > ypPair(Y.rows());
-    MatrixXd acc(1,Y.cols());
+    MatrixXd AUC(1,Y.cols());
     VectorXd min = Y.colwise().minCoeff();
     VectorXd max = Y.colwise().maxCoeff();
     VectorXd mid = (min + max) / 2.0;
-    
+    vector < pair < double, double > > ypPair(Y.rows());
+
     for (int i=0; i < Y.cols(); ++i)
     {
         ypPair.clear();
@@ -97,9 +97,9 @@ MatrixXd SLModelStrategy::getAUC(const MatrixXd& Y, const MatrixXd& predictY) co
                 ++fp;
             }
         }
-        acc(0,i) = (double)auc/(double)(tp*fp);
+        AUC(0,i) = (double)auc/(double)(tp*fp);
     }
-    return acc;
+    return AUC;
 }
 
 #define _PI acos(-1.0)
@@ -116,7 +116,7 @@ MatrixXd SLModelStrategy::getAIC(const MatrixXd& Y, const MatrixXd& predictY, co
 
 MatrixXd SLModelStrategy::getBIC(const MatrixXd& Y, const MatrixXd& predictY, const size_t numOfParams) const
 {
-    MatrixXd rss = ColSSum(Y - predictY);
+    MatrixXd rss  = ColSSum(Y - predictY);
     
     MatrixXd logL = -Y.rows()/2.0*(rss/Y.rows()).array().log()
                     -Y.rows()/2.0*log(2.0*_PI)
@@ -124,4 +124,3 @@ MatrixXd SLModelStrategy::getBIC(const MatrixXd& Y, const MatrixXd& predictY, co
     
     return -2.0*logL.array() + numOfParams*log(Y.rows());
 }
-

@@ -137,7 +137,7 @@ private:
     VectorXd w;                         // weigth of graph mining, abs(residual)
     
     Rule rule;                          // current rule
-    set<Rule> rule_cache;               // topk rule cache
+    multiset<Rule> rule_cache;          // topk rule cache
     vector<Rule> entireRules;
     vector<size_t> patternMatchedResult;// the index result of classify data matched current patterns
     
