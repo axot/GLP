@@ -36,7 +36,7 @@ using namespace boost;
 void usage()
 {
     cerr <<
-"Usage: gspls [-mLnkfysbv] [gsp file]\n\n"
+"Usage: gspls [-mLnkfytsbv] [gsp file]\n\n"
 "Options: \n"
 "           [-m minsup, default: 2]\n"
 "           [-L maxpat, default: 10]\n"
@@ -44,6 +44,8 @@ void usage()
 "           [-k topk, default: 5]\n"
 "           [-f folds of cross validation, default: 10]\n"
 "           [-y distinct response Y matrix file]\n"
+"           [-t the threshold value which used to avoid overfiting\n"
+"               default: 3(times)]\n"
 "           [-s shuffle data]\n"
 "           [-b use memory boosting]\n"
 "           [-v verbose]\n"
@@ -61,6 +63,7 @@ int main(int argc, const char *argv[])
     size_t n = 100;
     size_t topk = 5;
     size_t fold = 10;
+    size_t threshold = 3;
     char *yfile = NULL;
     char *gspfile = NULL;
     bool verbose = false;
@@ -73,7 +76,7 @@ int main(int argc, const char *argv[])
     }
     
     int opt;
-    while ((opt = getopt(argc, (char **)argv, "L:m:n:k:f:y:vbs")) != -1)
+    while ((opt = getopt(argc, (char **)argv, "L:m:n:k:f:y:t:vbs")) != -1)
     {
         switch(opt)
         {
@@ -94,6 +97,9 @@ int main(int argc, const char *argv[])
                 break;
             case 'y':
                 yfile = strdup(optarg);
+                break;
+            case 't':
+                threshold = atoi(optarg);
                 break;
             case 'v':
                 verbose = true;
@@ -134,7 +140,7 @@ int main(int argc, const char *argv[])
     SLCrossValidation<SLSparsePls>::SLCrossValidationParameters cvParam;
     cvParam.useShuffledData = useShuffledData;
     cvParam.kFold = fold;
-    cvParam.resultHistorySize = 4;
+    cvParam.resultHistorySize = threshold + 1;
     
     gspls.setCrossValidationParameters(cvParam);
     
@@ -148,7 +154,7 @@ int main(int argc, const char *argv[])
     Y = Center(Y);
     Res = Y;
     
-    double lastRSS = -DBL_MAX;
+    double minRSS = DBL_MAX;
     size_t overfitCount = 0;
     
     unsigned int i = 0;
@@ -195,13 +201,16 @@ int main(int argc, const char *argv[])
         
         double RSS = cvResult.mean(SLCrossValidationResultTypeValidation, SLModelResultTypeRSS);
                 
-        if ( RSS > lastRSS )
-            ++overfitCount;
-        else
+        if ( RSS < minRSS )
+        {
+            minRSS = RSS;
             overfitCount = 0;
+        }
+        else
+            ++overfitCount;
+        
         if ( overfitCount >= cvParam.resultHistorySize-1 ) break;
         
-        lastRSS = RSS;
     }
     
     if ( overfitCount < cvParam.resultHistorySize-1 )

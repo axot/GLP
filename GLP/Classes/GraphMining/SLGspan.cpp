@@ -353,11 +353,11 @@ bool SLGspan::can_prune(Projected& projected)
             oid = it->id;
         }
         
-        if (find(entireRules.begin(), entireRules.end(), rule) == entireRules.end() &&
-            find(rule_cache.begin(), rule_cache.end(), rule) == rule_cache.end())
+        if (find(rule_cache.begin(), rule_cache.end(), rule) == rule_cache.end() &&
+            find(entireRules.begin(), entireRules.end(), rule) == entireRules.end())
         {
             rule_cache.insert(rule);
-            if( topk >0 && rule_cache.size() > topk)
+            if( topk > 0 && rule_cache.size() > topk)
             {
                 // delete minimum gain rule
                 set<Rule>::iterator it = rule_cache.begin();
