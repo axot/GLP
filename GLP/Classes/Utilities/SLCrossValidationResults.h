@@ -53,12 +53,11 @@ public:
         return *this;
     }
 
-    /* Display Results of Model
+    /* Display Summary of Cross Vaildate Results
      * Input
-     *      results: Cross Validation Results
-     *   resultType: type of results
+     *      resultType: type of Cross Validation results
      */
-    void show(SLMODELRESULTYPE resultType)
+    void showSummary(SLMODELRESULTYPE resultType)
     {
         vector < string > stage(3);
         stage[0] = "Train";
@@ -86,7 +85,6 @@ public:
 
             if ( resultType & SLModelResultTypeBIC )
                 cout << format("%8s: %14.8f") % "BIC" % mean(currentStage, SLModelResultTypeBIC);
-
 
             cout << endl;
         }
@@ -138,7 +136,7 @@ public:
         
         long cols = (*this)[cvType].size();
         VectorXd mean(cols);
-        
+
         int i = 0;
         while ( it != (*this)[cvType].end() )
         {

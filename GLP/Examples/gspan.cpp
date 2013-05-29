@@ -32,15 +32,15 @@
 void usage()
 {
     cerr <<
+"gspan is a part of GLP v1.0\n\n"
 "Usage: gspan [-mLv] [gsp file]\n\n"
 "Options: \n"
 "           [-m minsup, default: 2]\n"
 "           [-L maxpat, default: 10]\n"
-"           [-v verbose]\n"
-"GLP v1.0\n"
+"           [-v verbose]\n\n"
 "  Author: Zheng Shao\n"
 " Contact: axot@axot.org\n"
-"Homepage: http://saigo-www.bio.kyutech.ac.jp/\n"
+"Homepage: http://saigo-www.bio.kyutech.ac.jp/"
     << endl;
 }
 
@@ -96,12 +96,15 @@ int main(int argc, const char *argv[])
     
     SLGraphMiningResult gspanResult;    
     gspanResult = gspan.search((VectorXd)NULL, SLGraphMiningTasktypeTrain, SLGraphMiningResultTypeX | SLGraphMiningResultTypeDFS);
+
+    stringstream fileSuffix;
+    fileSuffix << format("_gspan_m%d_L%d.txt") % param.minsup % param.maxpat;
     
-    ofstream outX("X.txt", ios::out);
+    ofstream outX(("Features" + fileSuffix.str()).c_str(), ios::out);
     outX << get<MatrixXd>(gspanResult[SLGraphMiningResultTypeX]) << endl;
     outX.close();
     
-    ofstream outDFS("DFS.txt", ios::out);
+    ofstream outDFS(("DFS" + fileSuffix.str()).c_str(), ios::out);
     vector<string> dfs = get< vector<string> >(gspanResult[SLGraphMiningResultTypeDFS]);
     for ( size_t i = 0; i < dfs.size(); ++i )
         outDFS << dfs[i] << endl;

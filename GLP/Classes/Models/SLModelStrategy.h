@@ -48,6 +48,9 @@ enum{
 typedef unsigned int SLMODELRESULTYPE;
 typedef map<SLMODELRESULTYPE, boost::variant< VectorXd, MatrixXd, string > > SLModelResult;
 
+/**
+ * @class SLModelStrategy <GLP/Models/SLModelStrategy.h>
+ */
 class SLModelStrategy
 {
 public:    

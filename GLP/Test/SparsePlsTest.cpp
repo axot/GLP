@@ -93,7 +93,7 @@ int main(int argc, const char *argv[])
                                                               SLModelResultTypeQ2 | SLModelResultTypeRSS | SLModelResultTypeBeta,
                                                               SLCrossValidationMethodsUsingAppendedXAsClassifyData);
         
-        results.show(SLModelResultTypeQ2 | SLModelResultTypeRSS);
+        results.showSummary(SLModelResultTypeQ2 | SLModelResultTypeRSS);
         cout << "Beta:\n" << get<MatrixXd>(results[SLCrossValidationResultTypeTest][0][SLModelResultTypeBeta]) << endl;
     }
 }

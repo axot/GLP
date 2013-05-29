@@ -37,8 +37,8 @@ using namespace Eigen;
 
 enum{
     SLGraphMiningResultTypeNone = 0,
-    SLGraphMiningResultTypeX    = 1 << 0,
-    SLGraphMiningResultTypeDFS  = 1 << 1,
+    SLGraphMiningResultTypeX    = 1 << 0,   // MatrixXd
+    SLGraphMiningResultTypeDFS  = 1 << 1,   // vector<string>
 };
 
 typedef unsigned int SLGRAPHMININGRESULTYPE;

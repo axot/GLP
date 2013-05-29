@@ -27,32 +27,35 @@
 #include <fstream>
 #include <time.h>
 #include <boost/typeof/typeof.hpp>
+#include <boost/format.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <cfloat>
 #include <GLP/SLGlp.h>
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 void usage()
 {
     cerr <<
+"gspls is a part of GLP v1.0\n\n"
 "Usage: gspls [-mLnkfytsbv] [gsp file]\n\n"
 "Options: \n"
-"           [-m minsup, default: 2]\n"
-"           [-L maxpat, default: 10]\n"
-"           [-n max components, default: 100]\n"
-"           [-k topk, default: 5]\n"
+"           [-m min frequency of common graphs, default: 2]\n"
+"           [-L max graph size for gspan mining, default: 10]\n"
+"           [-n max iterator number, default: 100]\n"
+"           [-k number of sub graphs abstract by gspan once time, default: 5]\n"
 "           [-f folds of cross validation, default: 10]\n"
 "           [-y distinct response Y matrix file]\n"
-"           [-t the threshold value which used to avoid overfiting\n"
-"               default: 3(times)]\n"
-"           [-s shuffle data]\n"
+"           [-t the threshold value which used to avoid overfiting default: 3(times)]\n"
+"           [-s shuffle data(preprocess)]\n"
 "           [-b use memory boosting]\n"
-"           [-v verbose]\n"
-"GLP v1.0\n"
+"           [-v verbose]\n\n"
+//          [-a use average residual]
 "  Author: Zheng Shao\n"
 " Contact: axot@axot.org\n"
-"Homepage: http://saigo-www.bio.kyutech.ac.jp/\n"
+"Homepage: http://saigo-www.bio.kyutech.ac.jp/"
     << endl;
 }
 
@@ -63,12 +66,13 @@ int main(int argc, const char *argv[])
     size_t n = 100;
     size_t topk = 5;
     size_t fold = 10;
-    size_t threshold = 3;
+    size_t resultHistorySize = 3;
     char *yfile = NULL;
     char *gspfile = NULL;
     bool verbose = false;
     bool boost = false;
     bool useShuffledData = false;
+    bool useAverage = false;
 
     if (argc < 2) {
         usage();
@@ -76,7 +80,7 @@ int main(int argc, const char *argv[])
     }
     
     int opt;
-    while ((opt = getopt(argc, (char **)argv, "L:m:n:k:f:y:t:vbs")) != -1)
+    while ((opt = getopt(argc, (char **)argv, "L:m:n:k:f:y:t:vbsa")) != -1)
     {
         switch(opt)
         {
@@ -99,7 +103,7 @@ int main(int argc, const char *argv[])
                 yfile = strdup(optarg);
                 break;
             case 't':
-                threshold = atoi(optarg);
+                resultHistorySize = atoi(optarg);
                 break;
             case 'v':
                 verbose = true;
@@ -109,6 +113,9 @@ int main(int argc, const char *argv[])
                 break;
             case 's':
                 useShuffledData = true;
+                break;
+            case 'a':
+                useAverage = true;
                 break;
             default:
                 usage();
@@ -133,17 +140,26 @@ int main(int argc, const char *argv[])
     gspanParam.maxpat = maxpat;
     gspanParam.topk   = topk;
     gspanParam.doesUseMemoryBoost = boost;
-    gspanParam.gspFilename = string(gspfile);
+    gspanParam.gspFilename        = string(gspfile);
     
     BOOST_AUTO(gspls, (*SLGlpFactory<SLSparsePls, SLGspan>::create(splsParam, gspanParam)));
         
     SLCrossValidation<SLSparsePls>::SLCrossValidationParameters cvParam;
-    cvParam.useShuffledData = useShuffledData;
-    cvParam.kFold = fold;
-    cvParam.resultHistorySize = threshold + 1;
+    cvParam.useShuffledData     = useShuffledData;
+    cvParam.kFold               = fold;
+    cvParam.resultHistorySize   = resultHistorySize;
     
     gspls.setCrossValidationParameters(cvParam);
     
+    stringstream fileSuffix;
+    fileSuffix << format("_gspls_m%d_L%d_n%d_k%d_f%d_t%d.txt")%
+                            gspanParam.minsup                 %
+                            gspanParam.maxpat                 %
+                            n                                 %
+                            gspanParam.topk                   %
+                            cvParam.kFold                     %
+                            cvParam.resultHistorySize;
+
     MatrixXd X, Y, Res;
     
     if ( yfile != NULL )
@@ -157,18 +173,37 @@ int main(int argc, const char *argv[])
     double minRSS = DBL_MAX;
     size_t overfitCount = 0;
     
+    ptime time_start(microsec_clock::local_time());
     unsigned int i = 0;
     SLGraphMiningResult gspanResult;
     while ( i < n )
     {
         cout << "n: " << ++i << endl;
         
-        long maxSquaredNormColumn;
-        ColSSum(Res).maxCoeff(&maxSquaredNormColumn);
-        VectorXd largestResCol = Res.col(maxSquaredNormColumn);
-        
-        gspanResult = gspls.search(largestResCol, SLGraphMiningTasktypeTrain, SLGraphMiningResultTypeX | SLGraphMiningResultTypeDFS);
-        
+        if ( useAverage )
+        {
+            VectorXd ResMean(Res.rows());
+            ResMean.setZero();
+
+            for (int i=0; i<Res.cols(); ++i)
+            {
+                ResMean += Res.col(i);
+            }
+            ResMean /= Res.cols();
+            gspanResult = gspls.search(ResMean,
+                                       SLGraphMiningTasktypeTrain,
+                                       SLGraphMiningResultTypeX | SLGraphMiningResultTypeDFS);
+        }
+        else
+        {
+            long maxSquaredNormColumn;
+            ColSSum(Res).maxCoeff(&maxSquaredNormColumn);
+            VectorXd largestResCol = Res.col(maxSquaredNormColumn);
+            
+            gspanResult = gspls.search(largestResCol,
+                                       SLGraphMiningTasktypeTrain,
+                                       SLGraphMiningResultTypeX | SLGraphMiningResultTypeDFS);
+        }
         MatrixXd x = get<MatrixXd>(gspanResult[SLGraphMiningResultTypeX]);
                 
         SLCrossValidationResults cvResult =
@@ -191,13 +226,13 @@ int main(int argc, const char *argv[])
         int bestBetaIndex;
         cvResult.eachMean(SLCrossValidationResultTypeTrain, SLModelResultTypeRSS).minCoeff(&bestBetaIndex);
         Res = Y - X*get<MatrixXd>(cvResult[SLCrossValidationResultTypeTrain][bestBetaIndex][SLModelResultTypeBeta]);
-        
-        cvResult.show(SLModelResultTypeQ2  |
-                      SLModelResultTypeRSS |
-                      SLModelResultTypeACC |
-                      SLModelResultTypeAUC |
-                      SLModelResultTypeAIC |
-                      SLModelResultTypeBIC);
+                
+        cvResult.showSummary( SLModelResultTypeQ2  |
+                              SLModelResultTypeRSS |
+                              SLModelResultTypeACC |
+                              SLModelResultTypeAUC |
+                              SLModelResultTypeAIC |
+                              SLModelResultTypeBIC);
         
         double RSS = cvResult.mean(SLCrossValidationResultTypeValidation, SLModelResultTypeRSS);
                 
@@ -209,47 +244,81 @@ int main(int argc, const char *argv[])
         else
             ++overfitCount;
         
-        if ( overfitCount >= cvParam.resultHistorySize-1 ) break;
+        if ( overfitCount >= cvParam.resultHistorySize ) break;
         
     }
     
-    if ( overfitCount < cvParam.resultHistorySize-1 )
+    ptime time_end(microsec_clock::local_time());
+    time_duration duration(time_end - time_start);
+    
+    if ( overfitCount < cvParam.resultHistorySize )
     {
         cerr << "can not get best result, please set a bigger value for argument n" << endl;
-        return -1;
+        return -3;
     }
     
     SLCrossValidationResults oldResult = gspls.getResultHistory().back();
-    int best = i - cvParam.resultHistorySize + 1;
+    int best = i - cvParam.resultHistorySize;
     cout << "Best: n = " <<  best << endl;
-    oldResult.show(SLModelResultTypeQ2  |
-                   SLModelResultTypeRSS |
-                   SLModelResultTypeACC |
-                   SLModelResultTypeAUC |
-                   SLModelResultTypeAIC |
-                   SLModelResultTypeBIC);
     
-    ofstream outX("X.txt", ios::out);
-    outX << X.leftCols(X.cols()-(cvParam.resultHistorySize-1)*topk) << endl;
+    oldResult.showSummary( SLModelResultTypeQ2  |
+                           SLModelResultTypeRSS |
+                           SLModelResultTypeACC |
+                           SLModelResultTypeAUC |
+                           SLModelResultTypeAIC |
+                           SLModelResultTypeBIC);
+
+    ofstream outX(("Features" + fileSuffix.str()).c_str(), ios::out);
+    outX << X.leftCols(X.cols()-(cvParam.resultHistorySize)*topk) << endl;
     outX.close();
     
-    ofstream outBeta("Beta.txt", ios::out);
+    ofstream outBeta(("Beta" + fileSuffix.str()).c_str(), ios::out);
     outBeta.precision(12);
     outBeta.flags(ios::left);
     long bestBetaIndex;
-    VectorXd ACCs(fold);
-    
-    for ( int j = 0; j < ACCs.size(); ++j )
-        ACCs[j] = get<MatrixXd>(oldResult[SLCrossValidationResultTypeTest][j][SLModelResultTypeACC]).mean();
-    
-    ACCs.maxCoeff(&bestBetaIndex);
+    VectorXd cvQ2(fold);
+    for ( int j = 0; j < cvQ2.size(); ++j )
+        cvQ2[j] = get<MatrixXd>(oldResult[SLCrossValidationResultTypeTest][j][SLModelResultTypeQ2]).mean();
+    cvQ2.maxCoeff(&bestBetaIndex);
     outBeta << get<MatrixXd>(oldResult[SLCrossValidationResultTypeTest][bestBetaIndex][SLModelResultTypeBeta]) << endl;
     outBeta.close();
     
-    ofstream outDFS("DFS.txt", ios::out);
+    if ( verbose )
+    {
+        {
+            cout << "Test Q2 detail, " << "best fold index: " << bestBetaIndex << endl;
+            MatrixXd Q2Mat(fold,Y.cols());
+            for ( size_t j = 0; j < fold; ++j )
+            {
+                cout << "fold index: " << j << endl;
+                Q2Mat.row(j) << get<MatrixXd>(oldResult[SLCrossValidationResultTypeTest][j][SLModelResultTypeQ2]);
+                cout << Q2Mat.row(j) << endl;
+            }
+            cout << "k-fold average:" << endl;
+            cout << Q2Mat.colwise().mean() << endl;
+            cout << endl;
+        }
+        
+        {
+            cout << "Test RSS detail, " << "best fold index: " << bestBetaIndex << endl;
+            MatrixXd RSSMat(fold,Y.cols());
+            for ( size_t j = 0; j < fold; ++j )
+            {
+                cout << "fold index: " << j << endl;
+                RSSMat.row(j) << get<MatrixXd>(oldResult[SLCrossValidationResultTypeTest][j][SLModelResultTypeRSS]);
+                cout << RSSMat.row(j) << endl;
+            }
+            cout << "k-fold average:" << endl;
+            cout << RSSMat.colwise().mean() << endl;
+            cout << endl;
+        }
+        
+        cout << "duration: " << duration << endl;
+    }
+    
+    ofstream outDFS(("DFS" + fileSuffix.str()).c_str(), ios::out);
     for ( size_t i = 0; i < topk*best; ++i )
         outDFS << get< vector<string> >(gspanResult[SLGraphMiningResultTypeDFS])[i] << endl;
-
     outDFS.close();
     
     return 0;

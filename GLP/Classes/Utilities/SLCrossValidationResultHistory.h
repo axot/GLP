@@ -36,7 +36,7 @@ public:
     void push_front(const SLCrossValidationResults& val)
     {
         deque<SLCrossValidationResults>::push_front(val);
-        while ( this->size() > resultHistorySize )
+        while ( this->size() > resultHistorySize+1 )
         {
             this->pop_back();
         }
