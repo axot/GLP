@@ -37,7 +37,7 @@ set(CMAKE_CXX_LDFLAGS "-shared")
 # Check library dependency
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREAD ON)
-find_package(Boost 1.40.0 REQUIRED)
+find_package(Boost 1.42.0 REQUIRED)
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
 endif()

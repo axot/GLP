@@ -29,6 +29,7 @@
 #include <boost/typeof/typeof.hpp>
 #include <boost/format.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/random.hpp>
 #include <cfloat>
 #include <GLP/SLGlp.h>
 
@@ -48,11 +49,12 @@ void usage()
 "           [-k number of sub graphs abstract by gspan once time, default: 5]\n"
 "           [-f folds of cross validation, default: 10]\n"
 "           [-y distinct response Y matrix file]\n"
+"           [-a use average residual column, defult is using max variance column]\n"
+"           [-r use random residual column, defult is using max variance column]\n"
 "           [-t the threshold value which used to avoid overfiting default: 3(times)]\n"
 "           [-s shuffle data(preprocess)]\n"
 "           [-b use memory boosting]\n"
 "           [-v verbose]\n\n"
-//          [-a use average residual]
 "  Author: Zheng Shao\n"
 " Contact: axot@axot.org\n"
 "Homepage: http://saigo-www.bio.kyutech.ac.jp/"
@@ -72,15 +74,16 @@ int main(int argc, const char *argv[])
     bool verbose = false;
     bool boost = false;
     bool useShuffledData = false;
-    bool useAverage = false;
-
+    bool useAverageCol = false;
+    bool useRandomCol = false;
+    
     if (argc < 2) {
         usage();
         return -1;
     }
     
     int opt;
-    while ((opt = getopt(argc, (char **)argv, "L:m:n:k:f:y:t:vbsa")) != -1)
+    while ((opt = getopt(argc, (char **)argv, "L:m:n:k:f:y:t:vbsar")) != -1)
     {
         switch(opt)
         {
@@ -115,7 +118,10 @@ int main(int argc, const char *argv[])
                 useShuffledData = true;
                 break;
             case 'a':
-                useAverage = true;
+                useAverageCol = true;
+                break;
+            case 'r':
+                useRandomCol = true;
                 break;
             default:
                 usage();
@@ -126,10 +132,16 @@ int main(int argc, const char *argv[])
     gspfile = strdup(argv[argc-1]);
     
     ++optind;
-    for (int i = optind; i < argc; i++)
+    for ( int i = optind; i < argc; i++ )
     {
-        printf ("Unknown argument: %s\n", argv[i]);
+        printf ("Error: Unknown argument: %s\n", argv[i]);
         usage();
+        return -2;
+    }
+    
+    if ( useAverageCol && useRandomCol )
+    {
+        cerr << "Error: Can not use both average and random residual column" << endl;
         return -2;
     }
     
@@ -152,7 +164,7 @@ int main(int argc, const char *argv[])
     gspls.setCrossValidationParameters(cvParam);
     
     stringstream fileSuffix;
-    fileSuffix << format("_gspls_m%d_L%d_n%d_k%d_f%d_t%d.txt")%
+    fileSuffix << format("gspls_m%d_L%d_n%d_k%d_f%d_t%d_")%
                             gspanParam.minsup                 %
                             gspanParam.maxpat                 %
                             n                                 %
@@ -176,21 +188,33 @@ int main(int argc, const char *argv[])
     ptime time_start(microsec_clock::local_time());
     unsigned int i = 0;
     SLGraphMiningResult gspanResult;
+    
+    mt19937 gen( static_cast<unsigned long>(time(NULL)));
+    uniform_int<> dist(0, Y.cols()-1);
+    variate_generator< mt19937&, uniform_int<> > rand( gen, dist );
+    
     while ( i < n )
     {
         cout << "n: " << ++i << endl;
         
-        if ( useAverage )
+        if ( useAverageCol )
         {
             VectorXd ResMean(Res.rows());
             ResMean.setZero();
 
-            for (int i=0; i<Res.cols(); ++i)
-            {
+            for (ssize_t i=0; i<Res.cols(); ++i)
                 ResMean += Res.col(i);
-            }
-            ResMean /= Res.cols();
-            gspanResult = gspls.search(ResMean,
+            
+            gspanResult = gspls.search(ResMean/Res.cols(),
+                                       SLGraphMiningTasktypeTrain,
+                                       SLGraphMiningResultTypeX | SLGraphMiningResultTypeDFS);
+        }
+        else if ( useRandomCol )
+        {
+            long randomColumnIndex;
+            
+            randomColumnIndex = rand();            
+            gspanResult = gspls.search(Res.col(randomColumnIndex),
                                        SLGraphMiningTasktypeTrain,
                                        SLGraphMiningResultTypeX | SLGraphMiningResultTypeDFS);
         }
@@ -198,9 +222,8 @@ int main(int argc, const char *argv[])
         {
             long maxSquaredNormColumn;
             ColSSum(Res).maxCoeff(&maxSquaredNormColumn);
-            VectorXd largestResCol = Res.col(maxSquaredNormColumn);
             
-            gspanResult = gspls.search(largestResCol,
+            gspanResult = gspls.search(Res.col(maxSquaredNormColumn),
                                        SLGraphMiningTasktypeTrain,
                                        SLGraphMiningResultTypeX | SLGraphMiningResultTypeDFS);
         }
@@ -253,7 +276,7 @@ int main(int argc, const char *argv[])
     
     if ( overfitCount < cvParam.resultHistorySize )
     {
-        cerr << "can not get best result, please set a bigger value for argument n" << endl;
+        cerr << "Info: Can not get best result, please set a bigger value for argument n" << endl;
         return -3;
     }
     
@@ -268,11 +291,11 @@ int main(int argc, const char *argv[])
                            SLModelResultTypeAIC |
                            SLModelResultTypeBIC);
 
-    ofstream outX(("Features" + fileSuffix.str()).c_str(), ios::out);
+    ofstream outX((fileSuffix.str()+"Features.txt").c_str(), ios::out);
     outX << X.leftCols(X.cols()-(cvParam.resultHistorySize)*topk) << endl;
     outX.close();
     
-    ofstream outBeta(("Beta" + fileSuffix.str()).c_str(), ios::out);
+    ofstream outBeta((fileSuffix.str()+"Beta.txt").c_str(), ios::out);
     outBeta.precision(12);
     outBeta.flags(ios::left);
     long bestBetaIndex;
@@ -316,7 +339,7 @@ int main(int argc, const char *argv[])
         cout << "duration: " << duration << endl;
     }
     
-    ofstream outDFS(("DFS" + fileSuffix.str()).c_str(), ios::out);
+    ofstream outDFS((fileSuffix.str()+"DFS.txt").c_str(), ios::out);
     for ( size_t i = 0; i < topk*best; ++i )
         outDFS << get< vector<string> >(gspanResult[SLGraphMiningResultTypeDFS])[i] << endl;
     outDFS.close();

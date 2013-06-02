@@ -98,13 +98,13 @@ int main(int argc, const char *argv[])
     gspanResult = gspan.search((VectorXd)NULL, SLGraphMiningTasktypeTrain, SLGraphMiningResultTypeX | SLGraphMiningResultTypeDFS);
 
     stringstream fileSuffix;
-    fileSuffix << format("_gspan_m%d_L%d.txt") % param.minsup % param.maxpat;
+    fileSuffix << format("gspan_m%d_L%d_") % param.minsup % param.maxpat;
     
-    ofstream outX(("Features" + fileSuffix.str()).c_str(), ios::out);
+    ofstream outX((fileSuffix.str()+"Features.txt").c_str(), ios::out);
     outX << get<MatrixXd>(gspanResult[SLGraphMiningResultTypeX]) << endl;
     outX.close();
     
-    ofstream outDFS(("DFS" + fileSuffix.str()).c_str(), ios::out);
+    ofstream outDFS((fileSuffix.str()+"DFS.txt").c_str(), ios::out);
     vector<string> dfs = get< vector<string> >(gspanResult[SLGraphMiningResultTypeDFS]);
     for ( size_t i = 0; i < dfs.size(); ++i )
         outDFS << dfs[i] << endl;
