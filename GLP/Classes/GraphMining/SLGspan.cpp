@@ -33,6 +33,7 @@ bool SLGspan::setParameters(SLGspanParameters& parameters)
 {
     ASSERT(parameters.gspFilename.empty() == false, "Parameter gspFilename is required for Gspan.");
     
+    maxsup = parameters.maxsup;
     minsup = parameters.minsup;
     maxpat = parameters.maxpat;
     topk   = parameters.topk;
@@ -329,7 +330,7 @@ bool SLGspan::can_prune(Projected& projected)
     }
     
     double g = fabs(gain);
-    if (support < minsup || max (upos, uneg) <= tau)
+    if ( support < minsup || support > maxsup || max (upos, uneg) <= tau )
     {
         return true;
     }

@@ -36,6 +36,7 @@ void usage()
 "Usage: gspan [-mLv] [gsp file]\n\n"
 "Options: \n"
 "           [-m minsup, default: 2]\n"
+"           [-n maxsup, default: infinity]\n"
 "           [-L maxpat, default: 10]\n"
 "           [-v verbose]\n\n"
 "  Author: Zheng Shao\n"
@@ -48,6 +49,7 @@ int main(int argc, const char *argv[])
 {
     size_t maxpat = 10;
     size_t minsup = 2;
+    size_t maxsup = ULLONG_MAX;
     char *gspfile = NULL;
     bool verbose = false;
     
@@ -57,7 +59,7 @@ int main(int argc, const char *argv[])
     }
     
     int opt;
-    while ((opt = getopt(argc, (char **)argv, "L:m:v")) != -1)
+    while ((opt = getopt(argc, (char **)argv, "L:m:n:v")) != -1)
     {
         switch(opt)
         {
@@ -66,6 +68,9 @@ int main(int argc, const char *argv[])
                 break;
             case 'm':
                 minsup = atoll(optarg);
+                break;
+            case 'n':
+                maxsup = atoll(optarg);
                 break;
             case 'v':
                 verbose = true;
@@ -90,6 +95,7 @@ int main(int argc, const char *argv[])
     SLGspan::SLGspanParameters param;
     
     param.minsup = minsup;
+    param.maxsup = maxsup;
     param.maxpat = maxpat;
     param.gspFilename = string(gspfile);
     gspan.setParameters(param);
@@ -98,7 +104,11 @@ int main(int argc, const char *argv[])
     gspanResult = gspan.search((VectorXd)NULL, SLGraphMiningTasktypeTrain, SLGraphMiningResultTypeX | SLGraphMiningResultTypeDFS);
 
     stringstream fileSuffix;
-    fileSuffix << format("gspan_m%d_L%d_") % param.minsup % param.maxpat;
+    
+    if ( param.maxsup < ULONG_LONG_MAX )
+        fileSuffix << format("gspan_m%d_n%d_L%d_") % param.minsup % param.maxsup % param.maxpat;
+    else
+        fileSuffix << format("gspan_m%d_nINF_L%d_") % param.minsup % param.maxpat;
     
     ofstream outX((fileSuffix.str()+"Features.txt").c_str(), ios::out);
     outX << get<MatrixXd>(gspanResult[SLGraphMiningResultTypeX]) << endl;

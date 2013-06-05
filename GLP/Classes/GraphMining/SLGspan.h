@@ -54,11 +54,12 @@ public:
     class SLGspanParameters
     {
     public:
-        SLGspanParameters() : minsup(2), maxpat(10), topk(1), doesUseMemoryBoost(false) {}
+        SLGspanParameters() : minsup(2), maxsup(ULLONG_MAX), maxpat(10), topk(1), doesUseMemoryBoost(false) {}
         
     public:
         // assignable parameters
         size_t minsup;
+        size_t maxsup;  // only use for standlone gspan version
         size_t maxpat;  // upper bound on node count
         size_t topk;
         
@@ -121,6 +122,7 @@ private:
 private:
     // assignable parameters
     size_t minsup;
+    size_t maxsup;
     size_t maxpat;
     size_t topk;
     string gspFilename;
@@ -142,7 +144,7 @@ private:
     vector<size_t> patternMatchedResult;// the index result of classify data matched current patterns
     
     double wbias;                       // 
-    double tau;                         // fabs of gain, gain: 重み付き頻度の差
+    double tau;                         // the absolute value of the difference between the weighted frequency
     
     Projected_map3 root;
     tree<TNODE> memoryCache;
