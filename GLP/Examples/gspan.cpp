@@ -101,7 +101,7 @@ int main(int argc, const char *argv[])
     gspan.setParameters(param);
     
     SLGraphMiningResult gspanResult;    
-    gspanResult = gspan.search((VectorXd)NULL, SLGraphMiningTasktypeTrain, SLGraphMiningResultTypeX | SLGraphMiningResultTypeDFS);
+    gspanResult = gspan.search((VectorXd)NULL, SLGraphMiningTasktypeTrain, SLGraphMiningResultTypeX | SLGraphMiningResultTypeRules);
 
     stringstream fileSuffix;
     
@@ -115,10 +115,15 @@ int main(int argc, const char *argv[])
     outX.close();
     
     ofstream outDFS((fileSuffix.str()+"DFS.txt").c_str(), ios::out);
-    vector<string> dfs = get< vector<string> >(gspanResult[SLGraphMiningResultTypeDFS]);
-    for ( size_t i = 0; i < dfs.size(); ++i )
-        outDFS << dfs[i] << endl;
+    ofstream outFreq((fileSuffix.str()+"Freq.txt").c_str(), ios::out);
+    vector<Rule> rules = get< vector<Rule> >(gspanResult[SLGraphMiningResultTypeRules]);
+    for ( size_t i = 0; i < rules.size(); ++i )
+    {
+        outDFS << rules[i].dfs << endl;
+        outFreq << rules[i].frequency << endl;
+    }
     outDFS.close();
+    outFreq.close();
     
     return 0;
 }

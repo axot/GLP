@@ -30,6 +30,7 @@
 #include <map>
 #include <vector>
 #include <boost/variant.hpp>
+#include "Gspan/Dfs.h"
 #include "../SLUtility.h"
 
 using namespace std;
@@ -38,11 +39,16 @@ using namespace Eigen;
 enum{
     SLGraphMiningResultTypeNone = 0,
     SLGraphMiningResultTypeX    = 1 << 0,   // MatrixXd
-    SLGraphMiningResultTypeDFS  = 1 << 1,   // vector<string>
+    SLGraphMiningResultTypeRules= 1 << 1,   // vector<Rule>
 };
 
 typedef unsigned int SLGRAPHMININGRESULTYPE;
-typedef map<SLGRAPHMININGRESULTYPE, boost::variant< VectorXd, MatrixXd, string, vector<string> > > SLGraphMiningResult;
+typedef map<SLGRAPHMININGRESULTYPE, boost::variant< VectorXd,
+                                                    MatrixXd,
+                                                    string,
+                                                    vector<string>,
+                                                    vector<Rule>
+                                                    > > SLGraphMiningResult;
 
 enum{
     SLGraphMiningTasktypeNotDefined   = 0,

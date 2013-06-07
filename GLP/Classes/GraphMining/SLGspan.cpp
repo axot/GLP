@@ -152,7 +152,6 @@ SLGraphMiningResult SLGspan::search(VectorXd residual, SLGRAPHMININGTASKTYPE tas
     }
     
     SLGraphMiningResult result;
-    vector<string> vDFS;
     if ( resultType & SLGraphMiningResultTypeX )
     {
         MatrixXd X(residual.rows(), rule_cache.size());
@@ -171,16 +170,9 @@ SLGraphMiningResult SLGspan::search(VectorXd residual, SLGRAPHMININGTASKTYPE tas
         result[SLGraphMiningResultTypeX] = X;
     }
     
-    if ( resultType & SLGraphMiningResultTypeDFS )
+    if ( resultType & SLGraphMiningResultTypeRules )
     {
-        ostringstream osdfs;
-    
-        for(vector<Rule>::iterator it = entireRules.begin(); it != entireRules.end(); ++it)
-        {
-            vDFS.push_back((*it).dfs);
-//            osdfs << (*it).dfs << endl;
-        }
-        result[SLGraphMiningResultTypeDFS] = vDFS;
+        result[SLGraphMiningResultTypeRules] = entireRules;
     }
     
     return result;
@@ -337,6 +329,7 @@ bool SLGspan::can_prune(Projected& projected)
     
     if (g > tau || (g == tau && DFS_CODE.size() < rule.size))
     {
+        rule.frequency = support;
         rule.gain = gain;
         rule.size = DFS_CODE.size();
         

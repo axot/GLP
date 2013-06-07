@@ -119,6 +119,7 @@ public:
     double gain;
     size_t size;
     vector <size_t> loc;
+    size_t frequency;
     
 public:
     friend bool operator < (const Rule &r1, const Rule &r2)

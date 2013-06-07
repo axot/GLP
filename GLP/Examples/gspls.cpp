@@ -207,7 +207,7 @@ int main(int argc, const char *argv[])
             
             gspanResult = gspls.search(ResMean/Res.cols(),
                                        SLGraphMiningTasktypeTrain,
-                                       SLGraphMiningResultTypeX | SLGraphMiningResultTypeDFS);
+                                       SLGraphMiningResultTypeX | SLGraphMiningResultTypeRules);
         }
         else if ( useRandomCol )
         {
@@ -216,7 +216,7 @@ int main(int argc, const char *argv[])
             randomColumnIndex = rand();            
             gspanResult = gspls.search(Res.col(randomColumnIndex),
                                        SLGraphMiningTasktypeTrain,
-                                       SLGraphMiningResultTypeX | SLGraphMiningResultTypeDFS);
+                                       SLGraphMiningResultTypeX | SLGraphMiningResultTypeRules);
         }
         else
         {
@@ -225,7 +225,7 @@ int main(int argc, const char *argv[])
             
             gspanResult = gspls.search(Res.col(maxSquaredNormColumn),
                                        SLGraphMiningTasktypeTrain,
-                                       SLGraphMiningResultTypeX | SLGraphMiningResultTypeDFS);
+                                       SLGraphMiningResultTypeX | SLGraphMiningResultTypeRules);
         }
         MatrixXd x = get<MatrixXd>(gspanResult[SLGraphMiningResultTypeX]);
                 
@@ -341,7 +341,7 @@ int main(int argc, const char *argv[])
     
     ofstream outDFS((fileSuffix.str()+"DFS.txt").c_str(), ios::out);
     for ( size_t i = 0; i < topk*best; ++i )
-        outDFS << get< vector<string> >(gspanResult[SLGraphMiningResultTypeDFS])[i] << endl;
+        outDFS << get< vector<Rule> >(gspanResult[SLGraphMiningResultTypeRules])[i].dfs << endl;
     outDFS.close();
     
     return 0;
