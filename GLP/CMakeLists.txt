@@ -31,13 +31,19 @@ endif()
 set(CMAKE_CXX_COMPILER "g++")
 set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O2")
-set(CMAKE_CXX_FLAGS "-Wall -Wno-deprecated -fPIC -fno-strict-aliasing -funroll-all-loops -fopenmp")
+
+IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    set(CMAKE_CXX_FLAGS "-Wall -Wno-deprecated -fPIC -fno-strict-aliasing")
+ELSE()
+    set(CMAKE_CXX_FLAGS "-Wall -Wno-deprecated -fPIC -fno-strict-aliasing -funroll-all-loops -fopenmp")
+ENDIF()
+
 set(CMAKE_CXX_LDFLAGS "-shared")
 
 # Check library dependency
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREAD ON)
-find_package(Boost 1.42.0 REQUIRED)
+find_package(Boost 1.40.0 REQUIRED)
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
 endif()

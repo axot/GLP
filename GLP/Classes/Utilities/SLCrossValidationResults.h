@@ -74,6 +74,9 @@ public:
             if ( resultType & SLModelResultTypeRSS )
                 cout << format("%8s: %14.8f") % "RSS" % mean(currentStage, SLModelResultTypeRSS);
             
+            if ( resultType & SLModelResultTypeCOV )
+                cout << format("%8s: %2.8f") % "COV" % mean(currentStage, SLModelResultTypeCOV);
+
             if ( resultType & SLModelResultTypeACC )
                 cout << format("%8s: %2.8f") % "ACC" % mean(currentStage, SLModelResultTypeACC);
             

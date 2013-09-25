@@ -43,6 +43,7 @@ enum{
     SLModelResultTypeACC     = 1 << 4,
     SLModelResultTypeAIC     = 1 << 5,
     SLModelResultTypeBIC     = 1 << 6,
+    SLModelResultTypeCOV     = 1 << 7,
 };
 
 typedef unsigned int SLMODELRESULTYPE;
@@ -97,6 +98,7 @@ public:
     virtual MatrixXd getAUC(const MatrixXd& Y, const MatrixXd& predictY) const;
     virtual MatrixXd getAIC(const MatrixXd& Y, const MatrixXd& predictY, const size_t numOfParams) const;
     virtual MatrixXd getBIC(const MatrixXd& Y, const MatrixXd& predictY, const size_t numOfParams) const;
+    virtual MatrixXd getCOV(const MatrixXd& Y, const MatrixXd& predictY) const;
 
 private:
     template <typename T1, typename T2>

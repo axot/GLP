@@ -41,23 +41,23 @@ void usage()
 {
     cerr <<
 "gspls is a part of GLP v1.0\n\n"
-"Usage: gspls [-mLnkfytsbv] [gsp file]\n\n"
-"Options: \n"
-"           [-m min frequency of common graphs, default: 2]\n"
-"           [-L max graph size for gspan mining, default: 10]\n"
-"           [-n max iterator number, default: 100]\n"
-"           [-k number of sub graphs abstract by gspan once time, default: 5]\n"
-"           [-f folds of cross validation, default: 10]\n"
-"           [-y distinct response Y matrix file]\n"
-"           [-a use average residual column, defult is using max variance column]\n"
-"           [-r use random residual column, defult is using max variance column]\n"
-"           [-t the threshold value which used to avoid overfiting default: 3(times)]\n"
-"           [-s shuffle data(preprocess)]\n"
-"           [-b use memory boosting]\n"
-"           [-v verbose]\n\n"
+"   Usage: gspls [-mLnkfytsbv] [gsp file]\n\n"
+" Options: \n"
+"          [-m min frequency of common graphs, default: 2]\n"
+"          [-L max graph size for gspan mining, default: 10]\n"
+"          [-n max iterator number, default: 100]\n"
+"          [-k number of sub graphs abstract by gspan once time, default: 5]\n"
+"          [-f folds of cross validation, default: 10]\n"
+"          [-y distinct response Y matrix file]\n"
+"          [-a use average residual column, defult is using max variance column]\n"
+"          [-r use random residual column, defult is using max variance column]\n"
+"          [-t the threshold value which used to avoid overfiting default: 3(times)]\n"
+"          [-s shuffle data(preprocess)]\n"
+"          [-b use memory boosting]\n"
+"          [-v verbose]\n\n"
 "  Author: Zheng Shao\n"
 " Contact: axot@axot.org\n"
-"Homepage: http://saigo-www.bio.kyutech.ac.jp/"
+"Homepage: http://saigo-www.bio.kyutech.ac.jp/~axot"
     << endl;
 }
 
@@ -164,13 +164,13 @@ int main(int argc, const char *argv[])
     gspls.setCrossValidationParameters(cvParam);
     
     stringstream fileSuffix;
-    fileSuffix << format("gspls_m%d_L%d_n%d_k%d_f%d_t%d_")%
-                            gspanParam.minsup                 %
-                            gspanParam.maxpat                 %
-                            n                                 %
-                            gspanParam.topk                   %
-                            cvParam.kFold                     %
-                            cvParam.resultHistorySize;
+    fileSuffix << format("gspls_m%d_L%d_n%d_k%d_f%d_t%d_")  %
+                          gspanParam.minsup                 %
+                          gspanParam.maxpat                 %
+                          n                                 %
+                          gspanParam.topk                   %
+                          cvParam.kFold                     %
+                          cvParam.resultHistorySize;
 
     MatrixXd X, Y, Res;
     
@@ -192,11 +192,20 @@ int main(int argc, const char *argv[])
     mt19937 gen( static_cast<unsigned long>(time(NULL)));
     uniform_int<> dist(0, Y.cols()-1);
     variate_generator< mt19937&, uniform_int<> > rand( gen, dist );
-    
+  
+    SLMODELRESULTYPE resultTypes =  SLModelResultTypeQ2   |
+                                    SLModelResultTypeRSS  |
+                                    SLModelResultTypeBeta |
+                                    SLModelResultTypeACC  |
+                                    SLModelResultTypeAUC  |
+                                    SLModelResultTypeAIC  |
+                                    SLModelResultTypeBIC  |
+                                    SLModelResultTypeCOV;
+
     while ( i < n )
     {
         cout << "n: " << ++i << endl;
-        
+      
         if ( useAverageCol )
         {
             VectorXd ResMean(Res.rows());
@@ -228,16 +237,8 @@ int main(int argc, const char *argv[])
                                        SLGraphMiningResultTypeX | SLGraphMiningResultTypeRules);
         }
         MatrixXd x = get<MatrixXd>(gspanResult[SLGraphMiningResultTypeX]);
-                
-        SLCrossValidationResults cvResult =
-            gspls.crossValidation(x, Y,
-                                  SLModelResultTypeQ2   |
-                                  SLModelResultTypeRSS  |
-                                  SLModelResultTypeBeta |
-                                  SLModelResultTypeACC  |
-                                  SLModelResultTypeAUC  |
-                                  SLModelResultTypeAIC  |
-                                  SLModelResultTypeBIC);
+      
+        SLCrossValidationResults cvResult = gspls.crossValidation(x, Y, resultTypes);
 
         long appendedXRows = x.rows();
         long appendedXCols = x.cols();
@@ -245,17 +246,12 @@ int main(int argc, const char *argv[])
         X.conservativeResize(appendedXRows, oldXCols+appendedXCols);
         X.rightCols(appendedXCols).setZero();
         X << X.leftCols(oldXCols), x;
-                
+      
         int bestBetaIndex;
         cvResult.eachMean(SLCrossValidationResultTypeTrain, SLModelResultTypeRSS).minCoeff(&bestBetaIndex);
         Res = Y - X*get<MatrixXd>(cvResult[SLCrossValidationResultTypeTrain][bestBetaIndex][SLModelResultTypeBeta]);
                 
-        cvResult.showSummary( SLModelResultTypeQ2  |
-                              SLModelResultTypeRSS |
-                              SLModelResultTypeACC |
-                              SLModelResultTypeAUC |
-                              SLModelResultTypeAIC |
-                              SLModelResultTypeBIC);
+        cvResult.showSummary(resultTypes);
         
         double RSS = cvResult.mean(SLCrossValidationResultTypeValidation, SLModelResultTypeRSS);
                 
@@ -274,25 +270,26 @@ int main(int argc, const char *argv[])
     ptime time_end(microsec_clock::local_time());
     time_duration duration(time_end - time_start);
     
+    SLCrossValidationResults oldResult;
+    int best = i - cvParam.resultHistorySize;
     if ( overfitCount < cvParam.resultHistorySize )
     {
         cerr << "Info: Can not get best result, please set a bigger value for argument n" << endl;
-        return -3;
+        best = i;
+        oldResult = gspls.getResultHistory().front();
     }
-    
-    SLCrossValidationResults oldResult = gspls.getResultHistory().back();
-    int best = i - cvParam.resultHistorySize;
+    else
+        oldResult = gspls.getResultHistory().back();
+
     cout << "Best: n = " <<  best << endl;
     
-    oldResult.showSummary( SLModelResultTypeQ2  |
-                           SLModelResultTypeRSS |
-                           SLModelResultTypeACC |
-                           SLModelResultTypeAUC |
-                           SLModelResultTypeAIC |
-                           SLModelResultTypeBIC);
+    oldResult.showSummary(resultTypes);
 
     ofstream outX((fileSuffix.str()+"Features.txt").c_str(), ios::out);
-    outX << X.leftCols(X.cols()-(cvParam.resultHistorySize)*topk) << endl;
+    if ( overfitCount < cvParam.resultHistorySize )
+        outX << X << endl;
+    else
+        outX << X.leftCols(X.cols()-(cvParam.resultHistorySize)*topk) << endl;
     outX.close();
     
     ofstream outBeta((fileSuffix.str()+"Beta.txt").c_str(), ios::out);
@@ -309,12 +306,12 @@ int main(int argc, const char *argv[])
     if ( verbose )
     {
         {
-            cout << "Test Q2 detail, " << "best fold index: " << bestBetaIndex << endl;
+            cout << "Test COV detail, " << "best fold index: " << bestBetaIndex << endl;
             MatrixXd Q2Mat(fold,Y.cols());
             for ( size_t j = 0; j < fold; ++j )
             {
                 cout << "fold index: " << j << endl;
-                Q2Mat.row(j) << get<MatrixXd>(oldResult[SLCrossValidationResultTypeTest][j][SLModelResultTypeQ2]);
+                Q2Mat.row(j) << get<MatrixXd>(oldResult[SLCrossValidationResultTypeTest][j][SLModelResultTypeCOV]).transpose();
                 cout << Q2Mat.row(j) << endl;
             }
             cout << "k-fold average:" << endl;

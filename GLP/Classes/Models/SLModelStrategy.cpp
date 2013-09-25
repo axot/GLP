@@ -124,3 +124,10 @@ MatrixXd SLModelStrategy::getBIC(const MatrixXd& Y, const MatrixXd& predictY, co
     
     return -2.0*logL.array() + numOfParams*log(Y.rows());
 }
+
+MatrixXd SLModelStrategy::getCOV(const MatrixXd& Y, const MatrixXd& predictY) const
+{
+    MatrixXd Yhat = Center(Y);
+    MatrixXd Phat = Center(predictY);
+    return (Yhat.transpose() * Phat).diagonal() / Yhat.rows();
+}

@@ -33,15 +33,15 @@ void usage()
 {
     cerr <<
 "gspan is a part of GLP v1.0\n\n"
-"Usage: gspan [-mLv] [gsp file]\n\n"
-"Options: \n"
-"           [-m minsup, default: 2]\n"
-"           [-n maxsup, default: infinity]\n"
-"           [-L maxpat, default: 10]\n"
-"           [-v verbose]\n\n"
+"   Usage: gspan [-mLv] [gsp file]\n\n"
+" Options: \n"
+"          [-m minsup, default: 2]\n"
+"          [-n maxsup, default: infinity]\n"
+"          [-L maxpat, default: 10]\n"
+"          [-v verbose]\n\n"
 "  Author: Zheng Shao\n"
 " Contact: axot@axot.org\n"
-"Homepage: http://saigo-www.bio.kyutech.ac.jp/"
+"Homepage: http://saigo-www.bio.kyutech.ac.jp/~axot"
     << endl;
 }
 
@@ -103,19 +103,19 @@ int main(int argc, const char *argv[])
     SLGraphMiningResult gspanResult;    
     gspanResult = gspan.search((VectorXd)NULL, SLGraphMiningTasktypeTrain, SLGraphMiningResultTypeX | SLGraphMiningResultTypeRules);
 
-    stringstream fileSuffix;
+    stringstream filePrefix;
     
-    if ( param.maxsup < ULONG_LONG_MAX )
-        fileSuffix << format("gspan_m%d_n%d_L%d_") % param.minsup % param.maxsup % param.maxpat;
+    if ( param.maxsup < ULLONG_MAX )
+        filePrefix << format("gspan_m%d_n%d_L%d_") % param.minsup % param.maxsup % param.maxpat;
     else
-        fileSuffix << format("gspan_m%d_nINF_L%d_") % param.minsup % param.maxpat;
+        filePrefix << format("gspan_m%d_nINF_L%d_") % param.minsup % param.maxpat;
     
-    ofstream outX((fileSuffix.str()+"Features.txt").c_str(), ios::out);
+    ofstream outX((filePrefix.str()+"Features.txt").c_str(), ios::out);
     outX << get<MatrixXd>(gspanResult[SLGraphMiningResultTypeX]) << endl;
     outX.close();
     
-    ofstream outDFS((fileSuffix.str()+"DFS.txt").c_str(), ios::out);
-    ofstream outFreq((fileSuffix.str()+"Freq.txt").c_str(), ios::out);
+    ofstream outDFS((filePrefix.str()+"DFS.txt").c_str(), ios::out);
+    ofstream outFreq((filePrefix.str()+"Freq.txt").c_str(), ios::out);
     vector<Rule> rules = get< vector<Rule> >(gspanResult[SLGraphMiningResultTypeRules]);
     for ( size_t i = 0; i < rules.size(); ++i )
     {

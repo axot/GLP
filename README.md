@@ -7,7 +7,7 @@ Cmake 2.6 or higher.
 
 Eigen 3.1.2 or higher.
 
-Boost 1.4.8 or higher.
+Boost 1.4.2 or higher.
 
 # Installation
 make

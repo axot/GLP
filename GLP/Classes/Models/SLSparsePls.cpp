@@ -95,8 +95,9 @@ SLModelResult SLSparsePls::classify(const MatrixXd& tX, const MatrixXd& tY, SLMO
                       SLModelResultTypeACC  |
                       SLModelResultTypeAUC  |
                       SLModelResultTypeAIC  |
-                      SLModelResultTypeBIC)),
-           "Only support Beta Q2 RSS ACC AUC AIC BIC for Sparse PLS.");
+                      SLModelResultTypeBIC  |
+                      SLModelResultTypeCOV)),
+           "Only support Beta Q2 RSS ACC AUC AIC BIC COV for Sparse PLS.");
     
     ASSERT(Beta.cols() != 0 && Beta.rows() != 0, "Train data first");
     
@@ -139,6 +140,10 @@ SLModelResult SLSparsePls::classify(const MatrixXd& tX, const MatrixXd& tY, SLMO
         result[SLModelResultTypeBIC] = getBIC(tY, tX*Beta, X.cols());
     }
 
+    if(type & SLModelResultTypeCOV)
+    {
+        result[SLModelResultTypeCOV] = getCOV(tY, tX*Beta);
+    }
     return result;
 }
 
@@ -158,8 +163,9 @@ SLModelResult SLSparsePls::getTrainResult(SLMODELRESULTYPE type) const
                       SLModelResultTypeACC  |
                       SLModelResultTypeAUC  |
                       SLModelResultTypeAIC  |
-                      SLModelResultTypeBIC)),
-           "Only support Beta Q2 RSS ACC AUC AIC BIC for Sparse PLS.");
+                      SLModelResultTypeBIC  |
+                      SLModelResultTypeCOV)),
+           "Only support Beta Q2 RSS ACC AUC AIC BIC COV for Sparse PLS.");
     
     ASSERT(Beta.cols() != 0 && Beta.rows() != 0, "Train data first");
     
@@ -199,5 +205,9 @@ SLModelResult SLSparsePls::getTrainResult(SLMODELRESULTYPE type) const
         result[SLModelResultTypeBIC] = getBIC(Y, X*Beta, X.cols());
     }
 
+    if(type & SLModelResultTypeCOV)
+    {
+        result[SLModelResultTypeCOV] = getCOV(Y, X*Beta);
+    }
     return result;
 }
