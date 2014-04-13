@@ -5,6 +5,23 @@
 //  Created by Zheng Shao on 4/13/14.
 //  Copyright (c) 2014 Saigo Laboratoire. All rights reserved.
 //
+//  This is free software with ABSOLUTELY NO WARRANTY.
+//
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+//  02111-1307, USA
+//
 
 #include <iostream>
 #include <fstream>
@@ -141,13 +158,13 @@ int main(int argc, const char *argv[])
     gspls.setCrossValidationParameters(cvParam);
     
     stringstream fileSuffix;
-    fileSuffix << format("gspan_pls_m%d_L%d_n%d_k%d_f%d_t%d_")  %
-    gspanParam.minsup                 %
-    gspanParam.maxpat                 %
-    n                                 %
-    gspanParam.topk                   %
-    cvParam.kFold                     %
-    cvParam.resultHistorySize;
+    fileSuffix << format("gspan_pls_m%d_L%d_n%d_k%d_f%d_t%d_")%
+                            gspanParam.minsup                 %
+                            gspanParam.maxpat                 %
+                            n                                 %
+                            gspanParam.topk                   %
+                            cvParam.kFold                     %
+                            cvParam.resultHistorySize;
     
     MatrixXd X, Y, Res;
     
@@ -160,7 +177,6 @@ int main(int argc, const char *argv[])
     Res = Y;
     
     double minRSS = DBL_MAX;
-    size_t overfitCount = 0;
     
     ptime time_start(microsec_clock::local_time());
     SLGraphMiningResult gspanResult;
@@ -188,6 +204,8 @@ int main(int argc, const char *argv[])
     cvResult.eachMean(SLCrossValidationResultTypeTrain, SLModelResultTypeRSS).minCoeff(&bestBetaIndex);
     Res = Y - X*get<MatrixXd>(cvResult[SLCrossValidationResultTypeTrain][bestBetaIndex][SLModelResultTypeBeta]);
     
+    int best = 1;
+    cout << "Best: n = " <<  best << endl;
     cvResult.showSummary(resultTypes);
     
     minRSS = cvResult.mean(SLCrossValidationResultTypeValidation, SLModelResultTypeRSS);
@@ -196,16 +214,11 @@ int main(int argc, const char *argv[])
     time_duration duration(time_end - time_start);
     
     SLCrossValidationResults oldResult;
-    int best = 1;
     oldResult = gspls.getResultHistory().back();
     
-    cout << "Best: n = " <<  best << endl;
     
     ofstream outX((fileSuffix.str()+"Features.txt").c_str(), ios::out);
-    if ( overfitCount < cvParam.resultHistorySize )
-        outX << X << endl;
-    else
-        outX << X.leftCols(X.cols()-(cvParam.resultHistorySize)*topk) << endl;
+    outX << X << endl;
     outX.close();
     
     ofstream outBeta((fileSuffix.str()+"Beta.txt").c_str(), ios::out);
@@ -252,8 +265,11 @@ int main(int argc, const char *argv[])
     }
 
     ofstream outDFS((fileSuffix.str()+"DFS.txt").c_str(), ios::out);
-    for ( size_t i = 0; i < topk*best; ++i )
-        outDFS << get< vector<Rule> >(gspanResult[SLGraphMiningResultTypeRules])[i].dfs << endl;
+    vector<Rule> rules = get< vector<Rule> >(gspanResult[SLGraphMiningResultTypeRules]);
+    for ( size_t i = 0; i < rules.size(); ++i )
+    {
+        outDFS << rules[i].dfs << endl;
+    }
     outDFS.close();
     
     return 0;
