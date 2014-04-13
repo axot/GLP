@@ -533,4 +533,3 @@ namespace EigenExt
     }
 };
 #endif
-

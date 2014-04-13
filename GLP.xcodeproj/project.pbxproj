@@ -36,6 +36,7 @@
 		53795B7B17421B5C001811B6 /* libglp.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 537078BC16AFA7C7004FFD09 /* libglp.dylib */; };
 		53795B8E17421B9D001811B6 /* gspan.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53795B54174219DD001811B6 /* gspan.cpp */; };
 		53795B8F17421BA2001811B6 /* gspan.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53795B54174219DD001811B6 /* gspan.cpp */; };
+		53A0783F18FA7BE000F73E4E /* gspan_pls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53A0782F18FA7B9C00F73E4E /* gspan_pls.cpp */; };
 		53A0CF2A16AFC4EC00B74AC1 /* libglp.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 537078BC16AFA7C7004FFD09 /* libglp.dylib */; };
 		53A0CF2B16AFC4F100B74AC1 /* libglp.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 537078BC16AFA7C7004FFD09 /* libglp.dylib */; };
 		53A0CF3016AFC4FD00B74AC1 /* gspls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53C09387168DDEA500A0ADC1 /* gspls.cpp */; };
@@ -135,6 +136,13 @@
 			remoteGlobalIDString = 537078C416AFA7DD004FFD09;
 			remoteInfo = glp_static;
 		};
+		53A0783718FA7BCB00F73E4E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 537123381683288A00B47D4E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 537078C416AFA7DD004FFD09;
+			remoteInfo = glp_static;
+		};
 		53A0CF3916AFC58000B74AC1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 537123381683288A00B47D4E /* Project object */;
@@ -174,6 +182,8 @@
 		53832802168D6CEF00E3B48F /* SLUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SLUtility.h; path = Classes/SLUtility.h; sourceTree = "<group>"; };
 		53832809168D767F00E3B48F /* SLModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLModel.h; path = Classes/Models/SLModel.h; sourceTree = "<group>"; };
 		53832810168D7E4E00E3B48F /* SLSparsePls.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SLSparsePls.cpp; path = Classes/Models/SLSparsePls.cpp; sourceTree = "<group>"; };
+		53A0782F18FA7B9C00F73E4E /* gspan_pls.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = gspan_pls.cpp; path = Examples/gspan_pls.cpp; sourceTree = "<group>"; };
+		53A0783E18FA7BCB00F73E4E /* gspan_pls_static */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = gspan_pls_static; sourceTree = BUILT_PRODUCTS_DIR; };
 		53A0CF3616AFC4FD00B74AC1 /* gspls_static */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = gspls_static; sourceTree = BUILT_PRODUCTS_DIR; };
 		53B5D6451697251800AE0523 /* Graph.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Graph.h; path = Classes/GraphMining/Gspan/Graph.h; sourceTree = "<group>"; };
 		53B5D6461697271900AE0523 /* Dfs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Dfs.h; path = Classes/GraphMining/Gspan/Dfs.h; sourceTree = "<group>"; };
@@ -236,6 +246,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		53A0783A18FA7BCB00F73E4E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		53A0CF3116AFC4FD00B74AC1 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -286,6 +303,7 @@
 				534B786116AF43BE006721F6 /* CMakeLists.txt */,
 				53C09387168DDEA500A0ADC1 /* gspls.cpp */,
 				53795B54174219DD001811B6 /* gspan.cpp */,
+				53A0782F18FA7B9C00F73E4E /* gspan_pls.cpp */,
 			);
 			name = Examples;
 			sourceTree = "<group>";
@@ -318,6 +336,7 @@
 				53A0CF3616AFC4FD00B74AC1 /* gspls_static */,
 				53795B7F17421B5C001811B6 /* gspan */,
 				53795B8917421B5F001811B6 /* gspan_static */,
+				53A0783E18FA7BCB00F73E4E /* gspan_pls_static */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -531,6 +550,23 @@
 			productReference = 53795B8917421B5F001811B6 /* gspan_static */;
 			productType = "com.apple.product-type.tool";
 		};
+		53A0783518FA7BCB00F73E4E /* gspan_pls_static */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 53A0783B18FA7BCB00F73E4E /* Build configuration list for PBXNativeTarget "gspan_pls_static" */;
+			buildPhases = (
+				53A0783818FA7BCB00F73E4E /* Sources */,
+				53A0783A18FA7BCB00F73E4E /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				53A0783618FA7BCB00F73E4E /* PBXTargetDependency */,
+			);
+			name = gspan_pls_static;
+			productName = GLP;
+			productReference = 53A0783E18FA7BCB00F73E4E /* gspan_pls_static */;
+			productType = "com.apple.product-type.tool";
+		};
 		53A0CF2C16AFC4FD00B74AC1 /* gspls_static */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 53A0CF3316AFC4FD00B74AC1 /* Build configuration list for PBXNativeTarget "gspls_static" */;
@@ -554,7 +590,7 @@
 		537123381683288A00B47D4E /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0460;
+				LastUpgradeCheck = 0510;
 				ORGANIZATIONNAME = "Saigo Laboratoire";
 			};
 			buildConfigurationList = 5371233B1683288A00B47D4E /* Build configuration list for PBXProject "GLP" */;
@@ -576,6 +612,7 @@
 				53A0CF2C16AFC4FD00B74AC1 /* gspls_static */,
 				53795B7517421B5C001811B6 /* gspan */,
 				53795B8017421B5F001811B6 /* gspan_static */,
+				53A0783518FA7BCB00F73E4E /* gspan_pls_static */,
 				53388A291690B0D500AF9E5E /* SparsePlsTest */,
 			);
 		};
@@ -669,6 +706,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		53A0783818FA7BCB00F73E4E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				53A0783F18FA7BE000F73E4E /* gspan_pls.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		53A0CF2F16AFC4FD00B74AC1 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -739,6 +784,11 @@
 			isa = PBXTargetDependency;
 			target = 537078C416AFA7DD004FFD09 /* glp_static */;
 			targetProxy = 53795B9217421BB7001811B6 /* PBXContainerItemProxy */;
+		};
+		53A0783618FA7BCB00F73E4E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 537078C416AFA7DD004FFD09 /* glp_static */;
+			targetProxy = 53A0783718FA7BCB00F73E4E /* PBXContainerItemProxy */;
 		};
 		53A0CF3A16AFC58000B74AC1 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -852,7 +902,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_ANALYZER_SECURITY_FLOATLOOPCOUNTER = YES;
 				CLANG_ANALYZER_SECURITY_INSECUREAPI_RAND = YES;
 				CLANG_ANALYZER_SECURITY_INSECUREAPI_STRCPY = YES;
@@ -884,7 +933,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_ANALYZER_SECURITY_FLOATLOOPCOUNTER = YES;
 				CLANG_ANALYZER_SECURITY_INSECUREAPI_RAND = YES;
 				CLANG_ANALYZER_SECURITY_INSECUREAPI_STRCPY = YES;
@@ -983,6 +1031,34 @@
 				);
 				OTHER_LDFLAGS = "${TARGET_BUILD_DIR}/libglp.a";
 				PRODUCT_NAME = gspan_static;
+			};
+			name = Release;
+		};
+		53A0783C18FA7BCB00F73E4E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				HEADER_SEARCH_PATHS = (
+					/usr/local/include,
+					/usr/local/include/eigen3,
+					"${SRCROOT}/build/Headers",
+				);
+				OTHER_LDFLAGS = "${TARGET_BUILD_DIR}/libglp.a";
+				PRODUCT_NAME = gspan_pls_static;
+			};
+			name = Debug;
+		};
+		53A0783D18FA7BCB00F73E4E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				HEADER_SEARCH_PATHS = (
+					/usr/local/include,
+					/usr/local/include/eigen3,
+					"${SRCROOT}/build/Headers",
+				);
+				OTHER_LDFLAGS = "${TARGET_BUILD_DIR}/libglp.a";
+				PRODUCT_NAME = gspan_pls_static;
 			};
 			name = Release;
 		};
@@ -1085,6 +1161,15 @@
 			buildConfigurations = (
 				53795B8717421B5F001811B6 /* Debug */,
 				53795B8817421B5F001811B6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		53A0783B18FA7BCB00F73E4E /* Build configuration list for PBXNativeTarget "gspan_pls_static" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				53A0783C18FA7BCB00F73E4E /* Debug */,
+				53A0783D18FA7BCB00F73E4E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

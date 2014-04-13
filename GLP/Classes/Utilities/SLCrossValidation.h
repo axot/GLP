@@ -107,8 +107,8 @@ public:
      *  Discussion: the structure of result history:
      *               ___
      *              | 0 |   <- current result
-     *              | 1 |   <- the last time of result
-     *              | 2 |   <- the time before last of result
+     *              | 1 |   <- the last time result
+     *              | 2 |   <- the time before last result
      *              |...|
      */
     const SLCrossValidationResultHistory& getResultHistory() const
