@@ -28,6 +28,12 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		532A614318FBD6A200D900AC /* SLNipals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 532A614118FBD6A200D900AC /* SLNipals.cpp */; };
+		532A614418FBD6A200D900AC /* SLNipals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 532A614118FBD6A200D900AC /* SLNipals.cpp */; };
+		532A614518FBD6A200D900AC /* SLNipals.h in Headers */ = {isa = PBXBuildFile; fileRef = 532A614218FBD6A200D900AC /* SLNipals.h */; };
+		532A614618FBD6A200D900AC /* SLNipals.h in Headers */ = {isa = PBXBuildFile; fileRef = 532A614218FBD6A200D900AC /* SLNipals.h */; };
+		532A614F18FCC68500D900AC /* libglp.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 537078BC16AFA7C7004FFD09 /* libglp.dylib */; };
+		532A615418FCC69700D900AC /* NipalsTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 532A614718FCC56800D900AC /* NipalsTest.cpp */; };
 		537078CD16AFB2FA004FFD09 /* SLSparsePls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53832810168D7E4E00E3B48F /* SLSparsePls.cpp */; };
 		537078CE16AFB2FF004FFD09 /* SLGspan.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53C09381168DBB5D00A0ADC1 /* SLGspan.cpp */; };
 		537078F116AFB722004FFD09 /* Graph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53B5D64C169730DD00AE0523 /* Graph.cpp */; };
@@ -52,6 +58,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		532A614B18FCC68500D900AC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 537123381683288A00B47D4E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 537078BB16AFA7C7004FFD09;
+			remoteInfo = glp;
+		};
 		5370791316AFC072004FFD09 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 537123381683288A00B47D4E /* Project object */;
@@ -153,6 +166,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		532A614118FBD6A200D900AC /* SLNipals.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SLNipals.cpp; path = Classes/Models/SLNipals.cpp; sourceTree = "<group>"; };
+		532A614218FBD6A200D900AC /* SLNipals.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLNipals.h; path = Classes/Models/SLNipals.h; sourceTree = "<group>"; };
+		532A614718FCC56800D900AC /* NipalsTest.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = NipalsTest.cpp; path = Test/NipalsTest.cpp; sourceTree = "<group>"; };
+		532A615318FCC68500D900AC /* NipalsTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = NipalsTest; sourceTree = BUILT_PRODUCTS_DIR; };
 		53317438168D9764005305C8 /* SLGlpFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLGlpFactory.h; path = Classes/Factory/SLGlpFactory.h; sourceTree = "<group>"; };
 		5331743E168D9861005305C8 /* SLGraphMining.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLGraphMining.h; path = Classes/GraphMining/SLGraphMining.h; sourceTree = "<group>"; };
 		53317441168D987B005305C8 /* SLGraphMiningStrategy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLGraphMiningStrategy.h; path = Classes/GraphMining/SLGraphMiningStrategy.h; sourceTree = "<group>"; };
@@ -201,6 +218,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		532A614E18FCC68500D900AC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				532A614F18FCC68500D900AC /* libglp.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		53388A271690B0D500AF9E5E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -268,6 +293,7 @@
 			children = (
 				534B786216AF43C9006721F6 /* CMakeLists.txt */,
 				53388A231690B03000AF9E5E /* SparsePlsTest.cpp */,
+				532A614718FCC56800D900AC /* NipalsTest.cpp */,
 				53CFE23517406DAC00989250 /* GspanTest.cpp */,
 			);
 			name = Test;
@@ -337,6 +363,7 @@
 				53795B7F17421B5C001811B6 /* gspan */,
 				53795B8917421B5F001811B6 /* gspan_static */,
 				53A0783E18FA7BCB00F73E4E /* gspan_pls_static */,
+				532A615318FCC68500D900AC /* NipalsTest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -388,6 +415,8 @@
 			children = (
 				53578E05168D69AD002668D3 /* SLSparsePls.h */,
 				53832810168D7E4E00E3B48F /* SLSparsePls.cpp */,
+				532A614218FBD6A200D900AC /* SLNipals.h */,
+				532A614118FBD6A200D900AC /* SLNipals.cpp */,
 			);
 			name = Concrete;
 			sourceTree = "<group>";
@@ -433,6 +462,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				532A614518FBD6A200D900AC /* SLNipals.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -440,12 +470,30 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				532A614618FBD6A200D900AC /* SLNipals.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		532A614918FCC68500D900AC /* NipalsTest */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 532A615018FCC68500D900AC /* Build configuration list for PBXNativeTarget "NipalsTest" */;
+			buildPhases = (
+				532A614C18FCC68500D900AC /* Sources */,
+				532A614E18FCC68500D900AC /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				532A614A18FCC68500D900AC /* PBXTargetDependency */,
+			);
+			name = NipalsTest;
+			productName = SparsePls;
+			productReference = 532A615318FCC68500D900AC /* NipalsTest */;
+			productType = "com.apple.product-type.tool";
+		};
 		53388A291690B0D500AF9E5E /* SparsePlsTest */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 53388A311690B0D500AF9E5E /* Build configuration list for PBXNativeTarget "SparsePlsTest" */;
@@ -614,6 +662,7 @@
 				53795B8017421B5F001811B6 /* gspan_static */,
 				53A0783518FA7BCB00F73E4E /* gspan_pls_static */,
 				53388A291690B0D500AF9E5E /* SparsePlsTest */,
+				532A614918FCC68500D900AC /* NipalsTest */,
 			);
 		};
 /* End PBXProject section */
@@ -648,6 +697,14 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		532A614C18FCC68500D900AC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				532A615418FCC69700D900AC /* NipalsTest.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		53388A261690B0D500AF9E5E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -661,6 +718,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				537078F316AFB728004FFD09 /* Utility.cpp in Sources */,
+				532A614318FBD6A200D900AC /* SLNipals.cpp in Sources */,
 				537078F216AFB725004FFD09 /* Dfs.cpp in Sources */,
 				537078F116AFB722004FFD09 /* Graph.cpp in Sources */,
 				537078CD16AFB2FA004FFD09 /* SLSparsePls.cpp in Sources */,
@@ -674,6 +732,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				53E4CCF2173EA94D00C0F204 /* SLSparsePls.cpp in Sources */,
+				532A614418FBD6A200D900AC /* SLNipals.cpp in Sources */,
 				53E4CCF3173EA94D00C0F204 /* Graph.cpp in Sources */,
 				53E4CCF4173EA94D00C0F204 /* Dfs.cpp in Sources */,
 				53E4CCF5173EA94D00C0F204 /* Utility.cpp in Sources */,
@@ -725,6 +784,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		532A614A18FCC68500D900AC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 537078BB16AFA7C7004FFD09 /* glp */;
+			targetProxy = 532A614B18FCC68500D900AC /* PBXContainerItemProxy */;
+		};
 		5370791416AFC072004FFD09 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 537123401683288A00B47D4E /* gspls */;
@@ -798,6 +862,32 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		532A615118FCC68500D900AC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				HEADER_SEARCH_PATHS = (
+					/usr/local/include,
+					/usr/local/include/eigen3,
+					"${SRCROOT}/build/Headers",
+				);
+				PRODUCT_NAME = NipalsTest;
+			};
+			name = Debug;
+		};
+		532A615218FCC68500D900AC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				HEADER_SEARCH_PATHS = (
+					/usr/local/include,
+					/usr/local/include/eigen3,
+					"${SRCROOT}/build/Headers",
+				);
+				PRODUCT_NAME = NipalsTest;
+			};
+			name = Release;
+		};
 		53388A321690B0D500AF9E5E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1093,6 +1183,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		532A615018FCC68500D900AC /* Build configuration list for PBXNativeTarget "NipalsTest" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				532A615118FCC68500D900AC /* Debug */,
+				532A615218FCC68500D900AC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		53388A311690B0D500AF9E5E /* Build configuration list for PBXNativeTarget "SparsePlsTest" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

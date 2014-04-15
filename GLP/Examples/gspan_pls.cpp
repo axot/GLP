@@ -139,7 +139,8 @@ int main(int argc, const char *argv[])
         return -2;
     }
     
-    SLSparsePls::SLSparsePlsParameters splsParam;
+    SLNipals::SLNipalsParameters nipalsParam;
+//    nipalsParam.verbose = true;
     
     SLGspan::SLGspanParameters gspanParam;
     gspanParam.minsup = minsup;
@@ -148,14 +149,14 @@ int main(int argc, const char *argv[])
     gspanParam.doesUseMemoryBoost = boost;
     gspanParam.gspFilename        = string(gspfile);
     
-    BOOST_AUTO(gspls, (*SLGlpFactory<SLSparsePls, SLGspan>::create(splsParam, gspanParam)));
+    BOOST_AUTO(nipals, (*SLGlpFactory<SLNipals, SLGspan>::create(nipalsParam, gspanParam)));
     
-    SLCrossValidation<SLSparsePls>::SLCrossValidationParameters cvParam;
+    SLCrossValidation<SLNipals>::SLCrossValidationParameters cvParam;
     cvParam.useShuffledData     = useShuffledData;
     cvParam.kFold               = fold;
     cvParam.resultHistorySize   = resultHistorySize;
     
-    gspls.setCrossValidationParameters(cvParam);
+    nipals.setCrossValidationParameters(cvParam);
     
     stringstream fileSuffix;
     fileSuffix << format("gspan_pls_m%d_L%d_n%d_k%d_f%d_t%d_")%
@@ -171,19 +172,15 @@ int main(int argc, const char *argv[])
     if ( yfile != NULL )
         EigenExt::loadMatrixFromFile(Y, yfile);
     else
-        Y = get<MatrixXd>(gspls.getInnerValues(SLGraphMiningInnerValueY)[SLGraphMiningInnerValueY]);
+        Y = get<MatrixXd>(nipals.getInnerValues(SLGraphMiningInnerValueY)[SLGraphMiningInnerValueY]);
     
     Y = Center(Y);
-    Res = Y;
     
     double minRSS = DBL_MAX;
+    size_t overfitCount = 0;
     
     ptime time_start(microsec_clock::local_time());
     SLGraphMiningResult gspanResult;
-    
-    mt19937 gen( static_cast<unsigned long>(time(NULL)));
-    uniform_int<> dist(0, Y.cols()-1);
-    variate_generator< mt19937&, uniform_int<> > rand( gen, dist );
     
     SLMODELRESULTYPE resultTypes =  SLModelResultTypeQ2   |
                                     SLModelResultTypeRSS  |
@@ -194,28 +191,48 @@ int main(int argc, const char *argv[])
                                     SLModelResultTypeBIC  |
                                     SLModelResultTypeCOV;
     
-    gspanResult = gspls.search((VectorXd)NULL, SLGraphMiningTasktypeTrain, SLGraphMiningResultTypeX | SLGraphMiningResultTypeRules);
-
+    gspanResult = nipals.search((VectorXd)NULL, SLGraphMiningTasktypeTrain, SLGraphMiningResultTypeX | SLGraphMiningResultTypeRules);
+    
     X = get<MatrixXd>(gspanResult[SLGraphMiningResultTypeX]);
-    
-    SLCrossValidationResults cvResult = gspls.crossValidation(X, Y, resultTypes);
 
-    int bestBetaIndex;
-    cvResult.eachMean(SLCrossValidationResultTypeTrain, SLModelResultTypeRSS).minCoeff(&bestBetaIndex);
-    Res = Y - X*get<MatrixXd>(cvResult[SLCrossValidationResultTypeTrain][bestBetaIndex][SLModelResultTypeBeta]);
-    
-    int best = 1;
-    cout << "Best: n = " <<  best << endl;
-    cvResult.showSummary(resultTypes);
-    
-    minRSS = cvResult.mean(SLCrossValidationResultTypeValidation, SLModelResultTypeRSS);
+    unsigned int i = 0;
+    while ( i < n )
+    {
+        cout << "n: " << ++i << endl;
+        
+        SLCrossValidationResults cvResult = nipals.crossValidation(X, Y, resultTypes);
+        cvResult.showSummary(resultTypes);
+        
+        double RSS = cvResult.mean(SLCrossValidationResultTypeValidation, SLModelResultTypeRSS);
+        
+        if ( RSS < minRSS )
+        {
+            minRSS = RSS;
+            overfitCount = 0;
+        }
+        else
+            ++overfitCount;
+        
+        if ( overfitCount >= cvParam.resultHistorySize ) break;
+    }
     
     ptime time_end(microsec_clock::local_time());
     time_duration duration(time_end - time_start);
     
     SLCrossValidationResults oldResult;
-    oldResult = gspls.getResultHistory().back();
+    int best = i - cvParam.resultHistorySize;
+    if ( overfitCount < cvParam.resultHistorySize )
+    {
+        cerr << "Info: Can not get best result, please set a bigger value for argument n" << endl;
+        best = i;
+        oldResult = nipals.getResultHistory().front();
+    }
+    else
+        oldResult = nipals.getResultHistory().back();
     
+    cout << "Best: n = " <<  best << endl;
+    
+    oldResult.showSummary(resultTypes);
     
     ofstream outX((fileSuffix.str()+"Features.txt").c_str(), ios::out);
     outX << X << endl;
@@ -224,7 +241,9 @@ int main(int argc, const char *argv[])
     ofstream outBeta((fileSuffix.str()+"Beta.txt").c_str(), ios::out);
     outBeta.precision(12);
     outBeta.flags(ios::left);
+    
     VectorXd cvQ2(fold);
+    long bestBetaIndex;
     for ( int j = 0; j < cvQ2.size(); ++j )
         cvQ2[j] = get<MatrixXd>(oldResult[SLCrossValidationResultTypeTest][j][SLModelResultTypeQ2]).mean();
     cvQ2.maxCoeff(&bestBetaIndex);

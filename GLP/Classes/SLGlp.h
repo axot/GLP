@@ -32,6 +32,7 @@
 // Models
 #include "Models/SLModel.h"
 #include "Models/SLSparsePls.h"
+#include "Models/SLNipals.h"
 
 // Graph Mining
 #include "GraphMining/SLGspan.h"
