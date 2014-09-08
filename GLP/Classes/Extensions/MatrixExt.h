@@ -529,7 +529,20 @@ namespace EigenExt
     template<typename MatrixType>
     inline MatrixType centering(MatrixType& m)
     {
-        return (m.rows()>1) ? (m - m.colwise().mean().replicate(m.rows(), 1)) : m;
+        return (m.rows()>1) ? (m.rowwise() - m.colwise().mean()) : m;
+    }
+    
+    template<typename MatrixType>
+    inline MatrixType scaleAndCenter(MatrixType& m)
+    {
+        if(m.rows() < 2)
+        {
+            cerr << "row of matrix must larger than 2" << endl;
+            exit(EXIT_FAILURE);
+        }
+        MatrixType x = centering(m);
+        return x.cwiseQuotient((x.colwise().squaredNorm()/
+                                (x.rows()-1)).cwiseSqrt().replicate(x.rows(),1));
     }
 };
 #endif

@@ -31,20 +31,27 @@
 #include "SLModelStrategy.h"
 #include "SLModel.h"
 
+enum{
+    PLSMODENON = 0,
+    PLSMODEREG = 1,
+    PLSMODECLA = 2
+};
+
 class SLSparsePls : public SLModelStrategy
 {
 public:
     class SLSparsePlsParameters
     {
     public:
-        SLSparsePlsParameters() : verbose(false) {}
+        SLSparsePlsParameters() : verbose(false), mode(PLSMODEREG) {}
         
     public:
         bool verbose;
+        int mode;
     };
     
 public:
-    SLSparsePls() : verbose(false) {}
+    SLSparsePls() {};
         
     /* Train: Sparse PLS regression: Y = XB
      * Input
@@ -90,7 +97,6 @@ private:
     
     // not assignable parameters
     SLSparsePlsParameters param;
-    bool verbose;
     MatrixXd X;
     MatrixXd Y;
     MatrixXd T;

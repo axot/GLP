@@ -68,10 +68,9 @@ MatrixXd SLModelStrategy::getACC(const MatrixXd& Y, const MatrixXd& predictY) co
 
 MatrixXd SLModelStrategy::getAUC(const MatrixXd& Y, const MatrixXd& predictY) const
 {
-    MatrixXd AUC(1,Y.cols());
-    VectorXd min = Y.colwise().minCoeff();
-    VectorXd max = Y.colwise().maxCoeff();
-    VectorXd mid = (min + max) / 2.0;
+    MatrixXd AUC(1, Y.cols());
+    
+    double mid = (min + max) / 2.0;
     vector < pair < double, double > > ypPair(Y.rows());
 
     for (int i=0; i < Y.cols(); ++i)
@@ -87,7 +86,7 @@ MatrixXd SLModelStrategy::getAUC(const MatrixXd& Y, const MatrixXd& predictY) co
         size_t auc = 0;
         for (int j=0; j < Y.rows(); ++j)
         {
-            if (ypPair[j].first > mid[i])
+            if (ypPair[j].first > mid)
             {
                 ++tp;
             }

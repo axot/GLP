@@ -8,7 +8,7 @@ all: release
 release: 
 	@mkdir -p $(RELEASEBUILDIR);			\
 	cd $(RELEASEBUILDIR);				\
-	cmake -DCMAKE_BUILD_TYPE=Release ../../../GLP;	\
+	cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local/Cellar/glp/1.0 ../../../GLP;	\
 	make -j4;					\
 	cd -
 

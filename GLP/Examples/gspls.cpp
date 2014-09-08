@@ -26,6 +26,7 @@
 #include <iostream>
 #include <fstream>
 #include <time.h>
+#include <getopt.h>
 #include <boost/typeof/typeof.hpp>
 #include <boost/format.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -43,23 +44,31 @@ void usage()
 "gspls is a part of GLP v1.0\n\n"
 "   Usage: gspls [-mLnkfytsbv] [gsp file]\n\n"
 " Options: \n"
-"          [-m min frequency of common graphs, default: 2]\n"
-"          [-L max graph size for gspan mining, default: 10]\n"
-"          [-n max iterator number, default: 100]\n"
-"          [-k number of sub graphs abstract by gspan once time, default: 5]\n"
-"          [-f folds of cross validation, default: 10]\n"
-"          [-y distinct response Y matrix file]\n"
-"          [-a use average residual column, defult is using max variance column]\n"
-"          [-r use random residual column, defult is using max variance column]\n"
-"          [-t the threshold value which used to avoid overfiting default: 3(times)]\n"
-"          [-s shuffle data(preprocess)]\n"
-"          [-b use memory boosting]\n"
-"          [-v verbose]\n\n"
+"          [--reg | --cla] regression or classification mode\n"
+"          [-m] min frequency of common graphs, default: 2\n"
+"          [-L] max graph size for gspan mining, default: 10\n"
+"          [-n] max iterator number, default: 100\n"
+"          [-k] number of sub graphs abstract by gspan once time, default: 5\n"
+"          [-f] folds of cross validation, default: 10\n"
+"          [-y] distinct response Y matrix file\n"
+"          [-a] use average residual column, defult is using max variance column\n"
+"          [-r] use random residual column, defult is using max variance column\n"
+"          [-t] the threshold value which used to avoid overfiting default: 3(times)\n"
+"          [-s] shuffle data(preprocess)\n"
+"          [-b] use memory boosting\n"
+"          [-p] centering and scaling label for regression mode\n"
+"          [-v] verbose\n"
+"\n"
 "  Author: Zheng Shao\n"
 " Contact: axot@axot.org\n"
 "Homepage: http://saigo-www.bio.kyutech.ac.jp/~axot"
     << endl;
 }
+
+enum{
+    ARGERROR = -1,
+    DEBUGEXIT = -100
+};
 
 int main(int argc, const char *argv[])
 {
@@ -76,17 +85,43 @@ int main(int argc, const char *argv[])
     bool useShuffledData = false;
     bool useAverageCol = false;
     bool useRandomCol = false;
+    bool preProcess = false;
+    bool modeReg = false;
+    bool modeCla = false;
     
     if (argc < 2) {
         usage();
-        return -1;
+        return ARGERROR;
     }
     
+    static struct option long_options[] =
+    {
+        {"reg", no_argument, 0, 0},
+        {"cla", no_argument, 0, 0},
+        {0, 0, 0, 0}
+    };
+
+    int option_index = 0;
     int opt;
-    while ((opt = getopt(argc, (char **)argv, "L:m:n:k:f:y:t:vbsar")) != -1)
+    while ((opt = getopt_long(argc, (char **)argv,
+                              "L:m:n:k:f:y:t:vbsarp", long_options, &option_index)) != -1)
     {
         switch(opt)
         {
+            case 0:
+            {
+                if (long_options[option_index].flag != 0) break;
+                string optname = string(long_options[option_index].name);
+                if (optname == "reg")
+                    modeReg = true;
+                else if (optname == "cla")
+                    modeCla = true;
+                else{
+                    usage();
+                    return ARGERROR;
+                }
+                break;
+            }
             case 'L':
                 maxpat = atoi(optarg);
                 break;
@@ -123,10 +158,21 @@ int main(int argc, const char *argv[])
             case 'r':
                 useRandomCol = true;
                 break;
+            case 'p':
+                preProcess = true;
+                break;
+            case '?':
             default:
                 usage();
-                return -2;
+                return ARGERROR;
         }
+    }
+    
+    if ((!modeReg && !modeCla) ||
+        (modeReg && modeCla))
+    {
+        cerr << "one and only one of reg/cla option must be set" << endl;
+        return ARGERROR;
     }
     
     gspfile = strdup(argv[argc-1]);
@@ -136,17 +182,25 @@ int main(int argc, const char *argv[])
     {
         printf ("Error: Unknown argument: %s\n", argv[i]);
         usage();
-        return -2;
+        return ARGERROR;
     }
     
     if ( useAverageCol && useRandomCol )
     {
         cerr << "Error: Can not use both average and random residual column" << endl;
-        return -2;
+        return ARGERROR;
     }
     
     SLSparsePls::SLSparsePlsParameters splsParam;
+    splsParam.verbose = verbose;
     
+    if (modeReg)
+        splsParam.mode = PLSMODEREG;
+    else if(modeCla)
+        splsParam.mode = PLSMODECLA;
+    else
+        splsParam.mode = PLSMODENON;
+        
     SLGspan::SLGspanParameters gspanParam;
     gspanParam.minsup = minsup;
     gspanParam.maxpat = maxpat;
@@ -179,10 +233,20 @@ int main(int argc, const char *argv[])
     else
         Y = get<MatrixXd>(gspls.getInnerValues(SLGraphMiningInnerValueY)[SLGraphMiningInnerValueY]);
     
-    Y = Center(Y);
+    if (modeReg)
+    {
+        cout << "Regression Mode" << endl;
+        if (preProcess) Y = Scale(Y);
+    }
+    
+    if (modeCla) cout << "Classification Mode" << endl;
+    
     Res = Y;
     
-    double minRSS = DBL_MAX;
+    double minRSS = 1E20;
+    double maxAUC = -1E20;
+    double AUC = 0.0f;
+    double RSS = 0.0f;
     size_t overfitCount = 0;
     
     ptime time_start(microsec_clock::local_time());
@@ -192,15 +256,21 @@ int main(int argc, const char *argv[])
     mt19937 gen( static_cast<unsigned long>(time(NULL)));
     uniform_int<> dist(0, Y.cols()-1);
     variate_generator< mt19937&, uniform_int<> > rand( gen, dist );
-  
-    SLMODELRESULTYPE resultTypes =  SLModelResultTypeQ2   |
-                                    SLModelResultTypeRSS  |
-                                    SLModelResultTypeBeta |
-                                    SLModelResultTypeACC  |
-                                    SLModelResultTypeAUC  |
-                                    SLModelResultTypeAIC  |
-                                    SLModelResultTypeBIC  |
-                                    SLModelResultTypeCOV;
+    
+    SLMODELRESULTYPE resultTypes = SLModelResultTypeNone;
+    if (modeReg)
+        resultTypes =   SLModelResultTypeQ2   |
+                        SLModelResultTypeRSS  |
+                        SLModelResultTypeBeta |
+                        SLModelResultTypeAIC  |
+                        SLModelResultTypeBIC  |
+                        SLModelResultTypeCOV;
+    else if (modeCla)
+        resultTypes =   SLModelResultTypeRSS  |
+                        SLModelResultTypeBeta |
+                        SLModelResultTypeACC  |
+                        SLModelResultTypeAUC  |
+                        SLModelResultTypeCOV;
 
     while ( i < n )
     {
@@ -253,16 +323,28 @@ int main(int argc, const char *argv[])
                 
         cvResult.showSummary(resultTypes);
         
-        double RSS = cvResult.mean(SLCrossValidationResultTypeValidation, SLModelResultTypeRSS);
-                
-        if ( RSS < minRSS )
+        if (modeReg)
         {
-            minRSS = RSS;
-            overfitCount = 0;
+            RSS = cvResult.mean(SLCrossValidationResultTypeValidation, SLModelResultTypeRSS);
+            if ( RSS < minRSS )
+            {
+                minRSS = RSS;
+                overfitCount = 0;
+            }
+            else
+                ++overfitCount;
         }
-        else
-            ++overfitCount;
-        
+        else if (modeCla)
+        {
+            AUC = cvResult.mean(SLCrossValidationResultTypeValidation, SLModelResultTypeAUC);
+            if ( AUC > maxAUC )
+            {
+                maxAUC = AUC;
+                overfitCount = 0;
+            }
+            else
+                ++overfitCount;
+        }
         if ( overfitCount >= cvParam.resultHistorySize ) break;
         
     }
@@ -295,11 +377,23 @@ int main(int argc, const char *argv[])
     ofstream outBeta((fileSuffix.str()+"Beta.txt").c_str(), ios::out);
     outBeta.precision(12);
     outBeta.flags(ios::left);
-    long bestBetaIndex;
+    long bestBetaIndex = -1;
+    
     VectorXd cvQ2(fold);
-    for ( int j = 0; j < cvQ2.size(); ++j )
-        cvQ2[j] = get<MatrixXd>(oldResult[SLCrossValidationResultTypeTest][j][SLModelResultTypeQ2]).mean();
-    cvQ2.maxCoeff(&bestBetaIndex);
+    VectorXd cvAUC(fold);
+    
+    if (modeReg)
+    {
+        for ( int j = 0; j < cvQ2.size(); ++j )
+            cvQ2[j] = get<MatrixXd>(oldResult[SLCrossValidationResultTypeTest][j][SLModelResultTypeQ2]).mean();
+        cvQ2.maxCoeff(&bestBetaIndex);
+    }
+    else if (modeCla)
+    {
+        for ( int j = 0; j < cvAUC.size(); ++j )
+            cvAUC[j] = get<MatrixXd>(oldResult[SLCrossValidationResultTypeTest][j][SLModelResultTypeAUC]).mean();
+        cvAUC.maxCoeff(&bestBetaIndex);
+    }
     outBeta << get<MatrixXd>(oldResult[SLCrossValidationResultTypeTest][bestBetaIndex][SLModelResultTypeBeta]) << endl;
     outBeta.close();
     

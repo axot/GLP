@@ -92,6 +92,10 @@ public:
     template <typename MP>
     MP getParameters() const { MP mp; return mp; }
     
+    // binary classity problem
+    // 0/1 case, min is 0, max is 1
+    double min, max;
+    
     virtual MatrixXd getRSS(const MatrixXd& RES) const;
     virtual MatrixXd getQ2 (const MatrixXd& RES, const MatrixXd& Y) const;
     virtual MatrixXd getACC(const MatrixXd& Y, const MatrixXd& predictY) const;

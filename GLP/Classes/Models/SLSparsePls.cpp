@@ -34,6 +34,16 @@ SLModelResult SLSparsePls::train(const MatrixXd& appendedX, const MatrixXd& theY
     {
         Y = theY;
         Res = Y;
+        
+        if (param.mode == PLSMODECLA)
+        {
+            min = Y.minCoeff();
+            max = Y.maxCoeff();
+            
+            double eps = 1e-4;
+            ASSERT((Y.array() > min+eps && Y.array() < max-eps).any() == false,
+                   "Only binary label was supported in classification mode");
+        }
     }
     
     ssize_t appendedXRows = appendedX.rows();
@@ -70,7 +80,7 @@ SLModelResult SLSparsePls::train(const MatrixXd& appendedX, const MatrixXd& theY
     
     Beta = W*(W.transpose()*X.transpose()*X*W).householderQr().solve(W.transpose()*X.transpose()*Y);
     
-    if (verbose)
+    if (param.verbose)
     {
         LOG(Y);
         LOG(X.rightCols(appendedXCols));
@@ -149,7 +159,6 @@ SLModelResult SLSparsePls::classify(const MatrixXd& tX, const MatrixXd& tY, SLMO
 
 bool SLSparsePls::setParameters(SLSparsePlsParameters& parameters)
 {
-    verbose = parameters.verbose;
     param = parameters;
     return true;
 }
