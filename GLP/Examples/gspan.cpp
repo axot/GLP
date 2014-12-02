@@ -101,7 +101,7 @@ int main(int argc, const char *argv[])
     gspan.setParameters(param);
     
     SLGraphMiningResult gspanResult;    
-    gspanResult = gspan.search((VectorXd)NULL, SLGraphMiningTasktypeTrain, SLGraphMiningResultTypeX | SLGraphMiningResultTypeRules);
+    gspanResult = gspan.search((VectorXd)NULL, SLGraphMiningTasktypeRegression, SLGraphMiningResultTypeX | SLGraphMiningResultTypeRules);
 
     stringstream filePrefix;
     
