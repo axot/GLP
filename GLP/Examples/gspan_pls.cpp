@@ -191,7 +191,7 @@ int main(int argc, const char *argv[])
                                     SLModelResultTypeBIC  |
                                     SLModelResultTypeCOV;
     
-    gspanResult = nipals.search((VectorXd)NULL, SLGraphMiningTasktypeRegression, SLGraphMiningResultTypeX | SLGraphMiningResultTypeRules);
+    gspanResult = nipals.search((VectorXd)NULL, SLGraphMiningTasktypeTrain, SLGraphMiningResultTypeX | SLGraphMiningResultTypeRules);
     
     X = get<MatrixXd>(gspanResult[SLGraphMiningResultTypeX]);
 

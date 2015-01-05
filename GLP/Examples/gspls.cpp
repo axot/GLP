@@ -285,7 +285,7 @@ int main(int argc, const char *argv[])
                 ResMean += Res.col(i);
             
             gspanResult = gspls.search(ResMean/Res.cols(),
-                                       SLGraphMiningTasktypeRegression,
+                                       SLGraphMiningTasktypeTrain,
                                        SLGraphMiningResultTypeX | SLGraphMiningResultTypeRules);
         }
         else if ( useRandomCol )
@@ -294,7 +294,7 @@ int main(int argc, const char *argv[])
             
             randomColumnIndex = rand();            
             gspanResult = gspls.search(Res.col(randomColumnIndex),
-                                       SLGraphMiningTasktypeRegression,
+                                       SLGraphMiningTasktypeTrain,
                                        SLGraphMiningResultTypeX | SLGraphMiningResultTypeRules);
         }
         else
@@ -303,7 +303,7 @@ int main(int argc, const char *argv[])
             ColSSum(Res).maxCoeff(&maxSquaredNormColumn);
             
             gspanResult = gspls.search(Res.col(maxSquaredNormColumn),
-                                       SLGraphMiningTasktypeRegression,
+                                       SLGraphMiningTasktypeTrain,
                                        SLGraphMiningResultTypeX | SLGraphMiningResultTypeRules);
         }
         MatrixXd x = get<MatrixXd>(gspanResult[SLGraphMiningResultTypeX]);

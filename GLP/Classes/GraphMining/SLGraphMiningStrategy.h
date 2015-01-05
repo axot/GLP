@@ -51,9 +51,9 @@ typedef map<SLGRAPHMININGRESULTYPE, boost::variant< VectorXd,
                                                     > > SLGraphMiningResult;
 
 enum{
-    SLGraphMiningTasktypeNotDefined      = 0,
-    SLGraphMiningTasktypeRegression      = 1 << 0,
-    SLGraphMiningTasktypeClassification  = 1 << 1,
+    SLGraphMiningTasktypeNotDefined   = 0,
+    SLGraphMiningTasktypeTrain        = 1 << 0,
+    SLGraphMiningTasktypeClassify     = 1 << 1,
 };
 
 typedef unsigned int SLGRAPHMININGTASKTYPE;
