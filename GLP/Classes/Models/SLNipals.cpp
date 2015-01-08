@@ -56,7 +56,7 @@ SLModelResult SLNipals::train(const MatrixXd& theX, const MatrixXd& theY, SLMODE
     
     T.rightCols(1).normalize();
     
-    Beta = W*(W.transpose()*X.transpose()*X*W).householderQr().solve(W.transpose()*X.transpose()*Y);
+    Beta = W*(W.transpose()*X.transpose()*X*W).colPivHouseholderQr().solve(W.transpose()*X.transpose()*Y);
     Res = Y - X*Beta;
     
 //    if (verbose)

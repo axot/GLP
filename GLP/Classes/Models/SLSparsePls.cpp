@@ -78,7 +78,7 @@ SLModelResult SLSparsePls::train(const MatrixXd& appendedX, const MatrixXd& theY
     
     T.rightCols(1).normalize();
     
-    Beta = W*(W.transpose()*X.transpose()*X*W).householderQr().solve(W.transpose()*X.transpose()*Y);
+    Beta = W*(W.transpose()*X.transpose()*X*W).colPivHouseholderQr().solve(W.transpose()*X.transpose()*Y);
     
     if (param.verbose)
     {
