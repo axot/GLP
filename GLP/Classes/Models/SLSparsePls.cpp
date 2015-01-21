@@ -96,16 +96,16 @@ SLModelResult SLSparsePls::train(const MatrixXd& appendedX, const MatrixXd& theY
     
     Beta = W*(W.transpose()*X.transpose()*X*W).colPivHouseholderQr().solve(W.transpose()*X.transpose()*Y);
     
-//    if (param.verbose)
-//    {
-//        LOG(Y);
-//        LOG(X.rightCols(appendedXCols));
-//        LOG(W);
-//        LOG(selectedCol);
-//        LOG(Beta);
-//        LOG(X*Beta.col(0));
-//        getchar();
-//    }
+    if (param.verbose)
+    {
+        LOG(Y);
+        LOG(X.rightCols(appendedXCols));
+        LOG(W);
+        LOG(selectedCol);
+        LOG(Beta);
+        LOG(X*Beta.col(0));
+        getchar();
+    }
     Res = Y - X*Beta;
     
     return getTrainResult(type);
