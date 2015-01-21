@@ -43,9 +43,7 @@ public:
     {
         model.setParameters(modelParameters);
         graphMining.setParameters(graphMiningParameters);
-        typename SLCrossValidation<M>::SLCrossValidationParameters param;
-        param.modelClone = model.getModel();
-        cv.setParameters(param);
+        cv.setParameters(cvParam);
     }
 
     // SLModelStrategy
@@ -87,8 +85,16 @@ public:
 
     void setCrossValidationParameters(typename SLCrossValidation<M>::SLCrossValidationParameters& parameters)
     {
-        parameters.modelClone = model.getModel();;
+        parameters.modelClone = model.getModel();
         cv.setParameters(parameters);
+    }
+    
+    template <typename MP>
+    void setModelParameters(MP & param)
+    {
+        model.setParameters(param);
+        cvParam.modelClone = model.getModel();
+        cv.setParameters(cvParam);
     }
     
     const SLCrossValidationResultHistory& getResultHistory() const
@@ -100,6 +106,7 @@ private:
     SLModel<M> model;
     SLGraphMining<G> graphMining;
     SLCrossValidation<M> cv;
+    typename SLCrossValidation<M>::SLCrossValidationParameters cvParam;
 };
 
 #endif /* defined(__GLP__SLGlpCombination__) */

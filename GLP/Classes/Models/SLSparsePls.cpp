@@ -49,11 +49,27 @@ SLModelResult SLSparsePls::train(const MatrixXd& appendedX, const MatrixXd& theY
     ssize_t appendedXRows = appendedX.rows();
     ssize_t appendedXCols = appendedX.cols();
     ssize_t oldXCols      = X.cols();
-    
-    ssize_t maxSquaredNormColumn;
-    ColSSum(Res).maxCoeff(&maxSquaredNormColumn);
-    VectorXd largestResCol = Res.col(maxSquaredNormColumn);
-
+       
+    ssize_t selectedColIndex;
+    VectorXd selectedCol;
+    if(param.colMode == PLSCOLSELVAR)
+    {
+        ColVariance(Res).maxCoeff(&selectedColIndex);
+        selectedCol = Res.col(selectedColIndex);
+    }
+    else if(param.colMode == PLSCOLSELRAND)
+    {
+        selectedCol = Res.col(param.randIndex);
+    }
+    else if(param.colMode == PLSCOLSELAVG)
+    {
+        VectorXd ResMean(Res.rows());
+        ResMean.setZero();
+        
+        for (ssize_t i=0; i<Res.cols(); ++i)
+            ResMean += Res.col(i);
+        selectedCol = ResMean/Res.cols();
+    }
     X.conservativeResize(appendedXRows, oldXCols+appendedXCols);
     X.rightCols(appendedXCols).setZero();
     X << X.leftCols(oldXCols), appendedX;
@@ -62,7 +78,7 @@ SLModelResult SLSparsePls::train(const MatrixXd& appendedX, const MatrixXd& theY
     W.bottomRows(appendedXCols).setZero();
     W.rightCols(1).setZero();
     
-    W.rightCols(1) = X.transpose()*largestResCol;
+    W.rightCols(1) = X.transpose()*selectedCol;
     W.rightCols(1).normalize();
         
     T.conservativeResize(appendedXRows, T.cols()+1);
@@ -80,16 +96,16 @@ SLModelResult SLSparsePls::train(const MatrixXd& appendedX, const MatrixXd& theY
     
     Beta = W*(W.transpose()*X.transpose()*X*W).colPivHouseholderQr().solve(W.transpose()*X.transpose()*Y);
     
-    if (param.verbose)
-    {
-        LOG(Y);
-        LOG(X.rightCols(appendedXCols));
-        LOG(W);
-        LOG(largestResCol);
-        LOG(Beta);
-        LOG(X*Beta.col(0));
-        getchar();
-    }
+//    if (param.verbose)
+//    {
+//        LOG(Y);
+//        LOG(X.rightCols(appendedXCols));
+//        LOG(W);
+//        LOG(selectedCol);
+//        LOG(Beta);
+//        LOG(X*Beta.col(0));
+//        getchar();
+//    }
     Res = Y - X*Beta;
     
     return getTrainResult(type);

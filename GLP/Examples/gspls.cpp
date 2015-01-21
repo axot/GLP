@@ -200,6 +200,13 @@ int main(int argc, const char *argv[])
         splsParam.mode = PLSMODECLA;
     else
         splsParam.mode = PLSMODENON;
+    
+    if (useAverageCol)
+        splsParam.colMode = PLSCOLSELAVG;
+    else if (useRandomCol)
+        splsParam.colMode = PLSCOLSELRAND;
+    else
+        splsParam.colMode = PLSCOLSELVAR;
         
     SLGspan::SLGspanParameters gspanParam;
     gspanParam.minsup = minsup;
@@ -253,7 +260,7 @@ int main(int argc, const char *argv[])
     unsigned int i = 0;
     SLGraphMiningResult gspanResult;
     
-    mt19937 gen( static_cast<unsigned long>(time(NULL)));
+    mt19937 gen(static_cast<unsigned long>(888));
     uniform_int<> dist(0, Y.cols()-1);
     variate_generator< mt19937&, uniform_int<> > rand( gen, dist );
     
@@ -292,7 +299,10 @@ int main(int argc, const char *argv[])
         {
             long randomColumnIndex;
             
-            randomColumnIndex = rand();            
+            randomColumnIndex = rand();
+            cerr << "gspls rand: " << randomColumnIndex << endl;
+            splsParam.randIndex = randomColumnIndex;
+            gspls.setModelParameters(splsParam);
             gspanResult = gspls.search(Res.col(randomColumnIndex),
                                        SLGraphMiningTasktypeTrain,
                                        SLGraphMiningResultTypeX | SLGraphMiningResultTypeRules);
@@ -300,7 +310,7 @@ int main(int argc, const char *argv[])
         else
         {
             long maxSquaredNormColumn;
-            ColSSum(Res).maxCoeff(&maxSquaredNormColumn);
+            ColVariance(Res).maxCoeff(&maxSquaredNormColumn);
             
             gspanResult = gspls.search(Res.col(maxSquaredNormColumn),
                                        SLGraphMiningTasktypeTrain,

@@ -33,9 +33,19 @@
 
 enum{
     PLSMODENON = 0,
-    PLSMODEREG = 1,
-    PLSMODECLA = 2
+    PLSMODEREG = 1 << 0,
+    PLSMODECLA = 1 << 1
 };
+
+typedef unsigned int SLPLSMODE;
+
+enum{
+    PLSCOLSELVAR  = 0,
+    PLSCOLSELRAND = 1 << 0,
+    PLSCOLSELAVG  = 1 << 1
+};
+
+typedef unsigned int SLPLSCOLSEL;
 
 class SLSparsePls : public SLModelStrategy
 {
@@ -43,11 +53,17 @@ public:
     class SLSparsePlsParameters
     {
     public:
-        SLSparsePlsParameters() : verbose(false), mode(PLSMODEREG) {}
+        SLSparsePlsParameters() :
+            verbose(false),
+            mode(PLSMODEREG),
+            colMode(PLSCOLSELVAR),
+            randIndex(0) {}
         
     public:
         bool verbose;
-        int mode;
+        SLPLSMODE mode;
+        SLPLSCOLSEL colMode;
+        int randIndex;
     };
     
 public:

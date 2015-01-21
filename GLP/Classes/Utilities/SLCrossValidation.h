@@ -214,6 +214,9 @@ SLCrossValidationResults SLCrossValidation<T>::crossValidation(const MatrixXd& X
         MatrixXd testX = cvSplitMatrix(shuffledX, shuffledX.rows()-oneUnitLength*(i+1), oneUnitLength);
         MatrixXd testY = cvSplitMatrix(shuffledY, shuffledY.rows()-oneUnitLength*(i+1), oneUnitLength);
         
+        BOOST_AUTO(modelParameters, modelClone.getParameters());
+        cvModels[i].setParameters(modelParameters);
+        
         SLCrossValidationResults eachResult;
         eachResult[SLCrossValidationResultTypeTrain]      = crossValidationTrain(i, trainX, trainY, resultType, methodType);
         eachResult[SLCrossValidationResultTypeValidation] = crossValidationValidationClassify(i, validationX, validationY, resultType, methodType);
@@ -252,6 +255,7 @@ SLGlpMultipleResults SLCrossValidation<T>::crossValidationTrain(const size_t ind
                                                                 SLCROSSVALIDATIONMETHODSTYPE methodType)
 {
     SLGlpMultipleResults result;
+    
     result.push_back(cvModels[index].train(X, Y, resultType));
     return result;
 }

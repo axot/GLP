@@ -32,6 +32,7 @@ using namespace Eigen;
 #define ColSSum(x)      (x).colwise().squaredNorm()
 #define Center(x)       EigenExt::centering(x)
 #define Scale(x)        EigenExt::scaleAndCenter(x)
+#define ColVariance(x)  (ColSSum((Center(x)))/double(x.rows() - 1))
 
 #define ASSERT(condition, message) \
 do { \
