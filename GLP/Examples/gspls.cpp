@@ -300,7 +300,6 @@ int main(int argc, const char *argv[])
             long randomColumnIndex;
             
             randomColumnIndex = rand();
-            cerr << "gspls rand: " << randomColumnIndex << endl;
             splsParam.randIndex = randomColumnIndex;
             gspls.setModelParameters(splsParam);
             gspanResult = gspls.search(Res.col(randomColumnIndex),

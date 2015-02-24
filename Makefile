@@ -3,12 +3,20 @@
 RELEASEBUILDIR=build/GLP.build/Release
 DEBUGBUILDIR=build/GLP.build/Debug
 
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Linux)
+  PREFIX = /usr
+endif
+ifeq ($(UNAME_S),Darwin)
+  PREFIX = /usr/local/Cellar/glp/1.0
+endif
+
 all: release
 
 release: 
 	@mkdir -p $(RELEASEBUILDIR);			\
 	cd $(RELEASEBUILDIR);				\
-	cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local/Cellar/glp/1.0 ../../../GLP;	\
+	cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$(PREFIX) ../../../GLP;	\
 	make -j4;					\
 	cd -
 

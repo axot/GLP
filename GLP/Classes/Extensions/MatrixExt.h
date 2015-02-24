@@ -43,59 +43,132 @@
 
 #define SMALL_BUF_SIZE (1024 * 16)
 
+/** EigenExt namespace, an eigen extension
+ *
+ * Supply missing matrix file I/O and data preprocessing functions.
+
+ # Basic usage
+ ## Matrix file I/O
+ Suppose the input matrix file name is `Matrix.data`, we want load this data to `Eigen::MatrixXd mat`
+ 
+ 1. Using single space as delimiter
+ ~~~{.cpp}
+   EigenExt::loadMatrixFromFileFast(mat, "Matrix.data");
+ ~~~
+ 
+ 2. Using other single delimiter, ex: ','
+ ~~~{.cpp}
+   EigenExt::loadMatrixFromFileFast(mat, "Matrix.data", ',');
+ ~~~
+ 
+ 3. Not sure which delimiter was used
+ ~~~{.cpp}
+   EigenExt::loadMatrixFromFile(mat, "Matrix.data");
+ ~~~
+ 
+ ## Data preprocessing
+ Suppose we have a `Eigen::MatrixXd mat`, we want do some preprocess:
+ 1. Centering each column of matrix
+ ~~~{.cpp}
+    Eigen::MatrixXd result = EigenExt::centering(mat);
+ ~~~
+ 
+ 2. Scale and centering each column of matrix
+ ~~~{.cpp}
+    Eigen::MatrixXd result = EigenExt::scaleAndCenter(mat);
+ ~~~
+ */
 namespace EigenExt
 {
     using namespace std;
     using namespace Eigen;
     using namespace boost::xpressive;
 
+    //! @cond PRIVATE
     typedef SparseMatrix<int> SMatrixXi;
-
-    /* RegEx Version: flexible matrix format, but slower
+    //! @endcond
+    
+    /** A regex version of matrix file loading
+     *
+     * Flexible matrix format, but slower
      *
      * Example:
+     * ~~~{.cpp}
+     * MatrixXd mat;
+     * loadMatrixFromFile(mat, "Matrix.data");
+     * ~~~
      *
-     * MatrixXd X;
-     * loadMatrixFromFile(X, "Matrix.data");
+     * @see loadMatrixFromFileFast
+     * @see loadMatrixFromFileSuperfast
      */
     template<typename MatrixType>
     bool loadMatrixFromFile(MatrixType& m, const char* filename);
 
-    /* Fast Version
+    /** A normal version of matrix file loading
+     *
      * strict matrix format, but more faster
      *
      * Matrix must be formated like below,
      * space can be replaced with any delimiter
      * and only signle delimiter is permitted
      *
-     * Matrix Sample:
-     * 1 2 3
-     * 4 5 6
-     * 7 8 9
+     * Input `Matrix.data` Sample:\n
+     * 1 2 3\n
+     * 4 5 6\n
+     * 7 8 9\n\n
      *
-     * Examples:
-     *
-     * MatrixXd X;
+     * Code snippet:
+     * ~~~{.cpp}
+     * MatrixXd mat;
      *
      * // use single space as delimiter
-     * loadMatrixFromFileFast(X, "Matrix.data");
+     * loadMatrixFromFileFast(mat, "Matrix.data");
      *
      * // use custom delimiter
-     * loadMatrixFromFileFast(X, "Matrix.data", ';');
+     * loadMatrixFromFileFast(mat, "Matrix.data", ';');
+     * ~~~
+     *
+     * @param m matrix object for storing data
+     * @param filename input file name
+     * @see loadMatrixFromFile
+     * @see loadMatrixFromFileSuperfast
      */
     template<typename MatrixType>
     bool loadMatrixFromFileFast(MatrixType& m, const char* filename, bool doesUseMemoryBoost = false);
 
+    /** A fast version of matrix file loading
+     *
+     * @param m matrix object for storing data
+     * @param filename input file name
+     * @param doesUseMemoryBoost use memory for faster performance
+     * @see loadMatrixFromFile
+     * @see loadMatrixFromFileSuperfast
+     */
     template<typename MatrixType>
     bool loadMatrixFromFileFast(MatrixType& m, const char* filename, const char delim, bool doesUseMemoryBoost = false);
 
+    /**
+     * A fastest version of matrix file loading
+     *
+     * @deprecated Maybe the best performance version of matrix file loading,
+     * but this is OS dependence for some cases.
+     *
+     * @param m matrix object for storing data
+     * @param filename input file name
+     * @param delim the delimiter symbol of input file
+     * @param doesUseMemoryBoost use memory for better performance
+     * @see loadMatrixFromFile
+     * @see loadMatrixFromFileFast
+     */
     template<typename MatrixType>
     bool loadMatrixFromFileSuperfast(MatrixType& m, const char* filename, const char delim);
-
+    
     template<typename MatrixType>
     MatrixType centering(MatrixType& m);
 
     /* Implementation */
+    
+    //! @cond PRIVATE
     inline void setMatValue(vector< Triplet<int> >& tripletList, MatrixXd& m, int row, int col, char* begin)
     {
         m(row,col) = atof(begin);
@@ -126,7 +199,8 @@ namespace EigenExt
     {
         m.setFromTriplets(tripletList.begin(), tripletList.end());
     }
-
+    //! @endcond
+    
     template<typename MatrixType>
     bool loadMatrixFromFile(MatrixType& m, const char* filename)
     {
@@ -526,12 +600,20 @@ namespace EigenExt
         return true;
     }
 
+    /** Centering each column of matrix
+     * @param m the input matrix
+     * @return centered matrix
+     */
     template<typename MatrixType>
     inline MatrixType centering(MatrixType& m)
     {
         return (m.rows()>1) ? (m.rowwise() - m.colwise().mean()) : m;
     }
     
+    /** Scale and centering each column of matrix
+     * @param m the input matrix
+     * @return scaled and centered matrix
+     */
     template<typename MatrixType>
     inline MatrixType scaleAndCenter(MatrixType& m)
     {
