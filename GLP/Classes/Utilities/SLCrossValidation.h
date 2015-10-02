@@ -41,9 +41,12 @@ using namespace std;
 using namespace boost;
 using namespace Eigen;
 
+/**
+ SLCROSSVALIDATIONMETHODSTYPE definition
+ */
 enum{
-    SLCrossValidationMethodsUsingWholeData                  = 0,
-    SLCrossValidationMethodsUsingAppendedXAsClassifyData    = 1 << 0,
+    SLCrossValidationMethodsUsingWholeData                  = 0,        /**< param X in crossValidationTrain() is a full size of matrix*/
+    SLCrossValidationMethodsUsingAppendedXAsClassifyData    = 1 << 0,   /**< param X in crossValidationTrain() will be appened to previous matrix*/
 };
 
 typedef unsigned int SLCROSSVALIDATIONMETHODSTYPE;

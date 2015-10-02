@@ -43,9 +43,18 @@ do { \
     } \
 }while (false)
 
+/**
+ SLUtility class
+ */
 class SLUtility
 {
 public:
+    /**
+     Detect if only one bit is set in `type`
+     
+     @param type bitset
+     @return return true if only one bit is set or false
+     */
     static bool isIncludedOnlyOneType(size_t type)
     {
         if ( type == 0 )

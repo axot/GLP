@@ -50,52 +50,58 @@ typedef unsigned int SLMODELRESULTYPE;
 typedef map<SLMODELRESULTYPE, boost::variant< VectorXd, MatrixXd, string > > SLModelResult;
 
 /**
- * @class SLModelStrategy <GLP/Models/SLModelStrategy.h>
+ * SLModelStrategy class
  */
 class SLModelStrategy
 {
-public:    
-    /**
-     * @brief Train stage
+public:
+    /** Train model
      * @param X X matrix of train data
      * @param Y Y matrix of train data
      * @param type type of results
      *
-     * @result the results stored in mapped structure.
+     * @return the results stored in mapped structure.
      */
     virtual SLModelResult train(const MatrixXd& X, const MatrixXd& Y, SLMODELRESULTYPE type) = 0;
         
-    /* Classify:
-     * Input
-     *     tX: X matrix of test data
-     *     tY: Y matrix of test data
-     *   type: type of results
+    /** Classify model
+     * @param tX X matrix of test data
+     * @param tY Y matrix of test data
+     * @param type type of results
      *
-     * Return: the results stored in mapped structure
+     * @return the results stored in mapped structure
      */
     virtual SLModelResult classify(const MatrixXd& tX, const MatrixXd& tY, SLMODELRESULTYPE type) const = 0;
         
-    /* Set Parameters:
-     * Input
-     *      parameters: Model assignable parameters
+    /** Setter of Parameters
+     * @param parameters Model assignable parameters
      *
-     * Return: true if sucessed.
+     * @return true if sucessed.
      */
     template <typename MP>
     bool setParameters(MP& parameters) { return true; };
     
-    /* Get Parameters:
+    /** Getter of Parameters
      *
-     *      Return: current parameters.
-     *  Discussion: for implementng cross validation you have to override this method.
+     * implementng cross validation you have to override this method.
+     *
+     * @return current parameters.
      */
     template <typename MP>
     MP getParameters() const { MP mp; return mp; }
     
-    // binary classity problem
-    // 0/1 case, min is 0, max is 1
+    /*! @name Varibles for binary classify problem
+     *
+     * for the case of 0/1 label, min is 0, max is 1
+     */
+    //@{
     double min, max;
+    //@}
     
+    /*! @name Common calculation methods of performance measures
+     *
+     */
+    //@{
     virtual MatrixXd getRSS(const MatrixXd& RES) const;
     virtual MatrixXd getQ2 (const MatrixXd& RES, const MatrixXd& Y) const;
     virtual MatrixXd getACC(const MatrixXd& Y, const MatrixXd& predictY) const;
@@ -103,6 +109,7 @@ public:
     virtual MatrixXd getAIC(const MatrixXd& Y, const MatrixXd& predictY, const size_t numOfParams) const;
     virtual MatrixXd getBIC(const MatrixXd& Y, const MatrixXd& predictY, const size_t numOfParams) const;
     virtual MatrixXd getCOV(const MatrixXd& Y, const MatrixXd& predictY) const;
+    //@}
 
 private:
     template <typename T1, typename T2>
