@@ -54,7 +54,6 @@ if(EIGEN3_FOUND)
   include_directories(${EIGEN3_INCLUDE_DIR})
 endif()
 
-include_directories(${CMAKE_SOURCE_DIR}/../build/Headers)
 link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 
 # The version number.
