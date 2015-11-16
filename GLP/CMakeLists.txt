@@ -60,7 +60,7 @@ link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 set(GLP_VERSION_MAJOR 1 CACHE INTERNAL "")
 set(GLP_VERSION_MINOR 0 CACHE INTERNAL "")
 
-add_subdirectory(Classes)
+add_subdirectory(Library)
 add_subdirectory(Examples)
 
 enable_testing()
