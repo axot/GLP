@@ -3,7 +3,6 @@ file(GLOB_RECURSE SOURCES "*.cpp")
 add_library(glp SHARED ${SOURCES})
 set_target_properties(glp PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 set_target_properties(glp PROPERTIES VERSION ${GLP_VERSION_MAJOR}.${GLP_VERSION_MINOR} SOVERSION ${GLP_VERSION_MAJOR})
-add_library(GLP ALIAS glp)
 target_include_directories(glp PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_library(glp_static STATIC ${SOURCES})
