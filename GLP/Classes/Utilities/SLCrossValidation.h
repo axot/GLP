@@ -36,6 +36,7 @@
 #include "../SLUtility.h"
 #include "SLCrossValidationResults.h"
 #include "SLCrossValidationResultHistory.h"
+#include "../GraphMining/SLGspan.h"
 
 using namespace std;
 using namespace boost;
@@ -49,7 +50,14 @@ enum{
     SLCrossValidationMethodsUsingAppendedXAsClassifyData    = 1 << 0,   /**< param X in crossValidationTrain() will be appened to previous matrix*/
 };
 
+enum{
+    SLSelectionColumnStrategyAverage  = 0,
+    SLSelectionColumnStrategyRandom   = 1,
+    SLSelectionColumnStrategyMaxCoeff = 2,
+};
+
 typedef unsigned int SLCROSSVALIDATIONMETHODSTYPE;
+typedef unsigned int SLCROSS_VALIDATION_SELECTION_STRATEGY;
 
 template <typename T>
 class SLCrossValidation
@@ -58,12 +66,13 @@ public:
     class SLCrossValidationParameters
     {
     public:
-        SLCrossValidationParameters() : kFold(10), resultHistorySize(5), useShuffledData(false) {}
+        SLCrossValidationParameters() : kFold(10), resultHistorySize(5), useShuffledData(false), strategy(SLSelectionColumnStrategyMaxCoeff) {}
         
     public:
         size_t kFold;
         size_t resultHistorySize;
         bool useShuffledData;
+        SLCROSS_VALIDATION_SELECTION_STRATEGY strategy;
         T modelClone;
     };
 
@@ -101,6 +110,7 @@ public:
         kFold = parameters.kFold;
         resultHistory.resultHistorySize = parameters.resultHistorySize;
         modelClone = parameters.modelClone;
+        strategy = parameters.strategy;
     }
 
     /* Cross Validation Result History:
@@ -131,6 +141,8 @@ private:
     SLGlpMultipleResults crossValidationTrain(const size_t index,
                                               const MatrixXd& X,
                                               const MatrixXd& Y,
+                                              const MatrixXd& Res,
+                                              const SLGspan& gspan,
                                               SLMODELRESULTYPE resultType,
                                               SLCROSSVALIDATIONMETHODSTYPE methodType);
     
@@ -152,6 +164,7 @@ private:
     size_t kFold;
     SLCrossValidationResultHistory resultHistory;
     T modelClone;
+    SLCROSS_VALIDATION_SELECTION_STRATEGY strategy;
     
     // not assignable parameters
     VectorXi randomIndexs;
@@ -204,8 +217,12 @@ SLCrossValidationResults SLCrossValidation<T>::crossValidation(const MatrixXd& X
         }
     }
     
+    MatrixXd& Res = shuffledY;
     size_t oneUnitLength = shuffledX.rows()/kFold;
     SLCrossValidationResults result;
+    SLGspan gspan;
+    SLGspan::SLGspanParameters param;
+
     for (size_t i = 0; i < kFold; ++i)
     {
         MatrixXd trainX = cvSplitMatrix(shuffledX, -oneUnitLength*i, (kFold-2)*oneUnitLength);
@@ -221,7 +238,7 @@ SLCrossValidationResults SLCrossValidation<T>::crossValidation(const MatrixXd& X
         cvModels[i].setParameters(modelParameters);
         
         SLCrossValidationResults eachResult;
-        eachResult[SLCrossValidationResultTypeTrain]      = crossValidationTrain(i, trainX, trainY, resultType, methodType);
+        eachResult[SLCrossValidationResultTypeTrain]      = crossValidationTrain(i, trainX, trainY, Res, gspan, resultType, methodType);
         eachResult[SLCrossValidationResultTypeValidation] = crossValidationValidationClassify(i, validationX, validationY, resultType, methodType);
         eachResult[SLCrossValidationResultTypeTest]       = crossValidationTestClassify(i, testX, testY, resultType, methodType);
         
@@ -254,11 +271,47 @@ template <typename T>
 SLGlpMultipleResults SLCrossValidation<T>::crossValidationTrain(const size_t index,
                                                                 const MatrixXd& X,
                                                                 const MatrixXd& Y,
+                                                                const MatrixXd& Res,
+                                                                const SLGspan& gspan,
                                                                 SLMODELRESULTYPE resultType,
                                                                 SLCROSSVALIDATIONMETHODSTYPE methodType)
 {
     SLGlpMultipleResults result;
-    
+    SLGraphMiningResult gspanResult;
+
+    if ( strategy == SLSelectionColumnStrategyAverage )
+    {
+        VectorXd ResMean(Res.rows());
+        ResMean.setZero();
+        
+        for (ssize_t i=0; i<Res.cols(); ++i)
+            ResMean += Res.col(i);
+        
+        gspanResult = gspan.search(ResMean/Res.cols(),
+                                   SLGraphMiningTasktypeTrain,
+                                   SLGraphMiningResultTypeX | SLGraphMiningResultTypeRules);
+    }
+    else if ( strategy == SLSelectionColumnStrategyRandom )
+    {
+        long randomColumnIndex;
+        
+        randomColumnIndex = rand();
+        splsParam.randIndex = randomColumnIndex;
+        gspls.setModelParameters(splsParam);
+        gspanResult = gspan.search(Res.col(randomColumnIndex),
+                                   SLGraphMiningTasktypeTrain,
+                                   SLGraphMiningResultTypeX | SLGraphMiningResultTypeRules);
+    }
+    else if ( strategy == SLSelectionColumnStrategyMaxCoeff )
+    {
+        long maxSquaredNormColumn;
+        ColVariance(Res).maxCoeff(&maxSquaredNormColumn);
+        
+        gspanResult = gspan.search(Res.col(maxSquaredNormColumn),
+                                   SLGraphMiningTasktypeTrain,
+                                   SLGraphMiningResultTypeX | SLGraphMiningResultTypeRules);
+    }
+
     result.push_back(cvModels[index].train(X, Y, resultType));
     return result;
 }
