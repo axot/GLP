@@ -14,4 +14,6 @@ install_targets(/lib glp glp_static)
 
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
         DESTINATION include
-        FILES_MATCHING PATTERN "*.h")
+        FILES_MATCHING
+        PATTERN "*.h"
+        PATTERN "*.hh")
