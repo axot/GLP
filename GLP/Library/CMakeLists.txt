@@ -1,4 +1,9 @@
-file(GLOB_RECURSE SOURCES "*.cpp")
+file(GLOB_RECURSE SOURCES
+    RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+    "*.cpp"
+    "*.h"
+    "*.hh"
+)
 
 add_library(glp SHARED ${SOURCES})
 set_target_properties(glp PROPERTIES CLEAN_DIRECT_OUTPUT 1)
