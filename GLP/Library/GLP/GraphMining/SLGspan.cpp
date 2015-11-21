@@ -178,6 +178,85 @@ SLGraphMiningResult SLGspan::search(VectorXd residual, SLGRAPHMININGTASKTYPE tas
     return result;
 }
 
+double SLGspan::classify (Graph &g, int flag)
+{
+    //    mode = CLASSIFY;
+    
+    result.clear ();
+    rule_cache.clear ();
+    
+    Projected_map3 root;
+    EdgeList edges;
+    DFS_CODE.clear ();
+    
+    transaction.clear ();
+    transaction.push_back (g);
+    
+    for (unsigned int from = 0; from < g.size() ; ++from) {
+        if (Utility::get_forward_root (g, g[from], edges)) {
+            for (EdgeList::iterator it = edges.begin(); it != edges.end();  ++it)
+                root[g[from].label][(*it)->elabel][g[(*it)->to].label].push (0, *it, 0);
+        }
+    }
+    
+    for (Projected_iterator3 fromlabel = root.begin(); fromlabel != root.end(); ++fromlabel) {
+        for (Projected_iterator2 elabel = fromlabel->second.begin(); elabel != fromlabel->second.end(); ++elabel) {
+            for (Projected_iterator1 tolabel = elabel->second.begin();
+                 tolabel != elabel->second.end(); ++tolabel) {
+                DFS_CODE.push (0, 1, fromlabel->first, elabel->first, tolabel->first);
+                project (tolabel->second);
+                DFS_CODE.pop ();
+            }
+        }
+    }
+    
+    std::sort (result.begin(), result.end());
+    result.erase (std::unique (result.begin(), result.end()), result.end());
+    
+    double r = bias;
+    
+    /* sum of matched patterns */
+    for (unsigned int i = 0; i < result.size(); ++i) r += alpha[result[i]];
+    
+    std::vector<double> notMatched;
+    /* sum of these not matched patterns */
+    for (unsigned int i = 0; i < alphaSize; ++i) notMatched.push_back(alpha[i]);
+    
+    int m, n;
+    m = n = 0;
+    
+    for (std::vector<double>::iterator it = notMatched.begin(); it != notMatched.end();)
+    {
+        if (result.size() && (unsigned)n < result.size() && (m == result[n]))
+        {
+            it = notMatched.erase(it);
+            ++n;
+        }
+        else
+        {
+            ++it;
+        }
+        ++m;
+    }
+    
+    for (unsigned int i = 0; i < notMatched.size(); ++i) r += flag*notMatched[i];
+    
+    if (os) {
+        
+        std::vector <std::pair <std::string, double> > tmp2;
+        
+        for (std::map <std::string, double>::iterator it = rules.begin(); it != rules.end(); ++it)
+            tmp2.push_back (std::make_pair <std::string, double> (it->first,  it->second));
+        
+        std::sort (tmp2.begin(), tmp2.end(), pair_2nd_cmp<std::string, double>());
+        
+        for (std::vector <std::pair <std::string, double> >::iterator it = tmp2.begin(); it != tmp2.end(); ++it)
+            *os << "rule: " << it->second << "\t" << it->first << std::endl;
+    }
+    
+    return r;
+}
+
 // Private Methods
 bool SLGspan::is_min()
 {

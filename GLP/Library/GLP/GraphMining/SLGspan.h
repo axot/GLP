@@ -99,6 +99,8 @@ public:
      * Return: true if sucessed.
      */
     bool setParameters(SLGspanParameters& parameters);
+    
+    double classify (Graph &g, int flag)
 
 private:
     void init();

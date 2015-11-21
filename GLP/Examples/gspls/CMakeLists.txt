@@ -1,4 +1,4 @@
-file(GLOB_RECURSE SOURCES "*.cpp" "gspls")
+file(GLOB_RECURSE SOURCES "*.cpp" "*.hpp" "gspls")
 
 add_executable(gspls ${SOURCES})
 add_executable(gspls_static ${SOURCES})
