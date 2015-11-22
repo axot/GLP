@@ -36,9 +36,7 @@ public:
         topk(1),
         resultHistorySize(3),
         trainFile(NULL),
-        ValidFile(NULL),
-        trainRespFile(NULL),
-        ValidRespFile(NULL),
+        respFile(NULL),
         verbose(false),
         boost(false),
         useShuffledData(false),
@@ -144,9 +142,7 @@ public:
     size_t fold;
     size_t resultHistorySize;
     char* trainFile;
-    char* ValidFile;
-    char* trainRespFile;
-    char* validRespFile;
+    char* respFile;
     bool verbose;
     bool boost;
     bool useShuffledData;
@@ -161,11 +157,13 @@ private:
     SLGsplsTrainParameters _param;
     MatrixXd _trainMat;
     MatrixXd _trainRespMat;
-    MatrixXd _ValidMat;
-    MatrixXd _ValidRespMat;
     ptime _timeStart, _timeEnd;
     SLGlpProduct<SLSparsePls, SLGspan>* _gspls;
     
+public:
+    int validStart;   
+    int validLength;
+
 public:
     static SLGsplsTrain* initWithParam(SLGsplsTrainParameters&);
     

@@ -58,22 +58,19 @@ MatrixXd& getTrainMat()
 
 MatrixXd& SLGsplsTrain::getTrainRespMat()
 {
-    if ( this->_param.trainRespFile != NULL && this->_trainRespMat == NULL )
-        EigenExt::loadMatrixFromFile(this->_trainRespMat, this->_param.trainRespFile);
+    if ( this->_param.respFile != NULL && this->_trainRespMat == NULL )
+        EigenExt::loadMatrixFromFile(this->_trainRespMat, this->_param.respFile);
     
     return this->_trainRespMat;
 }
 
 MatrixXd& getValidMat()
 {
-    
+    return this->_trainMat[this->validStart] 
 }
 
 MatrixXd& getValidRespMat()
 {
-    if ( this->_param.validRespFile != NULL && this->_vaildRespMat == NULL )
-        EigenExt::loadMatrixFromFile(this->_vaildRespMat, this->_param.validRespFile);
-    
     return this->_vaildRespMat;
 }
 
