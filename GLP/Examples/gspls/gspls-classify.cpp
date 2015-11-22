@@ -132,9 +132,9 @@ int main (int argc, char **argv)
         
         double y;
         
-        if (yMatrixFile)         y = YMatrix.col(yCol)[count];
-        else if (option == PLS)  y = (double)g.regy;
-        else                     y = (double)g.y;
+        if (yMatrixFile)                y = YMatrix.col(yCol)[count];
+        else if (option == Regression)  y = (double)g.regy;
+        else                            y = (double)g.y;
         
         Y.conservativeResize(Y.size()+1);
         Y[Y.size()-1] = y;
@@ -186,7 +186,7 @@ int main (int argc, char **argv)
     }
     std::cout << "Realized margin: " << margin << std::endl;
     std::cout << "AUC: " << (double)auc/((double)tp*(double)fp) << std::endl;
-    if (option == PLS)  std::cout << "Q2: " << 1-(p2/y2) << std::endl;
+    if (option == Regression)  std::cout << "Q2: " << 1-(p2/y2) << std::endl;
     
     double prec = 1.0 * res_a/(res_a + res_b);
     double rec  = 1.0 * res_a/(res_a + res_c);

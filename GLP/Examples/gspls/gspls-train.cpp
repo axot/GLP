@@ -58,9 +58,6 @@ MatrixXd& getTrainMat()
 
 MatrixXd& SLGsplsTrain::getTrainRespMat()
 {
-    if ( this->_param.respFile != NULL && this->_trainRespMat == NULL )
-        EigenExt::loadMatrixFromFile(this->_trainRespMat, this->_param.respFile);
-    
     return this->_trainRespMat;
 }
 
@@ -89,38 +86,11 @@ time_duration SLGsplsTrain::timeDuration()
     return time_duration(this->_timeEnd - this->_timeStart);
 }
 
-SLMODELRESULTYPE SLGsplsTrain::getResultType()
-{
-    SLMODELRESULTYPE result = SLModelResultTypeNone;
-    
-    switch (this->_param.colMode){
-        case PLSCOLSELAVG:
-            result = SLModelResultTypeQ2   |
-                     SLModelResultTypeRSS  |
-                     SLModelResultTypeBeta |
-                     SLModelResultTypeAIC  |
-                     SLModelResultTypeBIC  |
-                     SLModelResultTypeCOV;
-            break;
-            
-        case PLSCOLSELRAND:
-            result = SLModelResultTypeRSS  |
-                     SLModelResultTypeBeta |
-                     SLModelResultTypeACC  |
-                     SLModelResultTypeAUC  |
-                     SLModelResultTypeCOV;
-            break;
-            
-        default:
-            break;
-    }
-    return result;
-}
-
 SLGsplsTrain* SLGsplsTrain::initWithParam(SLGsplsTrainParameters& param)
 {
     SLGsplsTrain* train = new SLGsplsTrain();
-    train->_param = param;
+    train->setParam(param);
+    param->colMode->setDelegate(train);
     
     SLSparsePls::SLSparsePlsParameters splsParam;
     splsParam.verbose = param.verbose;
@@ -132,11 +102,61 @@ SLGsplsTrain* SLGsplsTrain::initWithParam(SLGsplsTrainParameters& param)
     gspanParam.maxpat             = param.maxpat;
     gspanParam.topk               = param.topk;
     gspanParam.doesUseMemoryBoost = param.boost;
-    gspanParam.gspFilename        = string(param.gspfile);
+    gspanParam.gspFilename        = string(param.trainFile);
     
-    train->_gspls = SLGlpFactory<SLSparsePls, SLGspan>::create(splsParam, gspanParam);
+    train->_splsParam  = splsParam;
+    train->_gspanParam = gspanParam
+    train->_gspls      = SLGlpFactory<SLSparsePls, SLGspan>::create(splsParam, gspanParam);
+
+    SLGspan trainGspan   = train->_gspls->getGraphMining();
+    SLGspan validGspan   = trainGspan;
+    vector<Graph> graphs = trainGspan->getTranscation();
+    
+    // use 10% data as validation
+    vector<Graph> validGraphs(graphs.end()-this->_validLength+1, graphs.end());
+    validGspan.setTransaction(validGraphs);
+    
+    // use left data as train
+    vector<Graph> trainGraphs(graphs.begin(), graphs.end()-this->_validLength);
+    trainGspan.setTransaction(trainGraphs);
     
     return train;
+}
+
+void SLGsplsTrain::setParam(SLGsplsTrainParameters& param)
+{
+    this->param = param;
+    
+    if (param.respFile != NULL)
+        EigenExt::loadMatrixFromFile(this->_trainRespMat, this->_param.respFile);
+    
+    this->_validLength  = floor(this->_trainRespMat.rows() * SLGsplsTrain::VALID_RATIO);
+    this->_validRespMat = this->_trainRespMat.bottomRows(this->_validLength);
+    this->_trainRespMat = this->_trainRespMat.topRows(this->_trainRespMat.rows() - this->_validLength);
+}
+
+// TODO: consider strategy pattern
+void SLGsplsTrain::gpsan()
+{
+    gspanResult = gspls.search(this->_param->colMode->getSelectedColumn(),
+                               SLGraphMiningTasktypeTrain,
+                               this->_param->colMode->getGraphMingResultType());
+    MatrixXd x = get<MatrixXd>(gspanResult[SLGraphMiningResultTypeX]);
+}
+
+void SLGsplsTrain::spls()
+{
+    
+}
+
+void SLGsplsTrain::calcResidual()
+{
+    
+}
+
+bool SLGsplsTrain::doesOverfit()
+{
+    
 }
 
 int main(int argc, char* argv[])
@@ -162,10 +182,10 @@ int main(int argc, char* argv[])
         train->spls();
         
         // calc res
+        train->calcResidual();
         
-        
-        // Valid
         // overfit detection
+        if (train->doesOverfit()) break;
     }
     
     // calc time elapsed

@@ -713,3 +713,14 @@ void SLGspan::initMemoryCache(Projected_map3 &root)
         }
     }
 }
+
+void SLGspan::setTransaction(vector<Graph> transaction)
+{
+    this->transaction = transaction;
+}
+
+vector<Graph>& SLGspan::getTransaction()
+{
+    return this->transaction;
+}
+

@@ -100,7 +100,11 @@ public:
      */
     bool setParameters(SLGspanParameters& parameters);
     
-    double classify (Graph &g, int flag)
+    double classify(Graph &g, int flag);
+    
+    void setTransaction(vector<Graph>);
+    
+    vector<Graph>& getTransaction();
 
 private:
     void init();
