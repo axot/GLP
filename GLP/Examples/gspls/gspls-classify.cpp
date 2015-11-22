@@ -41,10 +41,12 @@ struct pair_2nd_cmp: public std::binary_function<bool, T1, T2> {
 };
 
 enum CLASSIFYTYPE {
-    NOOPTION = 0,
-    NORMOL  = 1,
-    PLS     = 2
+    None            = 0,
+    Classification  = 1,
+    Regression      = 2
 };
+
+typedef int CLASSIFY_TYPE;
 
 int main (int argc, char **argv)
 {
