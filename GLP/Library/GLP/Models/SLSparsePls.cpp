@@ -89,7 +89,7 @@ MatrixXd SLPlsColumnSelectionVariance::getSelectedColumn()
 }
 
 // Public Methods
-SLModelResult SLSparsePls::train(const MatrixXd& appendedX, const MatrixXd& theY, const MatrixXd& residual, SLMODELRESULTYPE type)
+SLModelResult SLSparsePls::train(const MatrixXd& appendedX, const MatrixXd& theY, SLMODELRESULTYPE type)
 {
     if (Y.cols() == 0 || Y.rows() == 0)
     {
