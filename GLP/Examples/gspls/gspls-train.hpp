@@ -28,55 +28,13 @@ using namespace boost::posix_time;
 
 class SLGsplsTrain
 {
-    class IMode
+    class ColumnSelectionBase : public IColumnSelection<SLGsplsTrain>
     {
-        virtual SLMODELRESULTYPE getResultType();
-    };
-    
-    class IColumnSelection
-    {
-    protected:
-        SLGsplsTrain* parent;
-        
     public:
-        void setDelegate(SLGsplsTrain* train)
-        {
-            this->parent = train;
-        }
-        
-    protected:
         virtual SLGRAPHMININGTASKTYPE getGraphMingResultType();
-        virtual MatrixXd getSelectedColumn();
     };
-    
-    class ModeRregession : IMode
-    {
-        SLMODELRESULTYPE getResultType()
-        {
-            return
-                SLModelResultTypeQ2   |
-                SLModelResultTypeRSS  |
-                SLModelResultTypeBeta |
-                SLModelResultTypeAIC  |
-                SLModelResultTypeBIC  |
-                SLModelResultTypeCOV;
-        }
-    };
-    
-    class ModeClassification : IMode
-    {
-        SLMODELRESULTYPE getResultType()
-        {
-            return
-                SLModelResultTypeRSS  |
-                SLModelResultTypeBeta |
-                SLModelResultTypeACC  |
-                SLModelResultTypeAUC  |
-                SLModelResultTypeCOV;
-        }
-    };
-    
-    class ColumnSelectionAverage : IColumnSelection
+        
+    class ColumnSelectionAverage : ColumnSelectionBase
     {
         SLGRAPHMININGTASKTYPE getGraphMingResultType()
         {
@@ -85,20 +43,21 @@ class SLGsplsTrain
         
         MatrixXd getSelectedColumn()
         {
-            if (parent->_trainResidualMat.rows() < 1) parent->_trainResidualMat = parent->_trainRespMat;
+            if (dataSource->_trainResidualMat.rows() < 1)
+                dataSource->_trainResidualMat = dataSource->_trainRespMat;
             
-            VectorXd ResMean(parent->_trainResidualMat.rows());
+            VectorXd ResMean(dataSource->_trainResidualMat.rows());
             ResMean.setZero();
             
-            for (ssize_t i=0; i<parent->_trainResidualMat.cols(); ++i)
-                ResMean += parent->_trainResidualMat.col(i);
+            for (ssize_t i=0; i<dataSource->_trainResidualMat.cols(); ++i)
+                ResMean += dataSource->_trainResidualMat.col(i);
             
-            MatrixXd result = ResMean/parent->_trainResidualMat.cols();
+            MatrixXd result = ResMean/dataSource->_trainResidualMat.cols();
             return result;
         }
     };
     
-    class ColumnSelectionRandom : IColumnSelection
+    class ColumnSelectionRandom : ColumnSelectionBase
     {
         SLGRAPHMININGTASKTYPE getGraphMingResultType()
         {
@@ -110,24 +69,14 @@ class SLGsplsTrain
             long randomColumnIndex;
             
             randomColumnIndex = rand();
-            parent->_splsParam.randIndex = randomColumnIndex;
-            parent->_gspls->setModelParameters(parent->_splsParam);
-            return parent->_trainResidualMat.col(randomColumnIndex);
+            dataSource->_splsParam.randIndex = randomColumnIndex;
+            dataSource->_gspls->setModelParameters(dataSource->_splsParam);
+            return dataSource->_trainResidualMat.col(randomColumnIndex);
         }
     };
     
-    class ColumnSelectionVariance : IColumnSelection
+    class ColumnSelectionVariance : ColumnSelectionBase
     {
-        SLMODELRESULTYPE getModelResultType()
-        {
-            return SLModelResultTypeQ2   |
-            SLModelResultTypeRSS  |
-            SLModelResultTypeBeta |
-            SLModelResultTypeAIC  |
-            SLModelResultTypeBIC  |
-            SLModelResultTypeCOV;
-        }
-        
         SLGRAPHMININGTASKTYPE getGraphMingResultType()
         {
             return SLGraphMiningResultTypeX | SLGraphMiningResultTypeRules;
@@ -136,12 +85,13 @@ class SLGsplsTrain
         MatrixXd getSelectedColumn()
         {
             long maxSquaredNormColumn;
-            ColVariance(parent->_trainResidualMat).maxCoeff(&maxSquaredNormColumn);
+            ColVariance(dataSource->_trainResidualMat).maxCoeff(&maxSquaredNormColumn);
             
-            return parent->_trainResidualMat.col(maxSquaredNormColumn);
+            return dataSource->_trainResidualMat.col(maxSquaredNormColumn);
         }
     };
 
+public:
     class TrainParameters
     {
     public:
@@ -161,100 +111,7 @@ class SLGsplsTrain
         colMode(NULL)
         {}
         
-        static TrainParameters* initWithArgs(int argc, char* argv[])
-        {
-            TrainParameters* param = new TrainParameters();
-            
-            if (argc < 2) {
-                return NULL;
-            }
-            
-            static struct option long_options[] =
-            {
-                {"reg", no_argument, 0, 0},
-                {"cla", no_argument, 0, 0},
-                {0, 0, 0, 0}
-            };
-            
-            int option_index = 0;
-            int opt;
-            while ((opt = getopt_long(argc,
-                                      (char **)argv,
-                                      "L:m:n:k:f:y:t:vbsarp",
-                                      long_options,
-                                      &option_index)) != -1)
-            {
-                switch(opt)
-                {
-                    case 0:
-                    {
-                        if (long_options[option_index].flag != 0) break;
-                        
-                        string optname = string(long_options[option_index].name);
-                        if (optname == "reg"){
-                            param->mode = (IMode*) new ModeRregession();
-                        }
-                        else if (optname == "cla"){
-                            param->mode = (Imode*) new ModeClassification();
-                        }
-                        else{
-                            return NULL;
-                        }
-                        break;
-                    }
-                    case 'L':
-                        param->maxpat = atoi(optarg);
-                        break;
-                    case 'm':
-                        param->minsup = atoi(optarg);
-                        break;
-                    case 'n':
-                        param->n = atoi(optarg);
-                        break;
-                    case 'k':
-                        param->topk = atoi(optarg);
-                        break;
-                    case 'f':
-                        param->fold = atoi(optarg);
-                        break;
-                    case 'y':
-                        param->trainFile = strdup(optarg);
-                        break;
-                    case 't':
-                        param->resultHistorySize = atoi(optarg);
-                        break;
-                    case 'v':
-                        param->verbose = true;
-                        break;
-                    case 'b':
-                        param->boost = true;
-                        break;
-                    case 's':
-                        param->useShuffledData = true;
-                        break;
-                    case 'a':
-                        param->colMode = (IColumnSelection*) new ColumnSelectionAverage();
-                        break;
-                    case 'r':
-                        param->colMode = (IColumnSelection*) new ColumnSelectionRandom();
-                        break;
-                    case 'p':
-                        param->preProcess = true;
-                        break;
-                    case '?':
-                    default:
-                        return NULL;
-                }
-            }
-            
-            if (param->mode == NULL)
-                param->mode = (IMode*) new ModeRregession();
-
-            if (param->colMode == NULL)
-                param->colMode = (IColumnSelection*) new ColumnSelectionVariance();
-            
-            return param;
-        }
+        static TrainParameters* initWithArgs(int argc, char* argv[]);
         
     public:
         size_t maxpat;
@@ -269,8 +126,8 @@ class SLGsplsTrain
         bool boost;
         bool useShuffledData;
         bool preProcess;
-        IMode mode*;
-        IColumnSelection* colMode;
+        IMode<SLSparsePls>* mode;
+        ColumnSelectionBase* colMode;
     };
     
 private:
@@ -278,13 +135,16 @@ private:
     SLSparsePls::SLSparsePlsParameters _splsParam;
     SLGspan::SLGspanParameters _gspanParam;
 
+    MatrixXd _featuresMat;
     MatrixXd _trainMat;
     MatrixXd _trainRespMat;
     MatrixXd _trainResidualMat;
     MatrixXd _validMat;
     MatrixXd _validRespMat;
     MatrixXd _validResidualMat;
-    friend class IColumnSelection;
+    friend class ColumnSelectionAverage;
+    friend class ColumnSelectionRandom;
+    friend class ColumnSelectionVariance;
     
     // use 10% train data as validation
     int _validLength;
@@ -297,7 +157,16 @@ public:
     
 public:
     static SLGsplsTrain* initWithParam(TrainParameters&);
+    
     void setParam(TrainParameters&);
+    
+    MatrixXd calcResidual(SLModelResult& trainResult);
+    
+    bool isOverfit();
+    
+    MatrixXd gspan();
+    
+    SLModelResult spls(MatrixXd&);
     
     void timeStart();
     

@@ -27,6 +27,74 @@
 
 using namespace std;
 
+bool SLPlsModeRregession::checkReponseData()
+{
+    return true;
+}
+
+SLMODELRESULTYPE SLPlsModeRregession::getResultType()
+{
+    return
+    SLModelResultTypeQ2   |
+    SLModelResultTypeRSS  |
+    SLModelResultTypeBeta |
+    SLModelResultTypeAIC  |
+    SLModelResultTypeBIC  |
+    SLModelResultTypeCOV;
+}
+
+bool SLPlsModeClassification::checkReponseData()
+{
+    double min = dataSource->Y.minCoeff();
+    double max = dataSource->Y.maxCoeff();
+    
+    double eps = 1e-4;
+    return (dataSource->Y.array() > min+eps &&
+            dataSource->Y.array() < max-eps).any() == false;
+}
+
+SLMODELRESULTYPE SLPlsModeClassification::getResultType()
+{
+    return
+    SLModelResultTypeRSS  |
+    SLModelResultTypeBeta |
+    SLModelResultTypeACC  |
+    SLModelResultTypeAUC  |
+    SLModelResultTypeCOV;
+}
+
+class SLPlsColumnSelectionAverage : public IColumnSelection<SLSparsePls>
+{
+    MatrixXd getSelectedColumn()
+    {
+        VectorXd ResMean(dataSource->Res.rows());
+        ResMean.setZero();
+        
+        for (ssize_t i=0; i<dataSource->Res.cols(); ++i)
+            ResMean += dataSource->Res.col(i);
+        
+        return ResMean/dataSource->Res.cols();
+    }
+};
+
+class SLPlsColumnSelectionRandom : public IColumnSelection<SLSparsePls>
+{
+    MatrixXd getSelectedColumn()
+    {
+        return dataSource->Res.col(dataSource->param.randIndex);
+    }
+};
+
+class SLPlsColumnSelectionVariance : public IColumnSelection<SLSparsePls>
+{
+    MatrixXd getSelectedColumn()
+    {
+        ssize_t selectedColIndex;
+        ColVariance(dataSource->Res).maxCoeff(&selectedColIndex);
+        return dataSource->Res.col(selectedColIndex);
+    }
+};
+
 // Public Methods
 SLModelResult SLSparsePls::train(const MatrixXd& appendedX, const MatrixXd& theY, SLMODELRESULTYPE type)
 {
@@ -35,41 +103,15 @@ SLModelResult SLSparsePls::train(const MatrixXd& appendedX, const MatrixXd& theY
         Y = theY;
         Res = Y;
         
-        if (param.mode == PLSMODECLA)
-        {
-            min = Y.minCoeff();
-            max = Y.maxCoeff();
-            
-            double eps = 1e-4;
-            ASSERT((Y.array() > min+eps && Y.array() < max-eps).any() == false,
-                   "Only binary label was supported in classification mode");
-        }
+        ASSERT(param.mode->checkReponseData(), "Only binary label was supported in classification mode");
     }
     
     ssize_t appendedXRows = appendedX.rows();
     ssize_t appendedXCols = appendedX.cols();
     ssize_t oldXCols      = X.cols();
        
-    ssize_t selectedColIndex;
-    VectorXd selectedCol;
-    if(param.colMode == PLSCOLSELVAR)
-    {
-        ColVariance(Res).maxCoeff(&selectedColIndex);
-        selectedCol = Res.col(selectedColIndex);
-    }
-    else if(param.colMode == PLSCOLSELRAND)
-    {
-        selectedCol = Res.col(param.randIndex);
-    }
-    else if(param.colMode == PLSCOLSELAVG)
-    {
-        VectorXd ResMean(Res.rows());
-        ResMean.setZero();
-        
-        for (ssize_t i=0; i<Res.cols(); ++i)
-            ResMean += Res.col(i);
-        selectedCol = ResMean/Res.cols();
-    }
+    VectorXd selectedCol = param.colMode->getSelectedColumn();
+
     X.conservativeResize(appendedXRows, oldXCols+appendedXCols);
     X.rightCols(appendedXCols).setZero();
     X << X.leftCols(oldXCols), appendedX;
@@ -176,6 +218,8 @@ SLModelResult SLSparsePls::classify(const MatrixXd& tX, const MatrixXd& tY, SLMO
 bool SLSparsePls::setParameters(SLSparsePlsParameters& parameters)
 {
     param = parameters;
+    param.colMode->dataSource = this;
+    param.mode->dataSource    = this;
     return true;
 }
 

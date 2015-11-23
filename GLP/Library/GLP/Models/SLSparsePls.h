@@ -31,21 +31,40 @@
 #include "SLModelStrategy.h"
 #include "SLModel.h"
 
-enum{
-    PLSMODENON = 0,
-    PLSMODEREG = 1 << 0,
-    PLSMODECLA = 1 << 1
+class SLSparsePls;
+
+template <typename D>
+class IMode
+{
+public:
+    D* dataSource;
+    
+public:
+    virtual bool checkReponseData();
+    virtual SLMODELRESULTYPE getResultType();
 };
 
-typedef unsigned int SLPLSMODE;
+template <typename D>
+class IColumnSelection
+{
+public:
+    D* dataSource;
 
-enum{
-    PLSCOLSELVAR  = 0,
-    PLSCOLSELRAND = 1 << 0,
-    PLSCOLSELAVG  = 1 << 1
+public:
+    virtual MatrixXd getSelectedColumn();
 };
 
-typedef unsigned int SLPLSCOLSEL;
+class SLPlsModeRregession : public IMode<SLSparsePls>
+{
+    bool checkReponseData();
+    SLMODELRESULTYPE getResultType();
+};
+
+class SLPlsModeClassification : public IMode<SLSparsePls>
+{
+    bool checkReponseData();
+    SLMODELRESULTYPE getResultType();
+};
 
 class SLSparsePls : public SLModelStrategy
 {
@@ -55,14 +74,14 @@ public:
     public:
         SLSparsePlsParameters() :
             verbose(false),
-            mode(PLSMODEREG),
-            colMode(PLSCOLSELVAR),
+            mode(NULL),
+            colMode(NULL),
             randIndex(0) {}
         
     public:
         bool verbose;
-        SLPLSMODE mode;
-        SLPLSCOLSEL colMode;
+        IMode<SLSparsePls>* mode;
+        IColumnSelection<SLSparsePls>* colMode;
         int randIndex;
     };
     
@@ -119,6 +138,13 @@ private:
     MatrixXd Beta;
     MatrixXd Res;
     MatrixXd W;
+    
+    friend class SLPlsColumnSelectionAverage;
+    friend class SLPlsColumnSelectionRandom;
+    friend class SLPlsColumnSelectionVariance;
+    
+    friend class SLPlsModeRregession;
+    friend class SLPlsModeClassification;
 };
 
 #endif

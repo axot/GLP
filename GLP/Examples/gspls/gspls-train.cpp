@@ -25,78 +25,141 @@
 
 #include "gspls-train.hpp"
 
-string usage()
+SLGsplsTrain::TrainParameters* SLGsplsTrain::TrainParameters::initWithArgs(int argc, char* argv[])
 {
-    return
-    "gspls is a part of GLP v1.0\n\n"
-    "   Usage: gspls-train [-mLnkfytsbv] [gsp file]\n\n"
-    " Options: \n"
-    "          [--reg | --cla] regression or classification mode\n"
-    "          [-m] min frequency of common graphs, default: 2\n"
-    "          [-L] max graph size for gspan mining, default: 10\n"
-    "          [-n] max iterator number, default: 100\n"
-    "          [-k] number of sub graphs abstract by gspan once time, default: 5\n"
-    "          [-f] folds of cross Valid, default: 10\n"
-    "          [-y] distinct response Y matrix file\n"
-    "          [-a] use average residual column, defult is using max variance column\n"
-    "          [-r] use random residual column, defult is using max variance column\n"
-    "          [-t] the threshold value which used to avoid overfiting default: 3(times)\n"
-    "          [-s] shuffle data(preprocess)\n"
-    "          [-b] use memory boosting\n"
-    "          [-p] centering and scaling label for regression mode\n"
-    "          [-v] verbose\n"
-    "\n"
-    "  Author: Zheng Shao\n"
-    " Contact: axot@axot.org\n"
-    "Homepage: http://saigo-www.bio.kyutech.ac.jp/~axot";
-}
-
-MatrixXd& getTrainMat()
-{
+    SLGsplsTrain::TrainParameters* param = new SLGsplsTrain::TrainParameters();
     
+    if (argc < 2) {
+        return NULL;
+    }
+    
+    static struct option long_options[] =
+    {
+        {"reg", no_argument, 0, 0},
+        {"cla", no_argument, 0, 0},
+        {0, 0, 0, 0}
+    };
+    
+    int option_index = 0;
+    int opt;
+    while ((opt = getopt_long(argc,
+                              (char **)argv,
+                              "L:m:n:k:f:y:t:vbsarp",
+                              long_options,
+                              &option_index)) != -1)
+    {
+        switch(opt)
+        {
+            case 0:
+            {
+                if (long_options[option_index].flag != 0) break;
+                
+                string optname = string(long_options[option_index].name);
+                if (optname == "reg"){
+                    param->mode = (SLPlsModeRregession*) new SLPlsModeRregession();
+                }
+                else if (optname == "cla"){
+                    param->mode = (SLPlsModeClassification*) new SLPlsModeClassification();
+                }
+                else{
+                    return NULL;
+                }
+                break;
+            }
+            case 'L':
+                param->maxpat = atoi(optarg);
+                break;
+            case 'm':
+                param->minsup = atoi(optarg);
+                break;
+            case 'n':
+                param->n = atoi(optarg);
+                break;
+            case 'k':
+                param->topk = atoi(optarg);
+                break;
+            case 'f':
+                param->fold = atoi(optarg);
+                break;
+            case 'y':
+                param->trainFile = strdup(optarg);
+                break;
+            case 't':
+                param->resultHistorySize = atoi(optarg);
+                break;
+            case 'v':
+                param->verbose = true;
+                break;
+            case 'b':
+                param->boost = true;
+                break;
+            case 's':
+                param->useShuffledData = true;
+                break;
+            case 'a':
+                param->colMode = (ColumnSelectionBase*) new ColumnSelectionAverage();
+                break;
+            case 'r':
+                param->colMode = (ColumnSelectionBase*) new ColumnSelectionRandom();
+                break;
+            case 'p':
+                param->preProcess = true;
+                break;
+            case '?':
+            default:
+                return NULL;
+        }
+    }
+    
+    if (param->mode == NULL)
+        param->mode = (SLPlsModeRregession*) new SLPlsModeRregession();
+        
+        if (param->colMode == NULL)
+            param->colMode = (ColumnSelectionBase*) new ColumnSelectionVariance();
+            
+            return param;
 }
 
 MatrixXd& SLGsplsTrain::getTrainRespMat()
 {
-    return this->_trainRespMat;
+    return _trainRespMat;
 }
 
-MatrixXd& getValidMat()
+MatrixXd& SLGsplsTrain::getValidRespMat()
 {
-    return this->_trainMat[this->validStart] 
-}
-
-MatrixXd& getValidRespMat()
-{
-    return this->_vaildRespMat;
+    return _validRespMat;
 }
 
 void SLGsplsTrain::timeStart()
 {
-    this->_timeStart = ptime(microsec_clock::local_time());
+    _timeStart = ptime(microsec_clock::local_time());
 }
 
 void SLGsplsTrain::timeEnd()
 {
-    this->_timeEnd = ptime(microsec_clock::local_time());
+    _timeEnd = ptime(microsec_clock::local_time());
 }
 
 time_duration SLGsplsTrain::timeDuration()
 {
-    return time_duration(this->_timeEnd - this->_timeStart);
+    return time_duration(_timeEnd - _timeStart);
 }
 
-SLGsplsTrain* SLGsplsTrain::initWithParam(SLGsplsTrainParameters& param)
+SLGsplsTrain* SLGsplsTrain::initWithParam(TrainParameters& param)
 {
     SLGsplsTrain* train = new SLGsplsTrain();
     train->setParam(param);
-    param->colMode->setDelegate(train);
     
+    // assign data source
+    param.colMode->dataSource = train;
+    
+    // init spls parameter
     SLSparsePls::SLSparsePlsParameters splsParam;
     splsParam.verbose = param.verbose;
-    splsParam.mode    = param.mode;
-    splsParam.colMode = param.colMode;
+    splsParam.mode    = (IMode<SLSparsePls>*)param.mode;
+    splsParam.colMode = (IColumnSelection<SLSparsePls>*)param.colMode;
     
+    // init gspan parameter
     SLGspan::SLGspanParameters gspanParam;
     gspanParam.minsup             = param.minsup;
     gspanParam.maxpat             = param.maxpat;
@@ -105,93 +168,66 @@ SLGsplsTrain* SLGsplsTrain::initWithParam(SLGsplsTrainParameters& param)
     gspanParam.gspFilename        = string(param.trainFile);
     
     train->_splsParam  = splsParam;
-    train->_gspanParam = gspanParam
+    train->_gspanParam = gspanParam;
     train->_gspls      = SLGlpFactory<SLSparsePls, SLGspan>::create(splsParam, gspanParam);
 
+    // load train gsp file
+    if (param.respFile != NULL)
+        EigenExt::loadMatrixFromFile(train->_trainRespMat, train->_param.respFile);
+    
+    // calculate valid data length
+    train->_validLength  = floor(train->_trainRespMat.rows() * VALID_RATIO);
+
+    // setup response data
+    train->_validRespMat = train->_trainRespMat.bottomRows(train->_validLength);
+    train->_trainRespMat = train->_trainRespMat.topRows(train->_trainRespMat.rows() - train->_validLength);
+
+    // set transaction data
     SLGspan trainGspan   = train->_gspls->getGraphMining();
     SLGspan validGspan   = trainGspan;
     vector<Graph> graphs = trainGspan->getTranscation();
     
     // use 10% data as validation
-    vector<Graph> validGraphs(graphs.end()-this->_validLength+1, graphs.end());
+    vector<Graph> validGraphs(graphs.end() - train->_validLength + 1, graphs.end());
     validGspan.setTransaction(validGraphs);
     
     // use left data as train
-    vector<Graph> trainGraphs(graphs.begin(), graphs.end()-this->_validLength);
+    vector<Graph> trainGraphs(graphs.begin(), graphs.end() - train->_validLength);
     trainGspan.setTransaction(trainGraphs);
     
     return train;
 }
 
-void SLGsplsTrain::setParam(SLGsplsTrainParameters& param)
+MatrixXd SLGsplsTrain::gspan()
 {
-    this->param = param;
-    
-    if (param.respFile != NULL)
-        EigenExt::loadMatrixFromFile(this->_trainRespMat, this->_param.respFile);
-    
-    this->_validLength  = floor(this->_trainRespMat.rows() * SLGsplsTrain::VALID_RATIO);
-    this->_validRespMat = this->_trainRespMat.bottomRows(this->_validLength);
-    this->_trainRespMat = this->_trainRespMat.topRows(this->_trainRespMat.rows() - this->_validLength);
-}
-
-// TODO: consider strategy pattern
-void SLGsplsTrain::gpsan()
-{
-    gspanResult = gspls.search(this->_param->colMode->getSelectedColumn(),
-                               SLGraphMiningTasktypeTrain,
-                               this->_param->colMode->getGraphMingResultType());
+    SLGraphMiningResult gspanResult = _gspls->search(_param.colMode->getSelectedColumn(),
+                                                    SLGraphMiningTasktypeTrain,
+                                                    _param.colMode->getGraphMingResultType());
     MatrixXd x = get<MatrixXd>(gspanResult[SLGraphMiningResultTypeX]);
+    return x;
 }
 
-void SLGsplsTrain::spls()
+SLModelResult SLGsplsTrain::spls(MatrixXd& feature)
 {
+    SLModelResult result = _gspls->train(feature, _trainRespMat, _param.mode->getResultType());
     
+    long rows    = feature.rows();
+    long cols    = feature.cols();
+    long preCols = _featuresMat.cols();
+    _featuresMat.conservativeResize(rows, preCols+cols);
+    _featuresMat.rightCols(cols).setZero();
+    _featuresMat << _featuresMat.leftCols(preCols), feature;
+
+    return result;
 }
 
-void SLGsplsTrain::calcResidual()
+MatrixXd SLGsplsTrain::calcResidual(SLModelResult& trainResult)
 {
-    
+    _trainResidualMat = _trainRespMat - _featuresMat*get<MatrixXd>(trainResult[SLModelResultTypeBeta]);
+    return _trainResidualMat;
 }
 
-bool SLGsplsTrain::doesOverfit()
+bool SLGsplsTrain::isOverfit()
 {
     
-}
-
-int main(int argc, char* argv[])
-{
-    // parse arguments
-    SLGsplsTrainParameters* param = SLGsplsTrainParameters::initWithArgs(argc, argv);
-    if(param == NULL){
-        cerr << usage() << endl;
-        exit(-1);
-    }
-    
-    SLGsplsTrain* train = SLGsplsTrain::initWithParam(*param);
-    
-    // let's begin
-    train->timeStart();
-    
-    int i = 0;
-    while ( i < param->n) {
-        // do gspan
-        gspanResult = train->gspan();
-        
-        // spls
-        train->spls();
-        
-        // calc res
-        train->calcResidual();
-        
-        // overfit detection
-        if (train->doesOverfit()) break;
-    }
-    
-    // calc time elapsed
-    train->timeEnd();
-    
-    // write result to file
-    
-    return 0;
 }
