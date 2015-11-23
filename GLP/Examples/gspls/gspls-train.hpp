@@ -31,21 +31,18 @@ class SLGsplsTrain
     class ColumnSelectionBase : public IColumnSelection<SLGsplsTrain>
     {
     public:
-        virtual SLGRAPHMININGTASKTYPE getGraphMingResultType();
+        virtual SLGRAPHMININGTASKTYPE getGraphMingResultType() = 0;
     };
         
     class ColumnSelectionAverage : ColumnSelectionBase
     {
-        SLGRAPHMININGTASKTYPE getGraphMingResultType()
+        virtual SLGRAPHMININGTASKTYPE getGraphMingResultType()
         {
             return SLGraphMiningResultTypeX | SLGraphMiningResultTypeRules;
         }
         
-        MatrixXd getSelectedColumn()
-        {
-            if (dataSource->_trainResidualMat.rows() < 1)
-                dataSource->_trainResidualMat = dataSource->_trainRespMat;
-            
+        virtual MatrixXd getSelectedColumn()
+        {            
             VectorXd ResMean(dataSource->_trainResidualMat.rows());
             ResMean.setZero();
             
@@ -59,12 +56,12 @@ class SLGsplsTrain
     
     class ColumnSelectionRandom : ColumnSelectionBase
     {
-        SLGRAPHMININGTASKTYPE getGraphMingResultType()
+        virtual SLGRAPHMININGTASKTYPE getGraphMingResultType()
         {
             return SLGraphMiningResultTypeX | SLGraphMiningResultTypeRules;
         }
         
-        MatrixXd getSelectedColumn()
+        virtual MatrixXd getSelectedColumn()
         {
             long randomColumnIndex;
             
@@ -77,12 +74,12 @@ class SLGsplsTrain
     
     class ColumnSelectionVariance : ColumnSelectionBase
     {
-        SLGRAPHMININGTASKTYPE getGraphMingResultType()
+        virtual SLGRAPHMININGTASKTYPE getGraphMingResultType()
         {
             return SLGraphMiningResultTypeX | SLGraphMiningResultTypeRules;
         }
         
-        MatrixXd getSelectedColumn()
+        virtual MatrixXd getSelectedColumn()
         {
             long maxSquaredNormColumn;
             ColVariance(dataSource->_trainResidualMat).maxCoeff(&maxSquaredNormColumn);
@@ -156,10 +153,8 @@ public:
     static const float VALID_RATIO;
     
 public:
-    static SLGsplsTrain* initWithParam(TrainParameters&);
-    
-    void setParam(TrainParameters&);
-    
+    static SLGsplsTrain* initWithParam(TrainParameters);
+        
     MatrixXd calcResidual(SLModelResult& trainResult);
     
     bool isOverfit();
@@ -183,5 +178,4 @@ private:
     SLGsplsTrain(){};
 };
 
-const float SLGsplsTrain::VALID_RATIO = 0.1f;
 #endif /* gspls_train_hpp */

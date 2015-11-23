@@ -40,8 +40,8 @@ public:
     D* dataSource;
     
 public:
-    virtual bool checkReponseData();
-    virtual SLMODELRESULTYPE getResultType();
+    virtual bool checkReponseData() = 0;
+    virtual SLMODELRESULTYPE getResultType() = 0;
 };
 
 template <typename D>
@@ -51,19 +51,19 @@ public:
     D* dataSource;
 
 public:
-    virtual MatrixXd getSelectedColumn();
+    virtual MatrixXd getSelectedColumn() = 0;
 };
 
 class SLPlsModeRregession : public IMode<SLSparsePls>
 {
-    bool checkReponseData();
-    SLMODELRESULTYPE getResultType();
+    virtual bool checkReponseData();
+    virtual SLMODELRESULTYPE getResultType();
 };
 
 class SLPlsModeClassification : public IMode<SLSparsePls>
 {
-    bool checkReponseData();
-    SLMODELRESULTYPE getResultType();
+    virtual bool checkReponseData();
+    virtual SLMODELRESULTYPE getResultType();
 };
 
 class SLSparsePls : public SLModelStrategy

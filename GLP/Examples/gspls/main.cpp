@@ -13,7 +13,7 @@ string usage()
 {
     return
     "gspls is a part of GLP v1.0\n\n"
-    "   Usage: gspls-train [-mLnkfytsbv] [gsp file]\n\n"
+    "   Usage: gspls train [-mLnkfytsbv] [gsp file]\n\n"
     " Options: \n"
     "          [--reg | --cla] regression or classification mode\n"
     "          [-m] min frequency of common graphs, default: 2\n"
@@ -62,6 +62,8 @@ int main(int argc, char* argv[])
         
         // overfit detection
         if (train->isOverfit()) break;
+        
+        ++i;
     }
     
     // calc time elapsed

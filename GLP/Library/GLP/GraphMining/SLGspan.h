@@ -59,7 +59,7 @@ public:
     public:
         // assignable parameters
         size_t minsup;
-        size_t maxsup;  // only use for standlone gspan version
+        size_t maxsup;  // only use for standalone gspan version
         size_t maxpat;  // upper bound on node count
         size_t topk;
         
@@ -104,7 +104,7 @@ public:
     
     void setTransaction(vector<Graph>);
     
-    vector<Graph>& getTransaction();
+    vector<Graph> getTransaction();
 
 private:
     void init();

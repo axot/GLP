@@ -24,6 +24,7 @@
 //
 
 #include "gspls-train.hpp"
+const float SLGsplsTrain::VALID_RATIO = 0.2f;
 
 SLGsplsTrain::TrainParameters* SLGsplsTrain::TrainParameters::initWithArgs(int argc, char* argv[])
 {
@@ -82,7 +83,7 @@ SLGsplsTrain::TrainParameters* SLGsplsTrain::TrainParameters::initWithArgs(int a
                 param->fold = atoi(optarg);
                 break;
             case 'y':
-                param->trainFile = strdup(optarg);
+                param->respFile = strdup(optarg);
                 break;
             case 't':
                 param->resultHistorySize = atoi(optarg);
@@ -110,6 +111,8 @@ SLGsplsTrain::TrainParameters* SLGsplsTrain::TrainParameters::initWithArgs(int a
                 return NULL;
         }
     }
+    
+    param->trainFile = strdup(argv[argc-1]);
     
     if (param->mode == NULL)
         param->mode = (SLPlsModeRregession*) new SLPlsModeRregession();
@@ -145,10 +148,10 @@ time_duration SLGsplsTrain::timeDuration()
     return time_duration(_timeEnd - _timeStart);
 }
 
-SLGsplsTrain* SLGsplsTrain::initWithParam(TrainParameters& param)
+SLGsplsTrain* SLGsplsTrain::initWithParam(TrainParameters param)
 {
     SLGsplsTrain* train = new SLGsplsTrain();
-    train->setParam(param);
+    train->_param = param;
     
     // assign data source
     param.colMode->dataSource = train;
@@ -175,6 +178,9 @@ SLGsplsTrain* SLGsplsTrain::initWithParam(TrainParameters& param)
     if (param.respFile != NULL)
         EigenExt::loadMatrixFromFile(train->_trainRespMat, train->_param.respFile);
     
+    // init _trainResidualMat same as _trainRespMat
+    train->_trainResidualMat = train->_trainRespMat;
+
     // calculate valid data length
     train->_validLength  = floor(train->_trainRespMat.rows() * VALID_RATIO);
 
@@ -185,10 +191,10 @@ SLGsplsTrain* SLGsplsTrain::initWithParam(TrainParameters& param)
     // set transaction data
     SLGspan trainGspan   = train->_gspls->getGraphMining();
     SLGspan validGspan   = trainGspan;
-    vector<Graph> graphs = trainGspan->getTranscation();
+    vector<Graph> graphs = trainGspan.getTransaction();
     
     // use 10% data as validation
-    vector<Graph> validGraphs(graphs.end() - train->_validLength + 1, graphs.end());
+    vector<Graph> validGraphs(graphs.end() - train->_validLength, graphs.end());
     validGspan.setTransaction(validGraphs);
     
     // use left data as train
@@ -201,8 +207,8 @@ SLGsplsTrain* SLGsplsTrain::initWithParam(TrainParameters& param)
 MatrixXd SLGsplsTrain::gspan()
 {
     SLGraphMiningResult gspanResult = _gspls->search(_param.colMode->getSelectedColumn(),
-                                                    SLGraphMiningTasktypeTrain,
-                                                    _param.colMode->getGraphMingResultType());
+                                                     SLGraphMiningTasktypeTrain,
+                                                     _param.colMode->getGraphMingResultType());
     MatrixXd x = get<MatrixXd>(gspanResult[SLGraphMiningResultTypeX]);
     return x;
 }
@@ -229,5 +235,7 @@ MatrixXd SLGsplsTrain::calcResidual(SLModelResult& trainResult)
 
 bool SLGsplsTrain::isOverfit()
 {
-    
+    // TODO: IMP
+    static int count = 10;
+    return --count ? false : true;
 }
