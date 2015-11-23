@@ -66,6 +66,21 @@ class SLPlsModeClassification : public IMode<SLSparsePls>
     virtual SLMODELRESULTYPE getResultType();
 };
 
+class SLPlsColumnSelectionAverage : public IColumnSelection<SLSparsePls>
+{
+    virtual MatrixXd getSelectedColumn();
+};
+
+class SLPlsColumnSelectionRandom : public IColumnSelection<SLSparsePls>
+{
+    virtual MatrixXd getSelectedColumn();
+};
+
+class SLPlsColumnSelectionVariance : public IColumnSelection<SLSparsePls>
+{
+    virtual MatrixXd getSelectedColumn();
+};
+
 class SLSparsePls : public SLModelStrategy
 {
 public:
@@ -97,7 +112,7 @@ public:
      * Return: the results stored in mapped structure.
      */
     virtual SLModelResult train(const MatrixXd& appendedX, const MatrixXd& theY, SLMODELRESULTYPE type);
-    
+
     /* Classify:
      * Input
      *     tX: X matrix of test data

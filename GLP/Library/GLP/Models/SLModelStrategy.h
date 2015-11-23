@@ -44,6 +44,7 @@ enum{
     SLModelResultTypeAIC     = 1 << 5,
     SLModelResultTypeBIC     = 1 << 6,
     SLModelResultTypeCOV     = 1 << 7,
+    SLModelResultTypeRes     = 1 << 8
 };
 
 typedef unsigned int SLMODELRESULTYPE;

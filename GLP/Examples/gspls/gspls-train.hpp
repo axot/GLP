@@ -28,66 +28,6 @@ using namespace boost::posix_time;
 
 class SLGsplsTrain
 {
-    class ColumnSelectionBase : public IColumnSelection<SLGsplsTrain>
-    {
-    public:
-        virtual SLGRAPHMININGTASKTYPE getGraphMingResultType() = 0;
-    };
-        
-    class ColumnSelectionAverage : ColumnSelectionBase
-    {
-        virtual SLGRAPHMININGTASKTYPE getGraphMingResultType()
-        {
-            return SLGraphMiningResultTypeX | SLGraphMiningResultTypeRules;
-        }
-        
-        virtual MatrixXd getSelectedColumn()
-        {            
-            VectorXd ResMean(dataSource->_trainResidualMat.rows());
-            ResMean.setZero();
-            
-            for (ssize_t i=0; i<dataSource->_trainResidualMat.cols(); ++i)
-                ResMean += dataSource->_trainResidualMat.col(i);
-            
-            MatrixXd result = ResMean/dataSource->_trainResidualMat.cols();
-            return result;
-        }
-    };
-    
-    class ColumnSelectionRandom : ColumnSelectionBase
-    {
-        virtual SLGRAPHMININGTASKTYPE getGraphMingResultType()
-        {
-            return SLGraphMiningResultTypeX | SLGraphMiningResultTypeRules;
-        }
-        
-        virtual MatrixXd getSelectedColumn()
-        {
-            long randomColumnIndex;
-            
-            randomColumnIndex = rand();
-            dataSource->_splsParam.randIndex = randomColumnIndex;
-            dataSource->_gspls->setModelParameters(dataSource->_splsParam);
-            return dataSource->_trainResidualMat.col(randomColumnIndex);
-        }
-    };
-    
-    class ColumnSelectionVariance : ColumnSelectionBase
-    {
-        virtual SLGRAPHMININGTASKTYPE getGraphMingResultType()
-        {
-            return SLGraphMiningResultTypeX | SLGraphMiningResultTypeRules;
-        }
-        
-        virtual MatrixXd getSelectedColumn()
-        {
-            long maxSquaredNormColumn;
-            ColVariance(dataSource->_trainResidualMat).maxCoeff(&maxSquaredNormColumn);
-            
-            return dataSource->_trainResidualMat.col(maxSquaredNormColumn);
-        }
-    };
-
 public:
     class TrainParameters
     {
@@ -124,7 +64,7 @@ public:
         bool useShuffledData;
         bool preProcess;
         IMode<SLSparsePls>* mode;
-        ColumnSelectionBase* colMode;
+        IColumnSelection<SLSparsePls>* colMode;
     };
     
 private:
@@ -153,10 +93,8 @@ public:
     static const float VALID_RATIO;
     
 public:
-    static SLGsplsTrain* initWithParam(TrainParameters);
-        
-    MatrixXd calcResidual(SLModelResult& trainResult);
-    
+    static SLGsplsTrain* initWithParam(TrainParameters&);
+            
     bool isOverfit();
     
     MatrixXd gspan();

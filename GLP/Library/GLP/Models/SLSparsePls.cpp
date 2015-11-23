@@ -38,6 +38,7 @@ SLMODELRESULTYPE SLPlsModeRregession::getResultType()
     SLModelResultTypeQ2   |
     SLModelResultTypeRSS  |
     SLModelResultTypeBeta |
+    SLModelResultTypeRes  |
     SLModelResultTypeAIC  |
     SLModelResultTypeBIC  |
     SLModelResultTypeCOV;
@@ -58,45 +59,37 @@ SLMODELRESULTYPE SLPlsModeClassification::getResultType()
     return
     SLModelResultTypeRSS  |
     SLModelResultTypeBeta |
+    SLModelResultTypeRes  |
     SLModelResultTypeACC  |
     SLModelResultTypeAUC  |
     SLModelResultTypeCOV;
 }
 
-class SLPlsColumnSelectionAverage : public IColumnSelection<SLSparsePls>
+MatrixXd SLPlsColumnSelectionAverage::getSelectedColumn()
 {
-    MatrixXd getSelectedColumn()
-    {
-        VectorXd ResMean(dataSource->Res.rows());
-        ResMean.setZero();
-        
-        for (ssize_t i=0; i<dataSource->Res.cols(); ++i)
-            ResMean += dataSource->Res.col(i);
-        
-        return ResMean/dataSource->Res.cols();
-    }
-};
+    VectorXd ResMean(dataSource->Res.rows());
+    ResMean.setZero();
+    
+    for (ssize_t i=0; i<dataSource->Res.cols(); ++i)
+        ResMean += dataSource->Res.col(i);
+    
+    return ResMean/dataSource->Res.cols();
+}
 
-class SLPlsColumnSelectionRandom : public IColumnSelection<SLSparsePls>
+MatrixXd SLPlsColumnSelectionRandom::getSelectedColumn()
 {
-    MatrixXd getSelectedColumn()
-    {
-        return dataSource->Res.col(dataSource->param.randIndex);
-    }
-};
+    return dataSource->Res.col(rand());
+}
 
-class SLPlsColumnSelectionVariance : public IColumnSelection<SLSparsePls>
+MatrixXd SLPlsColumnSelectionVariance::getSelectedColumn()
 {
-    MatrixXd getSelectedColumn()
-    {
-        ssize_t selectedColIndex;
-        ColVariance(dataSource->Res).maxCoeff(&selectedColIndex);
-        return dataSource->Res.col(selectedColIndex);
-    }
-};
+    ssize_t selectedColIndex;
+    ColVariance(dataSource->Res).maxCoeff(&selectedColIndex);
+    return dataSource->Res.col(selectedColIndex);
+}
 
 // Public Methods
-SLModelResult SLSparsePls::train(const MatrixXd& appendedX, const MatrixXd& theY, SLMODELRESULTYPE type)
+SLModelResult SLSparsePls::train(const MatrixXd& appendedX, const MatrixXd& theY, const MatrixXd& residual, SLMODELRESULTYPE type)
 {
     if (Y.cols() == 0 || Y.rows() == 0)
     {
@@ -254,6 +247,11 @@ SLModelResult SLSparsePls::getTrainResult(SLMODELRESULTYPE type) const
         result[SLModelResultTypeBeta] = (MatrixXd)Beta;
     }
     
+    if(type & SLModelResultTypeRes)
+    {
+        result[SLModelResultTypeRes] = Res;
+    }
+
     if(type & SLModelResultTypeACC)
     {
         result[SLModelResultTypeACC] = getACC(Y, X*Beta);

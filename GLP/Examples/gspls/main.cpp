@@ -57,9 +57,6 @@ int main(int argc, char* argv[])
         // spls
         SLModelResult trainResult = train->spls(gspanResult);
         
-        // calc res
-        train->calcResidual(trainResult);
-        
         // overfit detection
         if (train->isOverfit()) break;
         

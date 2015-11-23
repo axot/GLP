@@ -98,10 +98,10 @@ SLGsplsTrain::TrainParameters* SLGsplsTrain::TrainParameters::initWithArgs(int a
                 param->useShuffledData = true;
                 break;
             case 'a':
-                param->colMode = (ColumnSelectionBase*) new ColumnSelectionAverage();
+                param->colMode = (IColumnSelection<SLSparsePls>*) new SLPlsColumnSelectionAverage();
                 break;
             case 'r':
-                param->colMode = (ColumnSelectionBase*) new ColumnSelectionRandom();
+                param->colMode = (IColumnSelection<SLSparsePls>*) new SLPlsColumnSelectionRandom();
                 break;
             case 'p':
                 param->preProcess = true;
@@ -118,7 +118,7 @@ SLGsplsTrain::TrainParameters* SLGsplsTrain::TrainParameters::initWithArgs(int a
         param->mode = (SLPlsModeRregession*) new SLPlsModeRregession();
         
         if (param->colMode == NULL)
-            param->colMode = (ColumnSelectionBase*) new ColumnSelectionVariance();
+            param->colMode = (IColumnSelection<SLSparsePls>*) new SLPlsColumnSelectionVariance();
             
             return param;
 }
@@ -148,19 +148,16 @@ time_duration SLGsplsTrain::timeDuration()
     return time_duration(_timeEnd - _timeStart);
 }
 
-SLGsplsTrain* SLGsplsTrain::initWithParam(TrainParameters param)
+SLGsplsTrain* SLGsplsTrain::initWithParam(TrainParameters& param)
 {
     SLGsplsTrain* train = new SLGsplsTrain();
     train->_param = param;
     
-    // assign data source
-    param.colMode->dataSource = train;
-    
     // init spls parameter
     SLSparsePls::SLSparsePlsParameters splsParam;
     splsParam.verbose = param.verbose;
-    splsParam.mode    = (IMode<SLSparsePls>*)param.mode;
-    splsParam.colMode = (IColumnSelection<SLSparsePls>*)param.colMode;
+    splsParam.mode    = param.mode;
+    splsParam.colMode = param.colMode;
     
     // init gspan parameter
     SLGspan::SLGspanParameters gspanParam;
@@ -178,15 +175,15 @@ SLGsplsTrain* SLGsplsTrain::initWithParam(TrainParameters param)
     if (param.respFile != NULL)
         EigenExt::loadMatrixFromFile(train->_trainRespMat, train->_param.respFile);
     
-    // init _trainResidualMat same as _trainRespMat
-    train->_trainResidualMat = train->_trainRespMat;
-
     // calculate valid data length
     train->_validLength  = floor(train->_trainRespMat.rows() * VALID_RATIO);
 
     // setup response data
     train->_validRespMat = train->_trainRespMat.bottomRows(train->_validLength);
     train->_trainRespMat = train->_trainRespMat.topRows(train->_trainRespMat.rows() - train->_validLength);
+
+    // init _trainResidualMat same as _trainRespMat
+    train->_trainResidualMat = train->_trainRespMat;
 
     // set transaction data
     SLGspan trainGspan   = train->_gspls->getGraphMining();
@@ -206,9 +203,10 @@ SLGsplsTrain* SLGsplsTrain::initWithParam(TrainParameters param)
 
 MatrixXd SLGsplsTrain::gspan()
 {
-    SLGraphMiningResult gspanResult = _gspls->search(_param.colMode->getSelectedColumn(),
+    SLGraphMiningResult gspanResult = _gspls->search(_trainResidualMat.col(0),
                                                      SLGraphMiningTasktypeTrain,
-                                                     _param.colMode->getGraphMingResultType());
+                                                     SLGraphMiningResultTypeX | SLGraphMiningResultTypeRules);
+    
     MatrixXd x = get<MatrixXd>(gspanResult[SLGraphMiningResultTypeX]);
     return x;
 }
@@ -224,13 +222,9 @@ SLModelResult SLGsplsTrain::spls(MatrixXd& feature)
     _featuresMat.rightCols(cols).setZero();
     _featuresMat << _featuresMat.leftCols(preCols), feature;
 
+    _trainResidualMat = get<MatrixXd>(result[SLModelResultTypeRes]);
+    
     return result;
-}
-
-MatrixXd SLGsplsTrain::calcResidual(SLModelResult& trainResult)
-{
-    _trainResidualMat = _trainRespMat - _featuresMat*get<MatrixXd>(trainResult[SLModelResultTypeBeta]);
-    return _trainResidualMat;
 }
 
 bool SLGsplsTrain::isOverfit()
