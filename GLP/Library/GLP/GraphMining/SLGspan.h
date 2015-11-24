@@ -106,6 +106,8 @@ public:
     
     vector<Graph> getTransaction();
 
+    void rebuildDFSTree();
+    
 private:
     void init();
     void initDFSTree(Projected_map3 &root);

@@ -9,6 +9,8 @@
 #include <cstdio>
 #include "gspls-train.hpp"
 
+using namespace std;
+
 string usage()
 {
     return
@@ -50,12 +52,17 @@ int main(int argc, char* argv[])
     train->timeStart();
     
     int i = 0;
-    while ( i < param->n) {
-        // do gspan
-        MatrixXd gspanResult = train->gspan();
+    SLGraphMiningResult gspanResult;
+    while (i < param->n) {
+        // column selection
+        MatrixXd selectedCol = param->colMode->getSelectedColumn(&train->getTrainResidualMat());
         
+        // do gspan
+        gspanResult = train->gspan(selectedCol);
+        MatrixXd x  = get<MatrixXd>(gspanResult[SLGraphMiningResultTypeX]);
+
         // spls
-        SLModelResult trainResult = train->spls(gspanResult);
+        SLModelResult trainResult = train->spls(x);
         
         // overfit detection
         if (train->isOverfit()) break;
@@ -67,6 +74,10 @@ int main(int argc, char* argv[])
     train->timeEnd();
     
     // write result to file
-    
+    ofstream outDFS("DFS.txt", ios::out);
+    for ( size_t i = 0; i < param->topk*3; ++i )
+        outDFS << get< vector<Rule> >(gspanResult[SLGraphMiningResultTypeRules])[i].dfs << endl;
+    outDFS.close();
+
     return 0;
 }

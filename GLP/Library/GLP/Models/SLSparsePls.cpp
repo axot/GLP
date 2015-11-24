@@ -65,29 +65,6 @@ SLMODELRESULTYPE SLPlsModeClassification::getResultType()
     SLModelResultTypeCOV;
 }
 
-MatrixXd SLPlsColumnSelectionAverage::getSelectedColumn()
-{
-    VectorXd ResMean(dataSource->Res.rows());
-    ResMean.setZero();
-    
-    for (ssize_t i=0; i<dataSource->Res.cols(); ++i)
-        ResMean += dataSource->Res.col(i);
-    
-    return ResMean/dataSource->Res.cols();
-}
-
-MatrixXd SLPlsColumnSelectionRandom::getSelectedColumn()
-{
-    return dataSource->Res.col(rand());
-}
-
-MatrixXd SLPlsColumnSelectionVariance::getSelectedColumn()
-{
-    ssize_t selectedColIndex;
-    ColVariance(dataSource->Res).maxCoeff(&selectedColIndex);
-    return dataSource->Res.col(selectedColIndex);
-}
-
 // Public Methods
 SLModelResult SLSparsePls::train(const MatrixXd& appendedX, const MatrixXd& theY, SLMODELRESULTYPE type)
 {
@@ -131,6 +108,8 @@ SLModelResult SLSparsePls::train(const MatrixXd& appendedX, const MatrixXd& theY
     
     Beta = W*(W.transpose()*X.transpose()*X*W).colPivHouseholderQr().solve(W.transpose()*X.transpose()*Y);
     
+    Res = Y - X*Beta;
+
     if (param.verbose)
     {
         LOG(Y);
@@ -139,9 +118,9 @@ SLModelResult SLSparsePls::train(const MatrixXd& appendedX, const MatrixXd& theY
         LOG(selectedCol);
         LOG(Beta);
         LOG(X*Beta.col(0));
+        LOG(Res);
         getchar();
     }
-    Res = Y - X*Beta;
     
     return getTrainResult(type);
 }
@@ -211,8 +190,7 @@ SLModelResult SLSparsePls::classify(const MatrixXd& tX, const MatrixXd& tY, SLMO
 bool SLSparsePls::setParameters(SLSparsePlsParameters& parameters)
 {
     param = parameters;
-    param.colMode->dataSource = this;
-    param.mode->dataSource    = this;
+    param.mode->dataSource = this;
     return true;
 }
 
@@ -220,6 +198,7 @@ bool SLSparsePls::setParameters(SLSparsePlsParameters& parameters)
 SLModelResult SLSparsePls::getTrainResult(SLMODELRESULTYPE type) const
 {
     ASSERT(!(type & ~(SLModelResultTypeBeta |
+                      SLModelResultTypeRes  |
                       SLModelResultTypeQ2   |
                       SLModelResultTypeRSS  |
                       SLModelResultTypeACC  |

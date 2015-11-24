@@ -24,7 +24,40 @@
 //
 
 #include "gspls-train.hpp"
-const float SLGsplsTrain::VALID_RATIO = 0.2f;
+const float SLGsplsTrain::VALID_RATIO = 0;
+
+MatrixXd SLPlsColumnSelectionAverage::getSelectedColumn(MatrixXd* mat)
+{
+    if (mat == NULL) return _selectedCol;
+    
+    VectorXd ResMean(mat->rows());
+    ResMean.setZero();
+    
+    for (ssize_t i=0; i<mat->cols(); ++i)
+        ResMean += mat->col(i);
+    
+    _selectedCol = ResMean/mat->cols();
+    return _selectedCol;
+}
+
+MatrixXd SLPlsColumnSelectionRandom::getSelectedColumn(MatrixXd* mat)
+{
+    if (mat == NULL) return _selectedCol;
+
+    _selectedCol = mat->col(rand());
+    return _selectedCol;
+}
+
+MatrixXd SLPlsColumnSelectionVariance::getSelectedColumn(MatrixXd* mat)
+{
+    if (mat == NULL) return _selectedCol;
+    
+    ssize_t selectedColIndex;
+    ColVariance((*mat)).maxCoeff(&selectedColIndex);
+
+    _selectedCol = mat->col(selectedColIndex);
+    return _selectedCol;
+}
 
 SLGsplsTrain::TrainParameters* SLGsplsTrain::TrainParameters::initWithArgs(int argc, char* argv[])
 {
@@ -133,6 +166,11 @@ MatrixXd& SLGsplsTrain::getValidRespMat()
     return _validRespMat;
 }
 
+MatrixXd& SLGsplsTrain::getTrainResidualMat()
+{
+    return _trainResidualMat;
+}
+
 void SLGsplsTrain::timeStart()
 {
     _timeStart = ptime(microsec_clock::local_time());
@@ -186,10 +224,10 @@ SLGsplsTrain* SLGsplsTrain::initWithParam(TrainParameters& param)
     train->_trainResidualMat = train->_trainRespMat;
 
     // set transaction data
-    SLGspan trainGspan   = train->_gspls->getGraphMining();
+    SLGspan& trainGspan  = train->_gspls->getGraphMining();
     SLGspan validGspan   = trainGspan;
     vector<Graph> graphs = trainGspan.getTransaction();
-    
+
     // use 10% data as validation
     vector<Graph> validGraphs(graphs.end() - train->_validLength, graphs.end());
     validGspan.setTransaction(validGraphs);
@@ -198,17 +236,17 @@ SLGsplsTrain* SLGsplsTrain::initWithParam(TrainParameters& param)
     vector<Graph> trainGraphs(graphs.begin(), graphs.end() - train->_validLength);
     trainGspan.setTransaction(trainGraphs);
     
+    // graph changed, rebuild dfs tree;
+    trainGspan.rebuildDFSTree();
+    
     return train;
 }
 
-MatrixXd SLGsplsTrain::gspan()
+SLGraphMiningResult SLGsplsTrain::gspan(MatrixXd& selectedColumn)
 {
-    SLGraphMiningResult gspanResult = _gspls->search(_trainResidualMat.col(0),
-                                                     SLGraphMiningTasktypeTrain,
-                                                     SLGraphMiningResultTypeX | SLGraphMiningResultTypeRules);
-    
-    MatrixXd x = get<MatrixXd>(gspanResult[SLGraphMiningResultTypeX]);
-    return x;
+    return _gspls->search(selectedColumn,
+                          SLGraphMiningTasktypeTrain,
+                          SLGraphMiningResultTypeX | SLGraphMiningResultTypeRules);
 }
 
 SLModelResult SLGsplsTrain::spls(MatrixXd& feature)

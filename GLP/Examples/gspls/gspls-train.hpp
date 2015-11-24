@@ -26,6 +26,33 @@ using namespace std;
 using namespace boost;
 using namespace boost::posix_time;
 
+class SLPlsColumnSelectionAverage : public IColumnSelection<SLSparsePls>
+{
+private:
+    MatrixXd _selectedCol;
+    
+public:
+    virtual MatrixXd getSelectedColumn(MatrixXd* mat = NULL);
+};
+
+class SLPlsColumnSelectionRandom : public IColumnSelection<SLSparsePls>
+{
+private:
+    MatrixXd _selectedCol;
+    
+public:
+    virtual MatrixXd getSelectedColumn(MatrixXd* mat = NULL);
+};
+
+class SLPlsColumnSelectionVariance : public IColumnSelection<SLSparsePls>
+{
+private:
+    MatrixXd _selectedCol;
+    
+public:
+    virtual MatrixXd getSelectedColumn(MatrixXd* mat = NULL);
+};
+
 class SLGsplsTrain
 {
 public:
@@ -85,7 +112,7 @@ private:
     
     // use 10% train data as validation
     int _validLength;
-    
+
     ptime _timeStart, _timeEnd;
     SLGlpProduct<SLSparsePls, SLGspan>* _gspls;
     
@@ -97,7 +124,7 @@ public:
             
     bool isOverfit();
     
-    MatrixXd gspan();
+    SLGraphMiningResult gspan(MatrixXd& selectedColumn);
     
     SLModelResult spls(MatrixXd&);
     
@@ -109,6 +136,7 @@ public:
     
     MatrixXd& getTrainMat();
     MatrixXd& getTrainRespMat();
+    MatrixXd& getTrainResidualMat();
     MatrixXd& getValidMat();
     MatrixXd& getValidRespMat();
     

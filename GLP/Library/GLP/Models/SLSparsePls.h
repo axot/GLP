@@ -48,10 +48,13 @@ template <typename D>
 class IColumnSelection
 {
 public:
-    D* dataSource;
-
-public:
-    virtual MatrixXd getSelectedColumn() = 0;
+    /** Get Selected Column
+     * @param mat matrix source
+     *
+     * @return when mat is null, return the cached result,
+     *         else return a selected solumn
+     */
+    virtual MatrixXd getSelectedColumn(MatrixXd* mat = NULL) = 0;
 };
 
 class SLPlsModeRregession : public IMode<SLSparsePls>
@@ -64,21 +67,6 @@ class SLPlsModeClassification : public IMode<SLSparsePls>
 {
     virtual bool checkReponseData();
     virtual SLMODELRESULTYPE getResultType();
-};
-
-class SLPlsColumnSelectionAverage : public IColumnSelection<SLSparsePls>
-{
-    virtual MatrixXd getSelectedColumn();
-};
-
-class SLPlsColumnSelectionRandom : public IColumnSelection<SLSparsePls>
-{
-    virtual MatrixXd getSelectedColumn();
-};
-
-class SLPlsColumnSelectionVariance : public IColumnSelection<SLSparsePls>
-{
-    virtual MatrixXd getSelectedColumn();
 };
 
 class SLSparsePls : public SLModelStrategy

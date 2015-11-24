@@ -688,6 +688,12 @@ void SLGspan::initDFSTree(Projected_map3 &root)
     }
 }
 
+void SLGspan::rebuildDFSTree()
+{
+    root.clear();
+    initDFSTree(root);
+}
+
 void SLGspan::initMemoryCache(Projected_map3 &root)
 {
     tree<TNODE>::iterator top = memoryCache.begin();

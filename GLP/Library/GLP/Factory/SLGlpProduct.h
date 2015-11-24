@@ -102,12 +102,12 @@ public:
         return cv.getResultHistory();
     }
     
-    M getModel()
+    M& getModel()
     {
         return model.getModel();
     }
     
-    G getGraphMining()
+    G& getGraphMining()
     {
         return graphMining.getGraphMining();
     }
