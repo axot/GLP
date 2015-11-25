@@ -271,3 +271,12 @@ bool SLGsplsTrain::isOverfit()
     static int count = 10;
     return --count ? false : true;
 }
+
+void SLGsplsTrain::saveResults()
+{
+    ofstream outDFS("DFS.txt", ios::out);
+    for ( size_t i = 0; i < this->_param.topk*3; ++i )
+        outDFS << get< vector<Rule> >(gspanResult[SLGraphMiningResultTypeRules])[i].dfs << endl;
+    outDFS.close();
+}
+

@@ -52,17 +52,16 @@ int main(int argc, char* argv[])
     train->timeStart();
     
     int i = 0;
-    SLGraphMiningResult gspanResult;
     while (i < param->n) {
         // column selection
         MatrixXd selectedCol = param->colMode->getSelectedColumn(&train->getTrainResidualMat());
         
         // do gspan
-        gspanResult = train->gspan(selectedCol);
-        MatrixXd x  = get<MatrixXd>(gspanResult[SLGraphMiningResultTypeX]);
+        train->gspanResult = train->gspan(selectedCol);
 
         // spls
-        SLModelResult trainResult = train->spls(x);
+        MatrixXd features = get<MatrixXd>(train->gspanResult[SLGraphMiningResultTypeX]);
+        train->splsResult = train->spls(features);
         
         // overfit detection
         if (train->isOverfit()) break;
@@ -74,10 +73,7 @@ int main(int argc, char* argv[])
     train->timeEnd();
     
     // write result to file
-    ofstream outDFS("DFS.txt", ios::out);
-    for ( size_t i = 0; i < param->topk*3; ++i )
-        outDFS << get< vector<Rule> >(gspanResult[SLGraphMiningResultTypeRules])[i].dfs << endl;
-    outDFS.close();
+    train->saveResults();
 
     return 0;
 }

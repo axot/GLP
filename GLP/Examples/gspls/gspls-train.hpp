@@ -106,6 +106,7 @@ private:
     MatrixXd _validMat;
     MatrixXd _validRespMat;
     MatrixXd _validResidualMat;
+    
     friend class ColumnSelectionAverage;
     friend class ColumnSelectionRandom;
     friend class ColumnSelectionVariance;
@@ -117,6 +118,9 @@ private:
     SLGlpProduct<SLSparsePls, SLGspan>* _gspls;
     
 public:
+    SLGraphMiningResult gspanResult;
+    SLModelResult splsResult;
+
     static const float VALID_RATIO;
     
 public:
@@ -128,6 +132,7 @@ public:
     
     SLModelResult spls(MatrixXd&);
     
+    void saveResults();
     void timeStart();
     
     void timeEnd();
