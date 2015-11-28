@@ -650,6 +650,12 @@ void SLGspan::rebuildDFSTree()
 {
     root.clear();
     initDFSTree(root);
+    
+    if ( doesUseMemoryBoost )
+    {
+        memoryCache.clear();
+        initMemoryCache(root);
+    }
 }
 
 void SLGspan::initMemoryCache(Projected_map3 &root)
