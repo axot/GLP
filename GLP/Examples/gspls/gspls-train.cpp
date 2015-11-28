@@ -150,10 +150,10 @@ SLGsplsTrain::TrainParameters* SLGsplsTrain::TrainParameters::initWithArgs(int a
     if (param->mode == NULL)
         param->mode = (SLPlsModeRregession*) new SLPlsModeRregession();
         
-        if (param->colMode == NULL)
-            param->colMode = (IColumnSelection<SLSparsePls>*) new SLPlsColumnSelectionVariance();
-            
-            return param;
+    if (param->colMode == NULL)
+        param->colMode = (IColumnSelection<SLSparsePls>*) new SLPlsColumnSelectionVariance();
+        
+        return param;
 }
 
 MatrixXd& SLGsplsTrain::getTrainRespMat()
@@ -294,9 +294,16 @@ bool SLGsplsTrain::isOverfit(vector<Rule> rules)
 
 void SLGsplsTrain::saveResults()
 {
-    ofstream outDFS("DFS.txt", ios::out);
-    for ( size_t i = 0; i < this->_param.topk*3; ++i )
-        outDFS << get< vector<Rule> >(gspanResult[SLGraphMiningResultTypeRules])[i].dfs << endl;
-    outDFS.close();
+    cerr << "Beta"    << endl << get< MatrixXd >(splsResult[SLModelResultTypeBeta]) << endl << endl;
+    cerr << "DFS"     << endl;
+    
+    vector<Rule> DFSes = get< vector<Rule> >(gspanResult[SLGraphMiningResultTypeRules]);
+    for ( size_t i = 0; i < DFSes.size(); ++i )
+        cerr << DFSes[i].dfs << endl;
+    
+//    ofstream outDFS("DFS.txt", ios::out);
+//    for ( size_t i = 0; i < this->_param.topk*3; ++i )
+//        outDFS << get< vector<Rule> >(gspanResult[SLGraphMiningResultTypeRules])[i].dfs << endl;
+//    outDFS.close();
 }
 
