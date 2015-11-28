@@ -446,8 +446,10 @@ void SLGspan::project(Projected& projected)
         vector<Rule>::iterator it;
         
         Darts::DoubleArray::result_type result =
-            this->darts->exactMatchSearch<Darts::DoubleArray::result_type>(ostrs.str().c_str());
-        if (result != -1){
+            this->darts->exactMatchSearch(ostrs.str().c_str());
+
+        if (result == -2) return;
+        if (result >= 0){
             patternMatched.push_back(result);
         }
         
@@ -535,10 +537,13 @@ void SLGspan::project(Projected& projected, tree<TNODE>::iterator& tnode)
         DFS_CODE.write (ostrs);
         
         vector<Rule>::iterator it;
-        it = find(entireRules.begin(), entireRules.end(), ostrs.str());
-        if ( it != entireRules.end() )
-        {
-            patternMatched.push_back(it - entireRules.begin());
+        
+        Darts::DoubleArray::result_type result =
+        this->darts->exactMatchSearch(ostrs.str().c_str());
+        
+        if (result == -2) return;
+        if (result >= 0){
+            patternMatched.push_back(result);
         }
         
         if (maxpat == DFS_CODE.size()) return;
