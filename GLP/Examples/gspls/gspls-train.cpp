@@ -24,7 +24,7 @@
 //
 
 #include "gspls-train.hpp"
-const float SLGsplsTrain::VALID_RATIO = 0;
+const float SLGsplsTrain::VALID_RATIO = 0.1f;
 
 MatrixXd SLPlsColumnSelectionAverage::getSelectedColumn(MatrixXd* mat)
 {
@@ -225,12 +225,13 @@ SLGsplsTrain* SLGsplsTrain::initWithParam(TrainParameters& param)
 
     // set transaction data
     SLGspan& trainGspan  = train->_gspls->getGraphMining();
-    SLGspan validGspan   = trainGspan;
+    train->_validGspan   = new SLGspan();
     vector<Graph> graphs = trainGspan.getTransaction();
+    train->_validGspan->setParameters(gspanParam);
 
-    // use 10% data as validation
+    // set validation transactions
     vector<Graph> validGraphs(graphs.end() - train->_validLength, graphs.end());
-    validGspan.setTransaction(validGraphs);
+    train->_validTransaction = validGraphs;
     
     // use left data as train
     vector<Graph> trainGraphs(graphs.begin(), graphs.end() - train->_validLength);
@@ -265,8 +266,21 @@ SLModelResult SLGsplsTrain::spls(MatrixXd& feature)
     return result;
 }
 
-bool SLGsplsTrain::isOverfit()
+bool SLGsplsTrain::isOverfit(vector<Rule> rules)
 {
+    MatrixXd result(_validTransaction.size(), rules.size());
+    
+    for (size_t i = 0; i < _validTransaction.size(); ++i) {
+        result.row(i) = _validGspan->classify(rules, _validTransaction[i]);
+    }
+    
+    SLModelResult scores = _gspls->classify(result, _validRespMat, _param.mode->getResultType());
+    
+    cerr << "Valid  Q2: " << scores[SLModelResultTypeQ2]  << endl;
+    cerr << "Valid AUC: " << scores[SLModelResultTypeAUC] << endl;
+    cerr << "Valid ACC: " << scores[SLModelResultTypeACC] << endl;
+    cerr << "Valid RSS: " << scores[SLModelResultTypeRSS] << endl;
+
     // TODO: IMP
     static int count = 10;
     return --count ? false : true;

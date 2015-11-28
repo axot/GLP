@@ -107,6 +107,9 @@ private:
     MatrixXd _validRespMat;
     MatrixXd _validResidualMat;
     
+    SLGspan* _validGspan;
+    vector<Graph> _validTransaction;
+    
     friend class ColumnSelectionAverage;
     friend class ColumnSelectionRandom;
     friend class ColumnSelectionVariance;
@@ -126,7 +129,7 @@ public:
 public:
     static SLGsplsTrain* initWithParam(TrainParameters&);
             
-    bool isOverfit();
+    bool isOverfit(vector<Rule> rules);
     
     SLGraphMiningResult gspan(MatrixXd& selectedColumn);
     

@@ -108,6 +108,8 @@ public:
 
     void rebuildDFSTree();
     
+    MatrixXd classify (vector<Rule> rules, Graph &g);
+    
 private:
     void init();
     void initDFSTree(Projected_map3 &root);
@@ -149,7 +151,7 @@ private:
     Rule rule;                          // current rule
     multiset<Rule> rule_cache;          // topk rule cache
     vector<Rule> entireRules;
-    vector<size_t> patternMatchedResult;// the index result of classify data matched current patterns
+    vector<size_t> patternMatched;      // the index result of classify data matched current patterns
     
     double wbias;                       // 
     double tau;                         // the absolute value of the difference between the weighted frequency

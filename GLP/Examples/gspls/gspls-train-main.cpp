@@ -53,19 +53,26 @@ int main(int argc, char* argv[])
     
     int i = 0;
     while (i < param->n) {
-        // column selection
-        MatrixXd selectedCol = param->colMode->getSelectedColumn(&train->getTrainResidualMat());
+        cerr << "iter: " << i << endl;
         
-        // do gspan
-        train->gspanResult = train->gspan(selectedCol);
+        // column selection
+        cerr << "column selection" << endl;
+        MatrixXd selectedCol = param->colMode->getSelectedColumn(&train->getTrainResidualMat());
 
+        // do gspan
+        cerr << "gspan" << endl;
+        train->gspanResult = train->gspan(selectedCol);
+        
         // spls
+        cerr << "spls train" << endl;
         MatrixXd features = get<MatrixXd>(train->gspanResult[SLGraphMiningResultTypeX]);
         train->splsResult = train->spls(features);
-        
+       
         // overfit detection
-        if (train->isOverfit()) break;
-        
+        cerr << "overfit detection" << endl;
+        vector<Rule> rules = get< vector<Rule> >(train->gspanResult[SLGraphMiningResultTypeRules]);
+        if (train->isOverfit(rules)) break;
+            
         ++i;
     }
     
