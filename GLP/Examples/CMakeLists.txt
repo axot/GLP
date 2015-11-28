@@ -2,9 +2,9 @@ add_executable(gspan gspan.cpp)
 add_executable(gspan_static gspan.cpp)
 add_executable(gspan_pls_static gspan_pls.cpp)
 
-target_link_libraries(gspan LINK_PUBLIC glp)
-target_link_libraries(gspan_static LINK_PUBLIC glp_static)
-target_link_libraries(gspan_pls_static LINK_PUBLIC glp_static)
+target_link_libraries(gspan glp)
+target_link_libraries(gspan_static glp_static)
+target_link_libraries(gspan_pls_static glp_static)
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   set_target_properties(gspan_static PROPERTIES LINK_FLAGS "-static")
