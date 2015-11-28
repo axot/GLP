@@ -263,6 +263,11 @@ SLModelResult SLGsplsTrain::spls(MatrixXd& feature)
 
     _trainResidualMat = get<MatrixXd>(result[SLModelResultTypeRes]);
     
+    cerr << "Train AUC: " << get< MatrixXd >(result[SLModelResultTypeAUC]).mean() << endl;
+    cerr << "Train ACC: " << get< MatrixXd >(result[SLModelResultTypeACC]).mean() << endl;
+    cerr << "Train COV: " << get< MatrixXd >(result[SLModelResultTypeCOV]).mean() << endl;
+    cerr << "Train RSS: " << get< MatrixXd >(result[SLModelResultTypeRSS]).mean() << endl;
+
     return result;
 }
 
@@ -270,20 +275,21 @@ bool SLGsplsTrain::isOverfit(vector<Rule> rules)
 {
     MatrixXd result(_validTransaction.size(), rules.size());
     
+    _validGspan->buildDarts(rules);
     for (size_t i = 0; i < _validTransaction.size(); ++i) {
-        result.row(i) = _validGspan->classify(rules, _validTransaction[i]);
+        result.row(i) = _validGspan->classify(_validTransaction[i]);
     }
     
     SLModelResult scores = _gspls->classify(result, _validRespMat, _param.mode->getResultType());
     
-    cerr << "Valid  Q2: " << scores[SLModelResultTypeQ2]  << endl;
-    cerr << "Valid AUC: " << scores[SLModelResultTypeAUC] << endl;
-    cerr << "Valid ACC: " << scores[SLModelResultTypeACC] << endl;
-    cerr << "Valid RSS: " << scores[SLModelResultTypeRSS] << endl;
+//    cerr << "Valid  Q2: " << get< MatrixXd >(scores[SLModelResultTypeQ2]).mean()  << endl;
+    cerr << "Valid AUC: " << get< MatrixXd >(scores[SLModelResultTypeAUC]).mean() << endl;
+    cerr << "Valid ACC: " << get< MatrixXd >(scores[SLModelResultTypeACC]).mean() << endl;
+    cerr << "Valid COV: " << get< MatrixXd >(scores[SLModelResultTypeCOV]).mean() << endl;
+    cerr << "Valid RSS: " << get< MatrixXd >(scores[SLModelResultTypeRSS]).mean() << endl;
 
     // TODO: IMP
-    static int count = 10;
-    return --count ? false : true;
+    return false;
 }
 
 void SLGsplsTrain::saveResults()

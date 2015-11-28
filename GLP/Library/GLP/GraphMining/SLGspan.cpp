@@ -174,15 +174,37 @@ SLGraphMiningResult SLGspan::search(VectorXd residual, SLGRAPHMININGTASKTYPE tas
     return result;
 }
 
-MatrixXd SLGspan::classify(vector<Rule> rules, Graph &g)
+void SLGspan::buildDarts(vector<Rule> rules)
 {
-    this->taskType = SLGraphMiningTasktypeClassify;
-    
-//    for (size_t i = 0; i < rules.size(); ++i) {
-//        rules[i].loc.clear();
-//    }
+    using namespace boost::phoenix;
+    using namespace boost::phoenix::arg_names;
+
     this->entireRules = rules;
     
+    vector<string> ary;
+    for (size_t i = 0; i < rules.size(); ++i)
+    {
+        ary.push_back(rules[i].dfs);
+    }
+
+    darts_indices.resize(ary.size());
+    
+    int i = 0;
+    transform(ary.begin(), ary.end(), darts_indices.begin(), boost::phoenix::ref(i)++);
+    sort(darts_indices.begin(), darts_indices.end(), boost::phoenix::ref(ary)[arg1] < boost::phoenix::ref(ary)[arg2]);
+    
+    vector <Darts::DoubleArray::key_type *> arrForBuild(ary.size());
+    for (size_t i = 0; i < arrForBuild.size(); ++i) {
+        arrForBuild[i] = (Darts::DoubleArray::key_type*)ary[darts_indices[i]].c_str();
+    }
+    
+    this->darts = new Darts::DoubleArray();
+    this->darts->build (arrForBuild.size(), &arrForBuild[0], 0, 0, 0);
+}
+
+MatrixXd SLGspan::classify(Graph &g)
+{
+    this->taskType = SLGraphMiningTasktypeClassify;
     patternMatched.clear ();
     
     Projected_map3 root;
@@ -209,11 +231,11 @@ MatrixXd SLGspan::classify(vector<Rule> rules, Graph &g)
     std::sort (patternMatched.begin(), patternMatched.end());
     patternMatched.erase (std::unique (patternMatched.begin(), patternMatched.end()), patternMatched.end());
     
-    MatrixXd features(transaction.size(), rules.size());
+    MatrixXd features(transaction.size(), this->entireRules.size());
     features.setConstant(0.0f);
     
     for (size_t n_rule = 0; n_rule < patternMatched.size(); ++n_rule)
-        features(0, patternMatched[n_rule]) = 1.0f;
+        features(0, darts_indices[patternMatched[n_rule]] ) = 1.0f;
     
     return features;
 }
@@ -422,10 +444,11 @@ void SLGspan::project(Projected& projected)
         DFS_CODE.write (ostrs);
         
         vector<Rule>::iterator it;
-        it = find(entireRules.begin(), entireRules.end(), ostrs.str());
-        if ( it != entireRules.end() )
-        {
-            patternMatched.push_back(it - entireRules.begin());
+        
+        Darts::DoubleArray::result_type result =
+            this->darts->exactMatchSearch<Darts::DoubleArray::result_type>(ostrs.str().c_str());
+        if (result != -1){
+            patternMatched.push_back(result);
         }
         
         if (maxpat == DFS_CODE.size()) return;
@@ -651,7 +674,7 @@ void SLGspan::rebuildDFSTree()
     root.clear();
     initDFSTree(root);
     
-    if ( doesUseMemoryBoost )
+    if (doesUseMemoryBoost)
     {
         memoryCache.clear();
         initMemoryCache(root);

@@ -31,11 +31,14 @@
 #include <map>
 #include <set>
 #include <list>
+#include <boost/spirit/include/phoenix_core.hpp>
+#include <boost/spirit/include/phoenix_operator.hpp>
 #include "SLGraphMiningStrategy.h"
 #include "Gspan/Graph.h"
 #include "Gspan/Dfs.h"
 #include "Gspan/Utility.h"
 #include "Gspan/tree.hh"
+#include "Gspan/darts.h"
 
 using namespace std;
 
@@ -108,7 +111,9 @@ public:
 
     void rebuildDFSTree();
     
-    MatrixXd classify (vector<Rule> rules, Graph &g);
+    void buildDarts(vector<Rule> rules);
+    
+    MatrixXd classify (Graph &g);
     
 private:
     void init();
@@ -151,6 +156,9 @@ private:
     Rule rule;                          // current rule
     multiset<Rule> rule_cache;          // topk rule cache
     vector<Rule> entireRules;
+    Darts::DoubleArray* darts;          // double array for search matched pattern in classification mode
+    vector<size_t> darts_indices;
+
     vector<size_t> patternMatched;      // the index result of classify data matched current patterns
     
     double wbias;                       // 

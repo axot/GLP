@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
     
     int i = 0;
     while (i < param->n) {
-        cerr << "iter: " << i << endl;
+        cerr << "iter: " << i+1 << endl;
         
         // column selection
         cerr << "column selection" << endl;
@@ -72,7 +72,8 @@ int main(int argc, char* argv[])
         cerr << "overfit detection" << endl;
         vector<Rule> rules = get< vector<Rule> >(train->gspanResult[SLGraphMiningResultTypeRules]);
         if (train->isOverfit(rules)) break;
-            
+
+        cerr << endl;
         ++i;
     }
     
