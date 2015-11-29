@@ -174,6 +174,16 @@ SLGraphMiningResult SLGspan::search(VectorXd residual, SLGRAPHMININGTASKTYPE tas
     return result;
 }
 
+void SLGspan::buildDarts(vector<string> dfs)
+{
+    vector<Rule> rules(dfs.size());
+    for (size_t i = 0; i < dfs.size(); ++i) {
+        rules[i].dfs = dfs[i];
+    }
+    
+    buildDarts(rules);
+}
+
 void SLGspan::buildDarts(vector<Rule> rules)
 {
     using namespace boost::phoenix;

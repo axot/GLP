@@ -136,6 +136,8 @@ public:
      */
     bool setParameters(SLSparsePlsParameters& parameters);
     
+    SLModelResult classify(const MatrixXd& beta, const MatrixXd& tX, const MatrixXd& tY, SLMODELRESULTYPE type);
+    
     /* Get Parameters:
      *
      * Return: current parameters.

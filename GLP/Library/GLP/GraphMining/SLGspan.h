@@ -112,6 +112,7 @@ public:
     void rebuildDFSTree();
     
     void buildDarts(vector<Rule> rules);
+    void buildDarts(vector<string> dfs);
     
     MatrixXd classify (Graph &g);
     

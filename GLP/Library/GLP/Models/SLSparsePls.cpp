@@ -153,6 +153,12 @@ SLModelResult SLSparsePls::train(const MatrixXd& appendedX, const MatrixXd& theY
     return getTrainResult(type);
 }
 
+SLModelResult SLSparsePls::classify(const MatrixXd& beta, const MatrixXd& tX, const MatrixXd& tY, SLMODELRESULTYPE type)
+{
+    Beta = beta;
+    return classify(tX, tY, type);
+}
+
 SLModelResult SLSparsePls::classify(const MatrixXd& tX, const MatrixXd& tY, SLMODELRESULTYPE type) const
 {
     ASSERT(type != SLModelResultTypeNone, "No type of result was indicated");
