@@ -79,7 +79,7 @@ SLGsplsTrain::TrainParameters* SLGsplsTrain::TrainParameters::initWithArgs(int a
     int opt;
     while ((opt = getopt_long(argc,
                               (char **)argv,
-                              "L:m:n:k:f:y:t:vbsarp",
+                              "L:m:n:k:f:y:t:o:vbsarp",
                               long_options,
                               &option_index)) != -1)
     {
@@ -123,6 +123,9 @@ SLGsplsTrain::TrainParameters* SLGsplsTrain::TrainParameters::initWithArgs(int a
                 break;
             case 't':
                 param->resultHist.length = atoi(optarg);
+                break;
+            case 'o':
+                param->validLength = atoi(optarg);
                 break;
             case 'v':
                 param->verbose = true;
@@ -216,11 +219,12 @@ SLGsplsTrain* SLGsplsTrain::initWithParam(TrainParameters& param)
         EigenExt::loadMatrixFromFile(train->_trainRespMat, train->_param.respFile);
     
     // calculate valid data length
-    train->_validLength  = floor(train->_trainRespMat.rows() * VALID_RATIO);
-
+    if (param.validLength < 0){
+        param.validLength  = floor(train->_trainRespMat.rows() * VALID_RATIO);
+    }
     // setup response data
-    train->_validRespMat = train->_trainRespMat.bottomRows(train->_validLength);
-    train->_trainRespMat = train->_trainRespMat.topRows(train->_trainRespMat.rows() - train->_validLength);
+    train->_validRespMat = train->_trainRespMat.bottomRows(param.validLength);
+    train->_trainRespMat = train->_trainRespMat.topRows(train->_trainRespMat.rows() - param.validLength);
 
     // init _trainResidualMat same as _trainRespMat
     train->_trainResidualMat = train->_trainRespMat;
@@ -232,11 +236,11 @@ SLGsplsTrain* SLGsplsTrain::initWithParam(TrainParameters& param)
     train->_validGspan->setParameters(gspanParam);
 
     // set validation transactions
-    vector<Graph> validGraphs(graphs.end() - train->_validLength, graphs.end());
+    vector<Graph> validGraphs(graphs.end() - param.validLength, graphs.end());
     train->_validTransaction = validGraphs;
     
     // use left data as train
-    vector<Graph> trainGraphs(graphs.begin(), graphs.end() - train->_validLength);
+    vector<Graph> trainGraphs(graphs.begin(), graphs.end() - param.validLength);
     trainGspan.setTransaction(trainGraphs);
     
     // graph changed, rebuild dfs tree;

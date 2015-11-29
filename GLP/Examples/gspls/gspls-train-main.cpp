@@ -45,6 +45,7 @@ string usage()
     "          [-r] use random residual column, defult is using max variance column\n"
     "          [-t] the threshold value which used to avoid overfiting default: 3(times)\n"
     "          [-b] use memory boosting\n"
+    "          [-o] the length(not percentage) of validation, default use bottom 10% of train data\n"
     "\n"
     "  Author: Zheng Shao\n"
     " Contact: axot@axot.org\n"

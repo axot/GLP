@@ -86,7 +86,8 @@ public:
         verbose(false),
         boost(false),
         mode(NULL),
-        colMode(NULL)
+        colMode(NULL),
+        validLength(-1)
         {}
         
         static TrainParameters* initWithArgs(int argc, char* argv[]);
@@ -104,6 +105,7 @@ public:
         bool boost;
         IMode<SLSparsePls>* mode;
         IColumnSelection<SLSparsePls>* colMode;
+        int validLength;
     };
     
 private:
@@ -126,7 +128,6 @@ private:
     friend class ColumnSelectionRandom;
     friend class ColumnSelectionVariance;
     
-    int _validLength;
     bool _isOverfit;
 
     ptime _timeStart, _timeEnd;
