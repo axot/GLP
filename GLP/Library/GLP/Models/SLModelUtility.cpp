@@ -53,7 +53,7 @@ void SLModelUtility::printResult(SLMODELRESULTYPE resultType, SLModelResult& res
     if ( resultType & SLModelResultTypeBIC )
         cout << format("%8s: %14.8f") % "BIC" % get< MatrixXd >(result[SLModelResultTypeBIC]).mean();
     
-    cout << endl << endl;
+    cout << endl;
 }
 
 MatrixXd SLModelUtility::getRSS(const MatrixXd& RES)

@@ -3,7 +3,7 @@
 //  GLP
 //
 //  Created by Zheng Shao on 11/23/15.
-//  Copyright (c) 2012 Saigo Laboratoire. All rights reserved.
+//  Copyright (c) 2012-2015 Saigo Laboratoire. All rights reserved.
 //
 //  This is free software with ABSOLUTELY NO WARRANTY.
 //
@@ -44,10 +44,7 @@ string usage()
     "          [-a] use average residual column, defult is using max variance column\n"
     "          [-r] use random residual column, defult is using max variance column\n"
     "          [-t] the threshold value which used to avoid overfiting default: 3(times)\n"
-    "          [-s] shuffle data(preprocess)\n"
     "          [-b] use memory boosting\n"
-    "          [-p] centering and scaling label for regression mode\n"
-    "          [-v] verbose\n"
     "\n"
     "  Author: Zheng Shao\n"
     " Contact: axot@axot.org\n"
@@ -70,35 +67,37 @@ int main(int argc, char* argv[])
     
     size_t i = 0;
     while (i < param->n) {
-        cerr << "iter: " << i+1 << endl;
+        cout << "n: " << ++i << endl;
         
         // column selection
-        cerr << "column selection" << endl;
         MatrixXd selectedCol = param->colMode->getSelectedColumn(&train->getTrainResidualMat());
 
-        // do gspan
-        cerr << "gspan" << endl;
+        // gspan
         train->gspanResult = train->gspan(selectedCol);
         
         // spls
-        cerr << "spls train" << endl;
+        cout << "Train" << endl;
         MatrixXd features = get<MatrixXd>(train->gspanResult[SLGraphMiningResultTypeX]);
         train->splsResult = train->spls(features);
-       
+               
         // overfit detection
-        cerr << "overfit detection" << endl;
+        cout << "Validation" << endl;
         vector<Rule> rules = get< vector<Rule> >(train->gspanResult[SLGraphMiningResultTypeRules]);
-        if (train->isOverfit(rules)) break;
+        
+        if (train->isOverfit(rules)){
+            cout << endl;
+            break;
+        }
 
-        cerr << endl;
-        ++i;
+        cout << endl;
     }
     
     // calc time elapsed
     train->timeEnd();
     
     // write result to file
-    train->saveResults();
+    size_t best = i - param->resultHist.length;
+    train->saveResults(best);
 
     return 0;
 }

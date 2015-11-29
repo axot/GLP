@@ -3,7 +3,7 @@
 //  GLP
 //
 //  Created by Zheng Shao on 11/17/15.
-//  Copyright (c) 2012 Saigo Laboratoire. All rights reserved.
+//  Copyright (c) 2012-2015 Saigo Laboratoire. All rights reserved.
 //
 //  This is free software with ABSOLUTELY NO WARRANTY.
 //
@@ -91,9 +91,11 @@ SLGsplsTrain::TrainParameters* SLGsplsTrain::TrainParameters::initWithArgs(int a
                 
                 string optname = string(long_options[option_index].name);
                 if (optname == "reg"){
+                    cout << "Regression Mode" << endl;
                     param->mode = (SLPlsModeRegression*) new SLPlsModeRegression();
                 }
                 else if (optname == "cla"){
+                    cout << "Classification Mode" << endl;
                     param->mode = (SLPlsModeClassification*) new SLPlsModeClassification();
                 }
                 else{
@@ -120,7 +122,7 @@ SLGsplsTrain::TrainParameters* SLGsplsTrain::TrainParameters::initWithArgs(int a
                 param->respFile = strdup(optarg);
                 break;
             case 't':
-                param->resultHistorySize = atoi(optarg);
+                param->resultHist.length = atoi(optarg);
                 break;
             case 'v':
                 param->verbose = true;
@@ -128,17 +130,11 @@ SLGsplsTrain::TrainParameters* SLGsplsTrain::TrainParameters::initWithArgs(int a
             case 'b':
                 param->boost = true;
                 break;
-            case 's':
-                param->useShuffledData = true;
-                break;
             case 'a':
                 param->colMode = (IColumnSelection<SLSparsePls>*) new SLPlsColumnSelectionAverage();
                 break;
             case 'r':
                 param->colMode = (IColumnSelection<SLSparsePls>*) new SLPlsColumnSelectionRandom();
-                break;
-            case 'p':
-                param->preProcess = true;
                 break;
             case '?':
             default:
@@ -185,6 +181,11 @@ void SLGsplsTrain::timeEnd()
 time_duration SLGsplsTrain::timeDuration()
 {
     return time_duration(_timeEnd - _timeStart);
+}
+
+void SLGsplsTrain::setFileSuffix(string suffix)
+{
+    _fileSuffix = suffix;
 }
 
 SLGsplsTrain* SLGsplsTrain::initWithParam(TrainParameters& param)
@@ -241,6 +242,15 @@ SLGsplsTrain* SLGsplsTrain::initWithParam(TrainParameters& param)
     // graph changed, rebuild dfs tree;
     trainGspan.rebuildDFSTree();
     
+    // outout file suffix
+    string suffix = (format("gspls_m%d_L%d_n%d_k%d_t%d_") %
+                            param.minsup                  %
+                            param.maxpat                  %
+                            param.n                       %
+                            param.topk                    %
+                            param.resultHist.length
+                     ).str();
+    train->setFileSuffix(suffix);
     return train;
 }
 
@@ -272,8 +282,9 @@ SLModelResult SLGsplsTrain::spls(MatrixXd& feature)
 
 bool SLGsplsTrain::isOverfit(vector<Rule> rules)
 {
-    MatrixXd result(_validTransaction.size(), rules.size());
+    _param.resultHist.push_front(make_pair(gspanResult, splsResult));
     
+    MatrixXd result(_validTransaction.size(), rules.size());
     _validGspan->buildDarts(rules);
     for (size_t i = 0; i < _validTransaction.size(); ++i) {
         result.row(i) = _validGspan->classify(_validTransaction[i]);
@@ -286,21 +297,46 @@ bool SLGsplsTrain::isOverfit(vector<Rule> rules)
     SLMODELRESULTYPE types = _param.mode->getResultType();
     SLModelUtility::printResult(types, scores);
 
-    return overfitCnt >= _param.resultHistorySize;
+    _isOverfit = overfitCnt >= _param.resultHist.length;
+    return _isOverfit;
 }
 
-void SLGsplsTrain::saveResults()
+void SLGsplsTrain::saveResults(size_t index)
 {
-    cerr << "Beta"    << endl << get< MatrixXd >(splsResult[SLModelResultTypeBeta]) << endl << endl;
-    cerr << "DFS"     << endl;
+    SLCrossValidationResults oldResult;
+    size_t best = index;
+    pair<SLGraphMiningResult, SLModelResult> resultPair;
     
-    vector<Rule> DFSes = get< vector<Rule> >(gspanResult[SLGraphMiningResultTypeRules]);
-    for ( size_t i = 0; i < DFSes.size(); ++i )
-        cerr << DFSes[i].dfs << endl;
+    if (_isOverfit == false)
+    {
+        cerr << "Info: Can not get best result, please set a bigger value for argument n" << endl;
+        best = _param.n;
+        resultPair = _param.resultHist.front();
+    }
+    else
+        resultPair = _param.resultHist.back();
     
-//    ofstream outDFS("DFS.txt", ios::out);
-//    for ( size_t i = 0; i < this->_param.topk*3; ++i )
-//        outDFS << get< vector<Rule> >(gspanResult[SLGraphMiningResultTypeRules])[i].dfs << endl;
-//    outDFS.close();
-}
+    // best index
+    cout << "Best: n = " << index << endl;
+    
+    // beta
+    ofstream outBeta((_fileSuffix+"Beta.txt").c_str(), ios::out);
+    outBeta.precision(12);
+    outBeta.flags(ios::left);
+    outBeta << resultPair.second[SLModelResultTypeBeta] << endl;
+    cout << "Beta" << endl << get< MatrixXd >(resultPair.second[SLModelResultTypeBeta]) << endl << endl;
 
+    // dfs
+    cout << "DFS" << endl;
+    vector<Rule> DFSes = get< vector<Rule> >(resultPair.first[SLGraphMiningResultTypeRules]);
+    ofstream outDFS((_fileSuffix+"DFS.txt").c_str(), ios::out);
+    for ( size_t i = 0; i < DFSes.size(); ++i )
+    {
+        cout   << DFSes[i].dfs << endl;
+        outDFS << DFSes[i].dfs << endl;
+    }
+    cout << endl;
+    
+    // time
+    cout << "duration: " << timeDuration() << endl;
+}

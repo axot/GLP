@@ -27,6 +27,7 @@
 #include "SLModelUtility.h"
 
 using namespace std;
+using namespace boost;
 
 bool SLPlsModeRegression::checkReponseData()
 {
