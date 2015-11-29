@@ -24,15 +24,16 @@
 #include <Eigen/QR>
 #include "SLSparsePls.h"
 #include "../SLUtility.h"
+#include "SLModelUtility.h"
 
 using namespace std;
 
-bool SLPlsModeRregession::checkReponseData()
+bool SLPlsModeRegression::checkReponseData()
 {
     return true;
 }
 
-SLMODELRESULTYPE SLPlsModeRregession::getResultType()
+SLMODELRESULTYPE SLPlsModeRegression::getResultType()
 {
     return
     SLModelResultTypeQ2   |
@@ -42,6 +43,19 @@ SLMODELRESULTYPE SLPlsModeRregession::getResultType()
     SLModelResultTypeAIC  |
     SLModelResultTypeBIC  |
     SLModelResultTypeCOV;
+}
+
+size_t SLPlsModeRegression::overfitCnt(SLModelResult& result)
+{
+    double rss = get< MatrixXd >(result[SLModelResultTypeRSS]).mean();
+    if ( rss < _minRSS )
+    {
+        _minRSS = rss;
+        _overfitCount = 0;
+    }
+    else ++_overfitCount;
+
+    return _overfitCount;
 }
 
 bool SLPlsModeClassification::checkReponseData()
@@ -63,6 +77,19 @@ SLMODELRESULTYPE SLPlsModeClassification::getResultType()
     SLModelResultTypeACC  |
     SLModelResultTypeAUC  |
     SLModelResultTypeCOV;
+}
+
+size_t SLPlsModeClassification::overfitCnt(SLModelResult& result)
+{
+    double auc = get< MatrixXd >(result[SLModelResultTypeAUC]).mean();
+    if ( auc > _maxAUC )
+    {
+        _maxAUC = auc;
+        _overfitCount = 0;
+    }
+    else ++_overfitCount;
+    
+    return _overfitCount;
 }
 
 // Public Methods
@@ -148,12 +175,12 @@ SLModelResult SLSparsePls::classify(const MatrixXd& tX, const MatrixXd& tY, SLMO
 
     if(type & SLModelResultTypeQ2)
     {
-        result[SLModelResultTypeQ2] = getQ2(tRES, tY);
+        result[SLModelResultTypeQ2] = SLModelUtility::getQ2(tRES, tY);
     }
     
     if(type & SLModelResultTypeRSS)
     {
-        result[SLModelResultTypeRSS] = getRSS(tRES);
+        result[SLModelResultTypeRSS] = SLModelUtility::getRSS(tRES);
     }
     
     if(type & SLModelResultTypeBeta)
@@ -168,27 +195,27 @@ SLModelResult SLSparsePls::classify(const MatrixXd& tX, const MatrixXd& tY, SLMO
     
     if(type & SLModelResultTypeACC)
     {
-        result[SLModelResultTypeACC] = getACC(tY, tX*Beta);
+        result[SLModelResultTypeACC] = SLModelUtility::getACC(tY, tX*Beta);
     }
     
     if(type & SLModelResultTypeAUC)
     {
-        result[SLModelResultTypeAUC] = getAUC(tY, tX*Beta);
+        result[SLModelResultTypeAUC] = SLModelUtility::getAUC(tY, tX*Beta);
     }
     
     if(type & SLModelResultTypeAIC)
     {
-        result[SLModelResultTypeAIC] = getAIC(tY, tX*Beta, X.cols());
+        result[SLModelResultTypeAIC] = SLModelUtility::getAIC(tY, tX*Beta, X.cols());
     }
 
     if(type & SLModelResultTypeBIC)
     {
-        result[SLModelResultTypeBIC] = getBIC(tY, tX*Beta, X.cols());
+        result[SLModelResultTypeBIC] = SLModelUtility::getBIC(tY, tX*Beta, X.cols());
     }
 
     if(type & SLModelResultTypeCOV)
     {
-        result[SLModelResultTypeCOV] = getCOV(tY, tX*Beta);
+        result[SLModelResultTypeCOV] = SLModelUtility::getCOV(tY, tX*Beta);
     }
     return result;
 }
@@ -219,12 +246,12 @@ SLModelResult SLSparsePls::getTrainResult(SLMODELRESULTYPE type) const
     SLModelResult result;
     if(type & SLModelResultTypeQ2)
     {
-        result[SLModelResultTypeQ2] = getQ2(Res, Y);
+        result[SLModelResultTypeQ2] = SLModelUtility::getQ2(Res, Y);
     }
     
     if(type & SLModelResultTypeRSS)
     {
-        result[SLModelResultTypeRSS] = getRSS(Res);
+        result[SLModelResultTypeRSS] = SLModelUtility::getRSS(Res);
     }
     
     if(type & SLModelResultTypeBeta)
@@ -239,27 +266,27 @@ SLModelResult SLSparsePls::getTrainResult(SLMODELRESULTYPE type) const
 
     if(type & SLModelResultTypeACC)
     {
-        result[SLModelResultTypeACC] = getACC(Y, X*Beta);
+        result[SLModelResultTypeACC] = SLModelUtility::getACC(Y, X*Beta);
     }
     
     if(type & SLModelResultTypeAUC)
     {
-        result[SLModelResultTypeAUC] = getAUC(Y, X*Beta);
+        result[SLModelResultTypeAUC] = SLModelUtility::getAUC(Y, X*Beta);
     }
     
     if(type & SLModelResultTypeAIC)
     {
-        result[SLModelResultTypeAIC] = getAIC(Y, X*Beta, X.cols());
+        result[SLModelResultTypeAIC] = SLModelUtility::getAIC(Y, X*Beta, X.cols());
     }
     
     if(type & SLModelResultTypeBIC)
     {
-        result[SLModelResultTypeBIC] = getBIC(Y, X*Beta, X.cols());
+        result[SLModelResultTypeBIC] = SLModelUtility::getBIC(Y, X*Beta, X.cols());
     }
 
     if(type & SLModelResultTypeCOV)
     {
-        result[SLModelResultTypeCOV] = getCOV(Y, X*Beta);
+        result[SLModelResultTypeCOV] = SLModelUtility::getCOV(Y, X*Beta);
     }
     return result;
 }

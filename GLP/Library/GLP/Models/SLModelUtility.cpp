@@ -1,5 +1,5 @@
 //
-//  SLModelStrategy.cpp
+//  SLModelUtility.cpp
 //  GLP
 //
 //  Created by Zheng Shao on 5/14/13.
@@ -21,19 +21,52 @@
 //  02111-1307, USA
 //
 
-#include "SLModelStrategy.h"
+#include "SLModelUtility.h"
+#include <iostream>
+#include <string>
+#include <boost/format.hpp>
 
-MatrixXd SLModelStrategy::getRSS(const MatrixXd& RES) const
+using namespace std;
+using namespace Eigen;
+using namespace boost;
+
+void SLModelUtility::printResult(SLMODELRESULTYPE resultType, SLModelResult& result)
+{
+    if ( resultType & SLModelResultTypeQ2 )
+        cout << format("%8s: %2.8f") % "Q2" % get< MatrixXd >(result[SLModelResultTypeQ2]).mean();
+    
+    if ( resultType & SLModelResultTypeRSS )
+        cout << format("%8s: %14.8f") % "RSS" % get< MatrixXd >(result[SLModelResultTypeRSS]).mean();
+    
+    if ( resultType & SLModelResultTypeCOV )
+        cout << format("%8s: %2.8f") % "COV" % get< MatrixXd >(result[SLModelResultTypeCOV]).mean();
+    
+    if ( resultType & SLModelResultTypeACC )
+        cout << format("%8s: %2.8f") % "ACC" % get< MatrixXd >(result[SLModelResultTypeACC]).mean();
+    
+    if ( resultType & SLModelResultTypeAUC )
+        cout << format("%8s: %2.8f") % "AUC" % get< MatrixXd >(result[SLModelResultTypeAUC]).mean();
+    
+    if ( resultType & SLModelResultTypeAIC )
+        cout << format("%8s: %14.8f") % "AIC" % get< MatrixXd >(result[SLModelResultTypeAIC]).mean();
+    
+    if ( resultType & SLModelResultTypeBIC )
+        cout << format("%8s: %14.8f") % "BIC" % get< MatrixXd >(result[SLModelResultTypeBIC]).mean();
+    
+    cout << endl << endl;
+}
+
+MatrixXd SLModelUtility::getRSS(const MatrixXd& RES)
 {
     return (MatrixXd)ColSSum(RES);
 }
 
-MatrixXd SLModelStrategy::getQ2(const MatrixXd& RES, const MatrixXd& Y) const
+MatrixXd SLModelUtility::getQ2(const MatrixXd& RES, const MatrixXd& Y)
 {
     return (MatrixXd)(MatrixXd::Ones(1, Y.cols()) - ColSSum(RES).cwiseQuotient(ColSSum(Center(Y))));
 }
 
-MatrixXd SLModelStrategy::getACC(const MatrixXd& Y, const MatrixXd& predictY) const
+MatrixXd SLModelUtility::getACC(const MatrixXd& Y, const MatrixXd& predictY)
 {
     size_t correct = 0;
     MatrixXd ACC(1,Y.cols());
@@ -66,13 +99,15 @@ MatrixXd SLModelStrategy::getACC(const MatrixXd& Y, const MatrixXd& predictY) co
     return ACC;
 }
 
-MatrixXd SLModelStrategy::getAUC(const MatrixXd& Y, const MatrixXd& predictY) const
+MatrixXd SLModelUtility::getAUC(const MatrixXd& Y, const MatrixXd& predictY)
 {
     MatrixXd AUC(1, Y.cols());
     
+    double min = Y.minCoeff();
+    double max = Y.maxCoeff();
     double mid = (min + max) / 2.0;
     vector < pair < double, double > > ypPair(Y.rows());
-
+    
     for (int i=0; i < Y.cols(); ++i)
     {
         ypPair.clear();
@@ -102,18 +137,18 @@ MatrixXd SLModelStrategy::getAUC(const MatrixXd& Y, const MatrixXd& predictY) co
 }
 
 #define _PI acos(-1.0)
-MatrixXd SLModelStrategy::getAIC(const MatrixXd& Y, const MatrixXd& predictY, const size_t numOfParams) const
+MatrixXd SLModelUtility::getAIC(const MatrixXd& Y, const MatrixXd& predictY, const size_t numOfParams)
 {
     MatrixXd rss  = ColSSum(Y - predictY);
     
     MatrixXd logL = -Y.rows()/2.0*(rss/Y.rows()).array().log()
                     -Y.rows()/2.0*log(2.0*_PI)
                     -Y.rows()/2.0;
-
+    
     return -2.0*logL.array() + 2.0*numOfParams;
 }
 
-MatrixXd SLModelStrategy::getBIC(const MatrixXd& Y, const MatrixXd& predictY, const size_t numOfParams) const
+MatrixXd SLModelUtility::getBIC(const MatrixXd& Y, const MatrixXd& predictY, const size_t numOfParams)
 {
     MatrixXd rss  = ColSSum(Y - predictY);
     
@@ -124,7 +159,7 @@ MatrixXd SLModelStrategy::getBIC(const MatrixXd& Y, const MatrixXd& predictY, co
     return -2.0*logL.array() + numOfParams*log(Y.rows());
 }
 
-MatrixXd SLModelStrategy::getCOV(const MatrixXd& Y, const MatrixXd& predictY) const
+MatrixXd SLModelUtility::getCOV(const MatrixXd& Y, const MatrixXd& predictY)
 {
     MatrixXd Yhat = Center(Y);
     MatrixXd Phat = Center(predictY);

@@ -114,8 +114,8 @@ private:
     friend class ColumnSelectionRandom;
     friend class ColumnSelectionVariance;
     
-    // use 10% train data as validation
     int _validLength;
+    size_t _overfitCount;
 
     ptime _timeStart, _timeEnd;
     SLGlpProduct<SLSparsePls, SLGspan>* _gspls;

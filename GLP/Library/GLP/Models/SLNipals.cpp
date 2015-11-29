@@ -22,8 +22,9 @@
 //
 
 #include <Eigen/QR>
-#include "../SLUtility.h"
 #include "SLNipals.h"
+#include "../SLUtility.h"
+#include "SLModelUtility.h"
 
 using namespace std;
 
@@ -98,12 +99,12 @@ SLModelResult SLNipals::classify(const MatrixXd& tX, const MatrixXd& tY, SLMODEL
 
     if(type & SLModelResultTypeQ2)
     {
-        result[SLModelResultTypeQ2] = getQ2(tRES, tY);
+        result[SLModelResultTypeQ2] = SLModelUtility::getQ2(tRES, tY);
     }
     
     if(type & SLModelResultTypeRSS)
     {
-        result[SLModelResultTypeRSS] = getRSS(tRES);
+        result[SLModelResultTypeRSS] = SLModelUtility::getRSS(tRES);
     }
     
     if(type & SLModelResultTypeBeta)
@@ -113,27 +114,27 @@ SLModelResult SLNipals::classify(const MatrixXd& tX, const MatrixXd& tY, SLMODEL
     
     if(type & SLModelResultTypeACC)
     {
-        result[SLModelResultTypeACC] = getACC(tY, tX*Beta);
+        result[SLModelResultTypeACC] = SLModelUtility::getACC(tY, tX*Beta);
     }
     
     if(type & SLModelResultTypeAUC)
     {
-        result[SLModelResultTypeAUC] = getAUC(tY, tX*Beta);
+        result[SLModelResultTypeAUC] = SLModelUtility::getAUC(tY, tX*Beta);
     }
     
     if(type & SLModelResultTypeAIC)
     {
-        result[SLModelResultTypeAIC] = getAIC(tY, tX*Beta, X.cols());
+        result[SLModelResultTypeAIC] = SLModelUtility::getAIC(tY, tX*Beta, X.cols());
     }
     
     if(type & SLModelResultTypeBIC)
     {
-        result[SLModelResultTypeBIC] = getBIC(tY, tX*Beta, X.cols());
+        result[SLModelResultTypeBIC] = SLModelUtility::getBIC(tY, tX*Beta, X.cols());
     }
     
     if(type & SLModelResultTypeCOV)
     {
-        result[SLModelResultTypeCOV] = getCOV(tY, tX*Beta);
+        result[SLModelResultTypeCOV] = SLModelUtility::getCOV(tY, tX*Beta);
     }
     return result;
 }
@@ -163,12 +164,12 @@ SLModelResult SLNipals::getTrainResult(SLMODELRESULTYPE type) const
     SLModelResult result;
     if(type & SLModelResultTypeQ2)
     {
-        result[SLModelResultTypeQ2] = getQ2(Res, Y);
+        result[SLModelResultTypeQ2] = SLModelUtility::getQ2(Res, Y);
     }
     
     if(type & SLModelResultTypeRSS)
     {
-        result[SLModelResultTypeRSS] = getRSS(Res);
+        result[SLModelResultTypeRSS] = SLModelUtility::getRSS(Res);
     }
     
     if(type & SLModelResultTypeBeta)
@@ -178,27 +179,27 @@ SLModelResult SLNipals::getTrainResult(SLMODELRESULTYPE type) const
     
     if(type & SLModelResultTypeACC)
     {
-        result[SLModelResultTypeACC] = getACC(Y, X*Beta);
+        result[SLModelResultTypeACC] = SLModelUtility::getACC(Y, X*Beta);
     }
     
     if(type & SLModelResultTypeAUC)
     {
-        result[SLModelResultTypeAUC] = getAUC(Y, X*Beta);
+        result[SLModelResultTypeAUC] = SLModelUtility::getAUC(Y, X*Beta);
     }
     
     if(type & SLModelResultTypeAIC)
     {
-        result[SLModelResultTypeAIC] = getAIC(Y, X*Beta, X.cols());
+        result[SLModelResultTypeAIC] = SLModelUtility::getAIC(Y, X*Beta, X.cols());
     }
     
     if(type & SLModelResultTypeBIC)
     {
-        result[SLModelResultTypeBIC] = getBIC(Y, X*Beta, X.cols());
+        result[SLModelResultTypeBIC] = SLModelUtility::getBIC(Y, X*Beta, X.cols());
     }
     
     if(type & SLModelResultTypeCOV)
     {
-        result[SLModelResultTypeCOV] = getCOV(Y, X*Beta);
+        result[SLModelResultTypeCOV] = SLModelUtility::getCOV(Y, X*Beta);
     }
     return result;
 }

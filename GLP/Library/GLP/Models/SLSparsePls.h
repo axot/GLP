@@ -42,6 +42,7 @@ public:
 public:
     virtual bool checkReponseData() = 0;
     virtual SLMODELRESULTYPE getResultType() = 0;
+    virtual size_t overfitCnt(SLModelResult&) = 0;
 };
 
 template <typename D>
@@ -57,16 +58,30 @@ public:
     virtual MatrixXd getSelectedColumn(MatrixXd* mat = NULL) = 0;
 };
 
-class SLPlsModeRregession : public IMode<SLSparsePls>
+class SLPlsModeRegression : public IMode<SLSparsePls>
 {
+private:
+    double _minRSS;
+    double _overfitCount;
+    
+public:
+    SLPlsModeRegression(): _minRSS(1E20), _overfitCount(0) {}
     virtual bool checkReponseData();
     virtual SLMODELRESULTYPE getResultType();
+    virtual size_t overfitCnt(SLModelResult&);
 };
 
 class SLPlsModeClassification : public IMode<SLSparsePls>
 {
+private:
+    double _maxAUC;
+    double _overfitCount;
+    
+public:
+    SLPlsModeClassification(): _maxAUC(-1E20), _overfitCount(0) {}
     virtual bool checkReponseData();
     virtual SLMODELRESULTYPE getResultType();
+    virtual size_t overfitCnt(SLModelResult&);
 };
 
 class SLSparsePls : public SLModelStrategy
@@ -142,11 +157,13 @@ private:
     MatrixXd Res;
     MatrixXd W;
     
+    SLModelResult classifyResult;
+    
     friend class SLPlsColumnSelectionAverage;
     friend class SLPlsColumnSelectionRandom;
     friend class SLPlsColumnSelectionVariance;
     
-    friend class SLPlsModeRregession;
+    friend class SLPlsModeRegression;
     friend class SLPlsModeClassification;
 };
 

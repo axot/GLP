@@ -24,6 +24,7 @@
 //
 
 #include "gspls-train.hpp"
+
 const float SLGsplsTrain::VALID_RATIO = 0.1f;
 
 MatrixXd SLPlsColumnSelectionAverage::getSelectedColumn(MatrixXd* mat)
@@ -90,7 +91,7 @@ SLGsplsTrain::TrainParameters* SLGsplsTrain::TrainParameters::initWithArgs(int a
                 
                 string optname = string(long_options[option_index].name);
                 if (optname == "reg"){
-                    param->mode = (SLPlsModeRregession*) new SLPlsModeRregession();
+                    param->mode = (SLPlsModeRegression*) new SLPlsModeRegression();
                 }
                 else if (optname == "cla"){
                     param->mode = (SLPlsModeClassification*) new SLPlsModeClassification();
@@ -148,7 +149,7 @@ SLGsplsTrain::TrainParameters* SLGsplsTrain::TrainParameters::initWithArgs(int a
     param->trainFile = strdup(argv[argc-1]);
     
     if (param->mode == NULL)
-        param->mode = (SLPlsModeRregession*) new SLPlsModeRregession();
+        param->mode = (SLPlsModeRegression*) new SLPlsModeRegression();
         
     if (param->colMode == NULL)
         param->colMode = (IColumnSelection<SLSparsePls>*) new SLPlsColumnSelectionVariance();
@@ -263,10 +264,8 @@ SLModelResult SLGsplsTrain::spls(MatrixXd& feature)
 
     _trainResidualMat = get<MatrixXd>(result[SLModelResultTypeRes]);
     
-    cerr << "Train AUC: " << get< MatrixXd >(result[SLModelResultTypeAUC]).mean() << endl;
-    cerr << "Train ACC: " << get< MatrixXd >(result[SLModelResultTypeACC]).mean() << endl;
-    cerr << "Train COV: " << get< MatrixXd >(result[SLModelResultTypeCOV]).mean() << endl;
-    cerr << "Train RSS: " << get< MatrixXd >(result[SLModelResultTypeRSS]).mean() << endl;
+    SLMODELRESULTYPE types = _param.mode->getResultType();
+    SLModelUtility::printResult(types, result);
 
     return result;
 }
@@ -281,15 +280,13 @@ bool SLGsplsTrain::isOverfit(vector<Rule> rules)
     }
     
     SLModelResult scores = _gspls->classify(result, _validRespMat, _param.mode->getResultType());
-    
-//    cerr << "Valid  Q2: " << get< MatrixXd >(scores[SLModelResultTypeQ2]).mean()  << endl;
-    cerr << "Valid AUC: " << get< MatrixXd >(scores[SLModelResultTypeAUC]).mean() << endl;
-    cerr << "Valid ACC: " << get< MatrixXd >(scores[SLModelResultTypeACC]).mean() << endl;
-    cerr << "Valid COV: " << get< MatrixXd >(scores[SLModelResultTypeCOV]).mean() << endl;
-    cerr << "Valid RSS: " << get< MatrixXd >(scores[SLModelResultTypeRSS]).mean() << endl;
 
-    // TODO: IMP
-    return false;
+    size_t overfitCnt = _param.mode->overfitCnt(scores);
+
+    SLMODELRESULTYPE types = _param.mode->getResultType();
+    SLModelUtility::printResult(types, scores);
+
+    return overfitCnt >= _param.resultHistorySize;
 }
 
 void SLGsplsTrain::saveResults()

@@ -43,5 +43,6 @@
 // Utilities
 #include "SLUtility.h"
 #include "Utilities/SLCrossValidation.h"
+#include "Models/SLModelUtility.h"
 
 #endif
