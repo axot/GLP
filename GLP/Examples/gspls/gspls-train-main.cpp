@@ -31,7 +31,7 @@ using namespace std;
 string usage()
 {
     return
-    "gspls is a part of GLP v1.0\n\n"
+    "gspls-train is a part of GLP v1.0\n\n"
     "   Usage: gspls-train [options] [gsp file]\n\n"
     " Options: \n"
     "          [--reg | --cla] regression or classification mode\n"
