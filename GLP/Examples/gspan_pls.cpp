@@ -52,7 +52,6 @@ void usage()
     "          [-a use average residual column, defult is using max variance column]\n"
     "          [-r use random residual column, defult is using max variance column]\n"
     "          [-t the threshold value which used to avoid overfiting default: 3(times)]\n"
-    "          [-s shuffle data(preprocess)]\n"
     "          [-b use memory boosting]\n"
     "          [-v verbose]\n\n"
     "  Author: Zheng Shao\n"
@@ -73,7 +72,6 @@ int main(int argc, const char *argv[])
     char *gspfile = NULL;
     bool verbose = false;
     bool boost = false;
-    bool useShuffledData = false;
     bool useAverageCol = false;
     bool useRandomCol = false;
     
@@ -114,9 +112,6 @@ int main(int argc, const char *argv[])
             case 'b':
                 boost = true;
                 break;
-            case 's':
-                useShuffledData = true;
-                break;
             case 'a':
                 useAverageCol = true;
                 break;
@@ -152,7 +147,6 @@ int main(int argc, const char *argv[])
     BOOST_AUTO(nipals, (*SLGlpFactory<SLNipals, SLGspan>::create(nipalsParam, gspanParam)));
     
     SLCrossValidation<SLNipals>::SLCrossValidationParameters cvParam;
-    cvParam.useShuffledData     = useShuffledData;
     cvParam.kFold               = fold;
     cvParam.resultHistorySize   = resultHistorySize;
     

@@ -196,7 +196,6 @@ SLCrossValidationResults SLCrossValidation<T>::crossValidation(const MatrixXd& X
     
     if ( useShuffledData )
     {
-//#pragma omp parallel for
         for (ssize_t i=0; i<X.rows(); ++i)
         {
             shuffledX.row(i) = X.row(randomIndexs[i]);

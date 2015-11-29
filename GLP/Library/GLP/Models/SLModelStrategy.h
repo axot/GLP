@@ -26,7 +26,6 @@
 #ifndef __GLP__SLModelStrategy__
 #define __GLP__SLModelStrategy__
 
-#include <iostream>
 #include <map>
 #include <vector>
 #include <boost/variant.hpp>
@@ -44,6 +43,7 @@ enum{
     SLModelResultTypeAIC     = 1 << 5,
     SLModelResultTypeBIC     = 1 << 6,
     SLModelResultTypeCOV     = 1 << 7,
+    SLModelResultTypeRes     = 1 << 8
 };
 
 typedef unsigned int SLMODELRESULTYPE;
@@ -88,35 +88,6 @@ public:
      * @return current parameters.
      */
     template <typename MP>
-    MP getParameters() const { MP mp; return mp; }
-    
-    /*! @name Varibles for binary classify problem
-     *
-     * for the case of 0/1 label, min is 0, max is 1
-     */
-    //@{
-    double min, max;
-    //@}
-    
-    /*! @name Common calculation methods of performance measures
-     *
-     */
-    //@{
-    virtual MatrixXd getRSS(const MatrixXd& RES) const;
-    virtual MatrixXd getQ2 (const MatrixXd& RES, const MatrixXd& Y) const;
-    virtual MatrixXd getACC(const MatrixXd& Y, const MatrixXd& predictY) const;
-    virtual MatrixXd getAUC(const MatrixXd& Y, const MatrixXd& predictY) const;
-    virtual MatrixXd getAIC(const MatrixXd& Y, const MatrixXd& predictY, const size_t numOfParams) const;
-    virtual MatrixXd getBIC(const MatrixXd& Y, const MatrixXd& predictY, const size_t numOfParams) const;
-    virtual MatrixXd getCOV(const MatrixXd& Y, const MatrixXd& predictY) const;
-    //@}
-
-private:
-    template <typename T1, typename T2>
-    struct ypcmp: public binary_function<bool, T1, T2> {
-        bool operator () (const std::pair <T1, T2> &x1, const std::pair<T1, T2> &x2) {
-            return x1.second > x2.second;
-        }
-    };
+    MP getParameters() const { MP mp; return mp; }    
 };
 #endif
