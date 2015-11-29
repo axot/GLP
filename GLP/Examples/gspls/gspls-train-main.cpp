@@ -97,7 +97,7 @@ int main(int argc, char* argv[])
     train->timeEnd();
     
     // write result to file
-    size_t best = i - param->resultHist.length;
+    size_t best = i == param->n ? i : i - param->resultHist.length;
     train->saveResults(best);
 
     return 0;

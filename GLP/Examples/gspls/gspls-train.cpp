@@ -321,7 +321,7 @@ void SLGsplsTrain::saveResults(size_t index)
         resultPair = _param.resultHist.back();
     
     // best index
-    cout << "Best: n = " << index << endl;
+    cout << "Best: n = " << best << endl;
     
     // beta
     ofstream outBeta((_fileSuffix+"Beta.txt").c_str(), ios::out);
