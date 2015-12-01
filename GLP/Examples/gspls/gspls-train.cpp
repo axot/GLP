@@ -186,9 +186,9 @@ time_duration SLGsplsTrain::timeDuration()
     return time_duration(_timeEnd - _timeStart);
 }
 
-void SLGsplsTrain::setFileSuffix(string suffix)
+void SLGsplsTrain::setFilePrefix(string prefix)
 {
-    _fileSuffix = suffix;
+    _filePrefix = prefix;
 }
 
 SLGsplsTrain* SLGsplsTrain::initWithParam(TrainParameters& param)
@@ -246,15 +246,15 @@ SLGsplsTrain* SLGsplsTrain::initWithParam(TrainParameters& param)
     // graph changed, rebuild dfs tree;
     trainGspan.rebuildDFSTree();
     
-    // outout file suffix
-    string suffix = (format("gspls_m%d_L%d_n%d_k%d_t%d_") %
+    // outout file prefix
+    string prefix = (format("gspls_m%d_L%d_n%d_k%d_t%d_") %
                             param.minsup                  %
                             param.maxpat                  %
                             param.n                       %
                             param.topk                    %
                             param.resultHist.length
                      ).str();
-    train->setFileSuffix(suffix);
+    train->setFilePrefix(prefix);
     return train;
 }
 
@@ -324,7 +324,7 @@ void SLGsplsTrain::saveResults(size_t index)
     cout << "Best: n = " << best << endl;
     
     // beta
-    ofstream outBeta((_fileSuffix+"Beta.txt").c_str(), ios::out);
+    ofstream outBeta((_filePrefix+"Beta.txt").c_str(), ios::out);
     outBeta.precision(12);
     outBeta.flags(ios::left);
     outBeta << resultPair.second[SLModelResultTypeBeta] << endl;
@@ -333,7 +333,7 @@ void SLGsplsTrain::saveResults(size_t index)
     // dfs
     cout << "DFS" << endl;
     vector<Rule> DFSes = get< vector<Rule> >(resultPair.first[SLGraphMiningResultTypeRules]);
-    ofstream outDFS((_fileSuffix+"DFS.txt").c_str(), ios::out);
+    ofstream outDFS((_filePrefix+"DFS.txt").c_str(), ios::out);
     for ( size_t i = 0; i < DFSes.size(); ++i )
     {
         cout   << DFSes[i].dfs << endl;

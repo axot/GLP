@@ -131,7 +131,7 @@ private:
     bool _isOverfit;
 
     ptime _timeStart, _timeEnd;
-    string _fileSuffix;
+    string _filePrefix;
     
     SLGlpProduct<SLSparsePls, SLGspan>* _gspls;
     
@@ -154,7 +154,7 @@ public:
     void timeEnd();
     time_duration timeDuration();
     
-    void setFileSuffix(string);
+    void setFilePrefix(string);
     
     MatrixXd& getTrainMat();
     MatrixXd& getTrainRespMat();
