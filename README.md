@@ -10,7 +10,7 @@ Eigen 3.1.2 or higher.
 Boost 1.4.2 or higher.
 
 # Installation
-make
+make  
 make install
 
 # License

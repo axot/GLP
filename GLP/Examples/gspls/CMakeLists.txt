@@ -16,8 +16,6 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   set_target_properties(gspls-classify-static PROPERTIES LINK_FLAGS "-static")
 ENDIF()
 
-install_programs(/bin gspls)
-install_targets(/bin gspls-train)
-install_targets(/bin gspls-train-static)
-install_targets(/bin gspls-classify)
-install_targets(/bin gspls-classify-static)
+install(PROGRAMS gspls DESTINATION bin)
+install(TARGETS gspls-train gspls-train-static gspls-classify gspls-classify-static
+        RUNTIME DESTINATION bin)

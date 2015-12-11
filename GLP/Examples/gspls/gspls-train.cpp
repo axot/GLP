@@ -186,9 +186,9 @@ time_duration SLGsplsTrain::timeDuration()
     return time_duration(_timeEnd - _timeStart);
 }
 
-void SLGsplsTrain::setFileSuffix(string suffix)
+void SLGsplsTrain::setFilePrefix(string prefix)
 {
-    _fileSuffix = suffix;
+    _filePrefix = prefix;
 }
 
 SLGsplsTrain* SLGsplsTrain::initWithParam(TrainParameters& param)
@@ -217,11 +217,14 @@ SLGsplsTrain* SLGsplsTrain::initWithParam(TrainParameters& param)
     // load train gsp file
     if (param.respFile != NULL)
         EigenExt::loadMatrixFromFile(train->_trainRespMat, train->_param.respFile);
-    
+    else
+        train->_trainRespMat = get<MatrixXd>(train->_gspls->getInnerValues(SLGraphMiningInnerValueY)[SLGraphMiningInnerValueY]);
+
     // calculate valid data length
     if (param.validLength < 0){
         param.validLength  = floor(train->_trainRespMat.rows() * VALID_RATIO);
     }
+    
     // setup response data
     train->_validRespMat = train->_trainRespMat.bottomRows(param.validLength);
     train->_trainRespMat = train->_trainRespMat.topRows(train->_trainRespMat.rows() - param.validLength);
@@ -246,15 +249,15 @@ SLGsplsTrain* SLGsplsTrain::initWithParam(TrainParameters& param)
     // graph changed, rebuild dfs tree;
     trainGspan.rebuildDFSTree();
     
-    // outout file suffix
-    string suffix = (format("gspls_m%d_L%d_n%d_k%d_t%d_") %
+    // outout file prefix
+    string prefix = (format("gspls_m%d_L%d_n%d_k%d_t%d_") %
                             param.minsup                  %
                             param.maxpat                  %
                             param.n                       %
                             param.topk                    %
                             param.resultHist.length
                      ).str();
-    train->setFileSuffix(suffix);
+    train->setFilePrefix(prefix);
     return train;
 }
 
@@ -267,6 +270,8 @@ SLGraphMiningResult SLGsplsTrain::gspan(MatrixXd& selectedColumn)
 
 SLModelResult SLGsplsTrain::spls(MatrixXd& feature)
 {
+    cout << "Train" << endl;
+
     SLModelResult result = _gspls->train(feature, _trainRespMat, _param.mode->getResultType());
     
     long rows    = feature.rows();
@@ -288,6 +293,11 @@ bool SLGsplsTrain::isOverfit(vector<Rule> rules)
 {
     _param.resultHist.push_front(make_pair(gspanResult, splsResult));
     
+    // do not detect overfit if validation data was not been set
+    if (_param.validLength == 0) return false;
+    
+    cout << "Validation" << endl;
+
     MatrixXd result(_validTransaction.size(), rules.size());
     _validGspan->buildDarts(rules);
     for (size_t i = 0; i < _validTransaction.size(); ++i) {
@@ -321,10 +331,10 @@ void SLGsplsTrain::saveResults(size_t index)
         resultPair = _param.resultHist.back();
     
     // best index
-    cout << "Best: n = " << index << endl;
+    cout << "Best: n = " << best << endl;
     
     // beta
-    ofstream outBeta((_fileSuffix+"Beta.txt").c_str(), ios::out);
+    ofstream outBeta((_filePrefix+"Beta.txt").c_str(), ios::out);
     outBeta.precision(12);
     outBeta.flags(ios::left);
     outBeta << resultPair.second[SLModelResultTypeBeta] << endl;
@@ -333,7 +343,7 @@ void SLGsplsTrain::saveResults(size_t index)
     // dfs
     cout << "DFS" << endl;
     vector<Rule> DFSes = get< vector<Rule> >(resultPair.first[SLGraphMiningResultTypeRules]);
-    ofstream outDFS((_fileSuffix+"DFS.txt").c_str(), ios::out);
+    ofstream outDFS((_filePrefix+"DFS.txt").c_str(), ios::out);
     for ( size_t i = 0; i < DFSes.size(); ++i )
     {
         cout   << DFSes[i].dfs << endl;

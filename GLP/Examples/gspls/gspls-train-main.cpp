@@ -34,7 +34,7 @@ string usage()
     "gspls-train is a part of GLP v1.0\n\n"
     "   Usage: gspls-train [options] [gsp file]\n\n"
     " Options: \n"
-    "          [--reg | --cla] regression or classification mode\n"
+    "          [--reg | --cla] regression or classification mode, default: regression\n"
     "          [-m] min frequency of common graphs, default: 2\n"
     "          [-L] max graph size for gspan mining, default: 10\n"
     "          [-n] max iterator number, default: 100\n"
@@ -77,12 +77,10 @@ int main(int argc, char* argv[])
         train->gspanResult = train->gspan(selectedCol);
         
         // spls
-        cout << "Train" << endl;
         MatrixXd features = get<MatrixXd>(train->gspanResult[SLGraphMiningResultTypeX]);
         train->splsResult = train->spls(features);
                
         // overfit detection
-        cout << "Validation" << endl;
         vector<Rule> rules = get< vector<Rule> >(train->gspanResult[SLGraphMiningResultTypeRules]);
         
         if (train->isOverfit(rules)){
@@ -97,7 +95,7 @@ int main(int argc, char* argv[])
     train->timeEnd();
     
     // write result to file
-    size_t best = i - param->resultHist.length;
+    size_t best = i == param->n ? i : i - param->resultHist.length;
     train->saveResults(best);
 
     return 0;

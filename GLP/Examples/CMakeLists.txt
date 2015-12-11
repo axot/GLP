@@ -11,8 +11,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   set_target_properties(gspan_pls_static PROPERTIES LINK_FLAGS "-static")
 ENDIF()
 
-install_targets(/bin gspan)
-install_targets(/bin gspan_static)
-install_targets(/bin gspan_pls_static)
+install(TARGETS gspan gspan_static gspan_pls_static
+        RUNTIME DESTINATION bin)
 
 add_subdirectory(gspls)
