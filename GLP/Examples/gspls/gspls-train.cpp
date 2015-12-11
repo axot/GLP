@@ -217,11 +217,14 @@ SLGsplsTrain* SLGsplsTrain::initWithParam(TrainParameters& param)
     // load train gsp file
     if (param.respFile != NULL)
         EigenExt::loadMatrixFromFile(train->_trainRespMat, train->_param.respFile);
-    
+    else
+        train->_trainRespMat = get<MatrixXd>(train->_gspls->getInnerValues(SLGraphMiningInnerValueY)[SLGraphMiningInnerValueY]);
+
     // calculate valid data length
     if (param.validLength < 0){
         param.validLength  = floor(train->_trainRespMat.rows() * VALID_RATIO);
     }
+    
     // setup response data
     train->_validRespMat = train->_trainRespMat.bottomRows(param.validLength);
     train->_trainRespMat = train->_trainRespMat.topRows(train->_trainRespMat.rows() - param.validLength);
@@ -267,6 +270,8 @@ SLGraphMiningResult SLGsplsTrain::gspan(MatrixXd& selectedColumn)
 
 SLModelResult SLGsplsTrain::spls(MatrixXd& feature)
 {
+    cout << "Train" << endl;
+
     SLModelResult result = _gspls->train(feature, _trainRespMat, _param.mode->getResultType());
     
     long rows    = feature.rows();
@@ -288,6 +293,11 @@ bool SLGsplsTrain::isOverfit(vector<Rule> rules)
 {
     _param.resultHist.push_front(make_pair(gspanResult, splsResult));
     
+    // do not detect overfit if validation data was not been set
+    if (_param.validLength == 0) return false;
+    
+    cout << "Validation" << endl;
+
     MatrixXd result(_validTransaction.size(), rules.size());
     _validGspan->buildDarts(rules);
     for (size_t i = 0; i < _validTransaction.size(); ++i) {
