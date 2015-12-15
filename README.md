@@ -28,7 +28,7 @@ $ brew link glp
 
 ```bash
 $ cd data
-$ python sdf2gsp.py -f mutagen.sdf -l mutagen.label -o mutagen.gsp
+$ python ../tools/sdf2gsp.py -f mutagen.sdf -l mutagen.label -o mutagen.gsp
 ```
 
 ### Create train/test dataset
@@ -37,7 +37,7 @@ In this example, we use 80% data for training, and the rest 20% data for test.
 Generate train/test gsp data first,
 
 ```bash
-$ mk_train_test.py -f mutagen.gsp -b mutagen -r 0.8
+$ python ../tools/mk_train_test.py -f mutagen.gsp -b mutagen -r 0.8
 [INFO] total:  684
 [INFO] Generating train data now: 547
 [>>>>>>>>>>>>>>> 100% >>>>>>>>>>>>>>]
@@ -63,7 +63,7 @@ $ tail -137 Ymatrix.txt > mutagen_test_multiple.label
 An exemplar usage of mining frequent subgraph patterns from graph data
 
 ```bash
-$ gspan -m 10 -L 10 -y mutagen.gsp
+$ gspan -m 10 -L 10 mutagen.gsp
 ```
 where `-m` specifies minimum support, and `-L` specifies maximum pattern size.
 
@@ -119,11 +119,11 @@ Type `gspls-classify` to see more options.
 ## Visualization
 __The scripts used here only works with Open-babel installed and need OS X environment__
 
-One way to visualize obtained subgraph patterns is to first convent the obtained raw DFS files into SDF/MOL files. Then one can use chemical conversion software openbabel to generate PNG files.
+One way to visualize obtained subgraph patterns is to first convert the obtained raw DFS files into SDF/MOL files. Then one can use chemical conversion software openbabel to generate PNG files.
 
 ```bash
 $ mkdir -p sdfs
-$ dfs2sdf.pl gspls_m2_L10_n10_k1_t3_DFS.txt
+$ ../tools/dfs2sdf.pl gspls_m2_L10_n10_k1_t3_DFS.txt
 $ sdf2png.sh
 ```
 
