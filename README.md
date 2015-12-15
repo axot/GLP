@@ -124,7 +124,8 @@ One way to visualize obtained subgraph patterns is to first convert the obtained
 ```bash
 $ mkdir -p sdfs
 $ ../tools/dfs2sdf.pl gspls_m2_L10_n10_k1_t3_DFS.txt
-$ sdf2png.sh
+$ ../tools/sdf2png.sh
+$ open sdfs/1_10.svg.png
 ```
 
 ## References
