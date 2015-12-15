@@ -1,4 +1,4 @@
-# Manual for Graph Learning Package(multiple graph PLS)
+# Graph Learning Package(multiple graph PLS)
 
 ## Description
 This document introduces basic usage of GLP package. The main components of this package are frequent subgraph pattern miner; gSpan and (multiple) graph PLS regression.
@@ -7,7 +7,7 @@ This document introduces basic usage of GLP package. The main components of this
 1. Cmake 2.6 or higher.  
 2. Eigen 3.1.2 or higher.  
 3. Boost 1.4.2 or higher.  
-4. (optional) open-babel
+4. (optional) Open-babel
 
 ## Installation
 ### Linux
@@ -69,8 +69,8 @@ where `-m` specifies minimum support, and `-L` specifies maximum pattern size.
 
 It produces three output files, and they are
 
-- `gspan_m10_nINF_L10_DFS.txt`, which contains subgraph patterns in DFS format. For details about DFS format, please see APPENDIX, and     
-- `gspan_m10_nINF_L10_Freq.txt`, which contains the frequencies of the enumerated subgraph patterns, and
+- `gspan_m10_nINF_L10_DFS.txt`, which contains subgraph patterns in DFS format. For details about DFS format, please see APPENDIX.
+- `gspan_m10_nINF_L10_Freq.txt`, which contains the frequencies of the enumerated subgraph patterns.
 - `gspan_m10_nINF_L10_Features.txt` which contains binary occurrence matrix of the obtained subgraph patterns.
 
 Type `gspan` to see more options.
@@ -94,7 +94,6 @@ $ gspls-train --cla -o 0 -n 10 \
 where `--cla` speficies classfication mode. Default is regression mode `--reg`, and `-o` specifies the number of training data to be separated for validation (in order to choose the number of latent vectors), and `-n` specifies the maximum number of iterations,
 and `-y` specifies the file with response values.
 
-
 In multiple-PLS mode, the corresponding file should contain response matrix.  
 It produces two output files, and they are
 
@@ -109,6 +108,7 @@ Type `gspls-train` to see more options.
 $ gspls-classify --cla -d gspls_m2_L10_n10_k1_t3_DFS.txt \
   -b gspls_m2_L10_n10_k1_t3_Beta.txt -y mutagen_test.label mutagen_test.gsp
 ```
+
 where `-b` specifies the file with learned regression weights, and
 `-y` specifies the file with response values.
 
@@ -117,7 +117,7 @@ In multiple-PLS mode, the corresponding file contains response matrix.
 Type `gspls-classify` to see more options.
 
 ## Visualization
-__The scripts used here only works with openbabel installed and under OS X environment__
+__The scripts used here only works with Open-babel installed and need OS X environment__
 
 One way to visualize obtained subgraph patterns is to first convent the obtained raw DFS files into SDF/MOL files. Then one can use chemical conversion software openbabel to generate PNG files.
 
@@ -150,7 +150,7 @@ Let’s begin with the following simple example, which stands `C-C`.
 
 `(6) 1 (0f6)`
 
-The first `(6)` stands for the atom label (`6` means Carbon). `1 (0f6)` means that there exists a forward edge from the atom index 0 to the next atom labeled `6`, with bond label `1` (single bond). It then from a single chemical structure `C-C`. The atom indices are automatically given by the order of their appearance, and starts with `0`.
+The first `(6)` stands for the atom label (`6` means Carbon). `1 (0f6)` means that there exists a forward edge from the atom index `0` to the next atom labeled `6`, with bond label `1` (single bond). It then from a single chemical structure `C-C`. The atom indices are automatically given by the order of their appearance, and starts with `0`.
 The next example stands for `C-C=C-C=C-C=`, where the last bond is connected to the first atom, and compose a ring structure.
 
 `(6) 1 (0f6) 2 (1f6) 1 (2f6) 2 (3f6) 1 (4f6) 2 (b0)`
