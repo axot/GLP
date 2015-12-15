@@ -1,0 +1,16 @@
+#!/bin/sh
+
+function usage(){
+    cat << EOF
+$0 [train|classify] [options...]
+EOF
+}
+
+if [[ $# -lt 1 ]]; then
+    usage;
+    exit -1;
+fi
+
+if [[ "$1" = "train" || "$1" = "classify" ]]; then
+    gspls-$1 "${@:2}"
+fi

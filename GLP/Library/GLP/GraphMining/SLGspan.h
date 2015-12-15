@@ -31,11 +31,14 @@
 #include <map>
 #include <set>
 #include <list>
+#include <boost/spirit/include/phoenix_core.hpp>
+#include <boost/spirit/include/phoenix_operator.hpp>
 #include "SLGraphMiningStrategy.h"
 #include "Gspan/Graph.h"
 #include "Gspan/Dfs.h"
 #include "Gspan/Utility.h"
 #include "Gspan/tree.hh"
+#include "Gspan/darts.h"
 
 using namespace std;
 
@@ -59,7 +62,7 @@ public:
     public:
         // assignable parameters
         size_t minsup;
-        size_t maxsup;  // only use for standlone gspan version
+        size_t maxsup;  // only use for standalone gspan version
         size_t maxpat;  // upper bound on node count
         size_t topk;
         
@@ -99,7 +102,20 @@ public:
      * Return: true if sucessed.
      */
     bool setParameters(SLGspanParameters& parameters);
+    
+    double classify(Graph &g, int flag);
+    
+    void setTransaction(vector<Graph>);
+    
+    vector<Graph> getTransaction();
 
+    void rebuildDFSTree();
+    
+    void buildDarts(vector<Rule> rules);
+    void buildDarts(vector<string> dfs);
+    
+    MatrixXd classify (Graph &g);
+    
 private:
     void init();
     void initDFSTree(Projected_map3 &root);
@@ -141,7 +157,10 @@ private:
     Rule rule;                          // current rule
     multiset<Rule> rule_cache;          // topk rule cache
     vector<Rule> entireRules;
-    vector<size_t> patternMatchedResult;// the index result of classify data matched current patterns
+    Darts::DoubleArray* darts;          // double array for search matched pattern in classification mode
+    vector<size_t> darts_indices;
+
+    vector<size_t> patternMatched;      // the index result of classify data matched current patterns
     
     double wbias;                       // 
     double tau;                         // the absolute value of the difference between the weighted frequency

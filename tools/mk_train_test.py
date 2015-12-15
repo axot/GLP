@@ -39,13 +39,13 @@ def usage():
   print '\nOptions:'
   print '\t-f input gsp file'
   print '\t-b the base filename of train & test, output path is same as gsp'
-  print '\t-r ratio of train, ex: 3/4 of train, 1/4 of test, the ratio is 0.75'
+  print '\t-r ratio of train, ex: use 3/4 for train, 1/4 for test, then the ratio is 0.75'
 
 def genTrain():
   global gsp, basename, total, ratio
   
-  print '[INFO] Generating train data now...'  
-  trainfile = open(os.path.dirname(gsp)+'/'+basename+'_train.gsp', 'w')
+  print('[INFO] Generating train data now: %d' % (ratio*total))
+  trainfile = open(os.path.dirname(os.path.realpath(gsp))+'/'+basename+'_train.gsp', 'w')
   gspile    = open(gsp, 'r')
 
   p = con.ProgressBar(int(ratio*total))
@@ -69,26 +69,27 @@ def genTrain():
 def genTest():
   global gsp, basename, total, ratio
 
-  print '[INFO] Generating test data now...'
-  testfile = open(os.path.dirname(gsp)+'/'+basename+'_test.gsp', 'w')
+  count = round((1-ratio)*total)
+  print('[INFO] Generating test data now: %d' % (count))
+  testfile = open(os.path.dirname(os.path.realpath(gsp))+'/'+basename+'_test.gsp', 'w')
   gspile   = open(gsp, 'r')
 
   iskip = 0
   for line in gspile:
     if line.startswith(r't #'):
       iskip += 1
-    if iskip >= ratio*total:
+    if iskip >= round(ratio*total):
       break
 
   gspile.seek(0)
 
-  p = con.ProgressBar(int((1.0-ratio)*total))
+  p = con.ProgressBar(count)
   i = 0
   for line in gspile:
     if line.startswith(r't #'):
       i += 1
 
-    if i-iskip > 0 and i-iskip < (1.0-ratio)*total:
+    if i-iskip > 0 and i-iskip <= count:
       testfile.write(line)
       p.update(i-iskip)
       p.show()
@@ -137,9 +138,10 @@ def main():
   # This api need python 2.7+
   # total = int(subprocess.check_output(regex + gsp + ' | wc -l', shell=True))
 
-  # Centos 6.x default use 2.6.x version, so you know
+  # Centos 6.x default use 2.6.x version
   total = int(con.execSh(regex+gsp+' | wc -l'))
 
+  print '[INFO] total: ', total
   genTrain()
   genTest()
   print '[INFO] All Done!'  

@@ -48,6 +48,11 @@ public:
     
     template <typename GP>
     bool setParameters(GP& modelParameters) { return aStrategy.setParameters(modelParameters); }
+    
+    AStrategy& getGraphMining()
+    {
+        return aStrategy;
+    }
 
 private:
     AStrategy aStrategy;

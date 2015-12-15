@@ -1,9 +1,9 @@
 //
-//  SLGlp.h
+//  SLResultHistory.h
 //  GLP
 //
-//  Created by Zheng Shao on 12/20/12.
-//  Copyright (c) 2012 Saigo Laboratoire. All rights reserved.
+//  Created by Zheng Shao on 11/29/15.
+//  Copyright (c) 2012-2015 Saigo Laboratoire. All rights reserved.
 //
 //  This is free software with ABSOLUTELY NO WARRANTY.
 //
@@ -23,27 +23,28 @@
 //  02111-1307, USA
 //
 
-#ifndef __GLP__SLGlp__
-#define __GLP__SLGlp__
+#ifndef SLResultHistory_h
+#define SLResultHistory_h
 
-// Factories
-#include "Factory/SLGlpFactory.h"
+#include "../GraphMining/SLGraphMiningStrategy.h"
+#include "../Models/SLModelStrategy.h"
 
-// Models
-#include "Models/SLModel.h"
-#include "Models/SLSparsePls.h"
-#include "Models/SLNipals.h"
+class SLResultHistory : public deque< pair<SLGraphMiningResult, SLModelResult> >
+{
+public:
+    SLResultHistory(): length(3) {}
+    
+    void push_front(const pair<SLGraphMiningResult, SLModelResult>& val)
+    {
+        deque< pair<SLGraphMiningResult, SLModelResult> >::push_front(val);
+        while ( this->size() > length+1 )
+        {
+            this->pop_back();
+        }
+    }
+    
+public:
+    size_t length;
+};
 
-// Graph Mining
-#include "GraphMining/SLGspan.h"
-
-// Extensions
-#include "Extensions/MatrixExt.h"
-
-// Utilities
-#include "SLUtility.h"
-#include "Utilities/SLCrossValidation.h"
-#include "Models/SLModelUtility.h"
-#include "Utilities/SLResultHistory.h"
-
-#endif
+#endif /* SLResultHistory_h */

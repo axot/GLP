@@ -31,21 +31,58 @@
 #include "SLModelStrategy.h"
 #include "SLModel.h"
 
-enum{
-    PLSMODENON = 0,
-    PLSMODEREG = 1 << 0,
-    PLSMODECLA = 1 << 1
+class SLSparsePls;
+
+template <typename D>
+class IMode
+{
+public:
+    D* dataSource;
+    
+public:
+    virtual bool checkReponseData() = 0;
+    virtual SLMODELRESULTYPE getResultType() = 0;
+    virtual size_t overfitCnt(SLModelResult&) = 0;
 };
 
-typedef unsigned int SLPLSMODE;
-
-enum{
-    PLSCOLSELVAR  = 0,
-    PLSCOLSELRAND = 1 << 0,
-    PLSCOLSELAVG  = 1 << 1
+template <typename D>
+class IColumnSelection
+{
+public:
+    /** Get Selected Column
+     * @param mat matrix source
+     *
+     * @return when mat is null, return the cached result,
+     *         else return a selected solumn
+     */
+    virtual MatrixXd getSelectedColumn(MatrixXd* mat = NULL) = 0;
 };
 
-typedef unsigned int SLPLSCOLSEL;
+class SLPlsModeRegression : public IMode<SLSparsePls>
+{
+private:
+    double _minRSS;
+    double _overfitCount;
+    
+public:
+    SLPlsModeRegression(): _minRSS(1E20), _overfitCount(0) {}
+    virtual bool checkReponseData();
+    virtual SLMODELRESULTYPE getResultType();
+    virtual size_t overfitCnt(SLModelResult&);
+};
+
+class SLPlsModeClassification : public IMode<SLSparsePls>
+{
+private:
+    double _maxAUC;
+    double _overfitCount;
+    
+public:
+    SLPlsModeClassification(): _maxAUC(-1E20), _overfitCount(0) {}
+    virtual bool checkReponseData();
+    virtual SLMODELRESULTYPE getResultType();
+    virtual size_t overfitCnt(SLModelResult&);
+};
 
 class SLSparsePls : public SLModelStrategy
 {
@@ -55,14 +92,14 @@ public:
     public:
         SLSparsePlsParameters() :
             verbose(false),
-            mode(PLSMODEREG),
-            colMode(PLSCOLSELVAR),
+            mode(NULL),
+            colMode(NULL),
             randIndex(0) {}
         
     public:
         bool verbose;
-        SLPLSMODE mode;
-        SLPLSCOLSEL colMode;
+        IMode<SLSparsePls>* mode;
+        IColumnSelection<SLSparsePls>* colMode;
         int randIndex;
     };
     
@@ -78,7 +115,7 @@ public:
      * Return: the results stored in mapped structure.
      */
     virtual SLModelResult train(const MatrixXd& appendedX, const MatrixXd& theY, SLMODELRESULTYPE type);
-    
+
     /* Classify:
      * Input
      *     tX: X matrix of test data
@@ -98,6 +135,8 @@ public:
      * Discussion: no optional parameters for Sparse PLS
      */
     bool setParameters(SLSparsePlsParameters& parameters);
+    
+    SLModelResult classify(const MatrixXd& beta, const MatrixXd& tX, const MatrixXd& tY, SLMODELRESULTYPE type);
     
     /* Get Parameters:
      *
@@ -119,6 +158,15 @@ private:
     MatrixXd Beta;
     MatrixXd Res;
     MatrixXd W;
+    
+    SLModelResult classifyResult;
+    
+    friend class SLPlsColumnSelectionAverage;
+    friend class SLPlsColumnSelectionRandom;
+    friend class SLPlsColumnSelectionVariance;
+    
+    friend class SLPlsModeRegression;
+    friend class SLPlsModeClassification;
 };
 
 #endif

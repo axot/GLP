@@ -59,7 +59,7 @@ public:
         return aStrategy.setParameters(modelParameters);
     }
     
-    AStrategy getModel() const
+    AStrategy& getModel()
     {
         return aStrategy;
     }

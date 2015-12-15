@@ -24,8 +24,74 @@
 #include <Eigen/QR>
 #include "SLSparsePls.h"
 #include "../SLUtility.h"
+#include "SLModelUtility.h"
 
 using namespace std;
+using namespace boost;
+
+bool SLPlsModeRegression::checkReponseData()
+{
+    return true;
+}
+
+SLMODELRESULTYPE SLPlsModeRegression::getResultType()
+{
+    return
+    SLModelResultTypeQ2   |
+    SLModelResultTypeRSS  |
+    SLModelResultTypeBeta |
+    SLModelResultTypeRes  |
+    SLModelResultTypeAIC  |
+    SLModelResultTypeBIC  |
+    SLModelResultTypeCOV;
+}
+
+size_t SLPlsModeRegression::overfitCnt(SLModelResult& result)
+{
+    double rss = get< MatrixXd >(result[SLModelResultTypeRSS]).mean();
+    if ( rss < _minRSS )
+    {
+        _minRSS = rss;
+        _overfitCount = 0;
+    }
+    else ++_overfitCount;
+
+    return _overfitCount;
+}
+
+bool SLPlsModeClassification::checkReponseData()
+{
+    double min = dataSource->Y.minCoeff();
+    double max = dataSource->Y.maxCoeff();
+    
+    double eps = 1e-4;
+    return (dataSource->Y.array() > min+eps &&
+            dataSource->Y.array() < max-eps).any() == false;
+}
+
+SLMODELRESULTYPE SLPlsModeClassification::getResultType()
+{
+    return
+    SLModelResultTypeRSS  |
+    SLModelResultTypeBeta |
+    SLModelResultTypeRes  |
+    SLModelResultTypeACC  |
+    SLModelResultTypeAUC  |
+    SLModelResultTypeCOV;
+}
+
+size_t SLPlsModeClassification::overfitCnt(SLModelResult& result)
+{
+    double auc = get< MatrixXd >(result[SLModelResultTypeAUC]).mean();
+    if ( auc > _maxAUC )
+    {
+        _maxAUC = auc;
+        _overfitCount = 0;
+    }
+    else ++_overfitCount;
+    
+    return _overfitCount;
+}
 
 // Public Methods
 SLModelResult SLSparsePls::train(const MatrixXd& appendedX, const MatrixXd& theY, SLMODELRESULTYPE type)
@@ -35,41 +101,15 @@ SLModelResult SLSparsePls::train(const MatrixXd& appendedX, const MatrixXd& theY
         Y = theY;
         Res = Y;
         
-        if (param.mode == PLSMODECLA)
-        {
-            min = Y.minCoeff();
-            max = Y.maxCoeff();
-            
-            double eps = 1e-4;
-            ASSERT((Y.array() > min+eps && Y.array() < max-eps).any() == false,
-                   "Only binary label was supported in classification mode");
-        }
+        ASSERT(param.mode->checkReponseData(), "Only binary label was supported in classification mode");
     }
     
     ssize_t appendedXRows = appendedX.rows();
     ssize_t appendedXCols = appendedX.cols();
     ssize_t oldXCols      = X.cols();
        
-    ssize_t selectedColIndex;
-    VectorXd selectedCol;
-    if(param.colMode == PLSCOLSELVAR)
-    {
-        ColVariance(Res).maxCoeff(&selectedColIndex);
-        selectedCol = Res.col(selectedColIndex);
-    }
-    else if(param.colMode == PLSCOLSELRAND)
-    {
-        selectedCol = Res.col(param.randIndex);
-    }
-    else if(param.colMode == PLSCOLSELAVG)
-    {
-        VectorXd ResMean(Res.rows());
-        ResMean.setZero();
-        
-        for (ssize_t i=0; i<Res.cols(); ++i)
-            ResMean += Res.col(i);
-        selectedCol = ResMean/Res.cols();
-    }
+    VectorXd selectedCol = param.colMode->getSelectedColumn();
+
     X.conservativeResize(appendedXRows, oldXCols+appendedXCols);
     X.rightCols(appendedXCols).setZero();
     X << X.leftCols(oldXCols), appendedX;
@@ -96,6 +136,8 @@ SLModelResult SLSparsePls::train(const MatrixXd& appendedX, const MatrixXd& theY
     
     Beta = W*(W.transpose()*X.transpose()*X*W).colPivHouseholderQr().solve(W.transpose()*X.transpose()*Y);
     
+    Res = Y - X*Beta;
+
     if (param.verbose)
     {
         LOG(Y);
@@ -104,11 +146,17 @@ SLModelResult SLSparsePls::train(const MatrixXd& appendedX, const MatrixXd& theY
         LOG(selectedCol);
         LOG(Beta);
         LOG(X*Beta.col(0));
+        LOG(Res);
         getchar();
     }
-    Res = Y - X*Beta;
     
     return getTrainResult(type);
+}
+
+SLModelResult SLSparsePls::classify(const MatrixXd& beta, const MatrixXd& tX, const MatrixXd& tY, SLMODELRESULTYPE type)
+{
+    Beta = beta;
+    return classify(tX, tY, type);
 }
 
 SLModelResult SLSparsePls::classify(const MatrixXd& tX, const MatrixXd& tY, SLMODELRESULTYPE type) const
@@ -116,6 +164,7 @@ SLModelResult SLSparsePls::classify(const MatrixXd& tX, const MatrixXd& tY, SLMO
     ASSERT(type != SLModelResultTypeNone, "No type of result was indicated");
     
     ASSERT(!(type & ~(SLModelResultTypeBeta |
+                      SLModelResultTypeRes  |
                       SLModelResultTypeQ2   |
                       SLModelResultTypeRSS  |
                       SLModelResultTypeACC  |
@@ -123,7 +172,7 @@ SLModelResult SLSparsePls::classify(const MatrixXd& tX, const MatrixXd& tY, SLMO
                       SLModelResultTypeAIC  |
                       SLModelResultTypeBIC  |
                       SLModelResultTypeCOV)),
-           "Only support Beta Q2 RSS ACC AUC AIC BIC COV for Sparse PLS.");
+           "Only support Beta Res Q2 RSS ACC AUC AIC BIC COV for Sparse PLS.");
     
     ASSERT(Beta.cols() != 0 && Beta.rows() != 0, "Train data first");
     
@@ -133,12 +182,12 @@ SLModelResult SLSparsePls::classify(const MatrixXd& tX, const MatrixXd& tY, SLMO
 
     if(type & SLModelResultTypeQ2)
     {
-        result[SLModelResultTypeQ2] = getQ2(tRES, tY);
+        result[SLModelResultTypeQ2] = SLModelUtility::getQ2(tRES, tY);
     }
     
     if(type & SLModelResultTypeRSS)
     {
-        result[SLModelResultTypeRSS] = getRSS(tRES);
+        result[SLModelResultTypeRSS] = SLModelUtility::getRSS(tRES);
     }
     
     if(type & SLModelResultTypeBeta)
@@ -146,29 +195,34 @@ SLModelResult SLSparsePls::classify(const MatrixXd& tX, const MatrixXd& tY, SLMO
         result[SLModelResultTypeBeta] = (MatrixXd)(Beta);
     }
     
+    if(type & SLModelResultTypeRes)
+    {
+        result[SLModelResultTypeRes] = Res;
+    }
+    
     if(type & SLModelResultTypeACC)
     {
-        result[SLModelResultTypeACC] = getACC(tY, tX*Beta);
+        result[SLModelResultTypeACC] = SLModelUtility::getACC(tY, tX*Beta);
     }
     
     if(type & SLModelResultTypeAUC)
     {
-        result[SLModelResultTypeAUC] = getAUC(tY, tX*Beta);
+        result[SLModelResultTypeAUC] = SLModelUtility::getAUC(tY, tX*Beta);
     }
     
     if(type & SLModelResultTypeAIC)
     {
-        result[SLModelResultTypeAIC] = getAIC(tY, tX*Beta, X.cols());
+        result[SLModelResultTypeAIC] = SLModelUtility::getAIC(tY, tX*Beta, X.cols());
     }
 
     if(type & SLModelResultTypeBIC)
     {
-        result[SLModelResultTypeBIC] = getBIC(tY, tX*Beta, X.cols());
+        result[SLModelResultTypeBIC] = SLModelUtility::getBIC(tY, tX*Beta, X.cols());
     }
 
     if(type & SLModelResultTypeCOV)
     {
-        result[SLModelResultTypeCOV] = getCOV(tY, tX*Beta);
+        result[SLModelResultTypeCOV] = SLModelUtility::getCOV(tY, tX*Beta);
     }
     return result;
 }
@@ -176,6 +230,7 @@ SLModelResult SLSparsePls::classify(const MatrixXd& tX, const MatrixXd& tY, SLMO
 bool SLSparsePls::setParameters(SLSparsePlsParameters& parameters)
 {
     param = parameters;
+    param.mode->dataSource = this;
     return true;
 }
 
@@ -183,6 +238,7 @@ bool SLSparsePls::setParameters(SLSparsePlsParameters& parameters)
 SLModelResult SLSparsePls::getTrainResult(SLMODELRESULTYPE type) const
 {
     ASSERT(!(type & ~(SLModelResultTypeBeta |
+                      SLModelResultTypeRes  |
                       SLModelResultTypeQ2   |
                       SLModelResultTypeRSS  |
                       SLModelResultTypeACC  |
@@ -190,19 +246,19 @@ SLModelResult SLSparsePls::getTrainResult(SLMODELRESULTYPE type) const
                       SLModelResultTypeAIC  |
                       SLModelResultTypeBIC  |
                       SLModelResultTypeCOV)),
-           "Only support Beta Q2 RSS ACC AUC AIC BIC COV for Sparse PLS.");
+           "Only support Beta Res Q2 RSS ACC AUC AIC BIC COV for Sparse PLS.");
     
     ASSERT(Beta.cols() != 0 && Beta.rows() != 0, "Train data first");
     
     SLModelResult result;
     if(type & SLModelResultTypeQ2)
     {
-        result[SLModelResultTypeQ2] = getQ2(Res, Y);
+        result[SLModelResultTypeQ2] = SLModelUtility::getQ2(Res, Y);
     }
     
     if(type & SLModelResultTypeRSS)
     {
-        result[SLModelResultTypeRSS] = getRSS(Res);
+        result[SLModelResultTypeRSS] = SLModelUtility::getRSS(Res);
     }
     
     if(type & SLModelResultTypeBeta)
@@ -210,29 +266,34 @@ SLModelResult SLSparsePls::getTrainResult(SLMODELRESULTYPE type) const
         result[SLModelResultTypeBeta] = (MatrixXd)Beta;
     }
     
+    if(type & SLModelResultTypeRes)
+    {
+        result[SLModelResultTypeRes] = Res;
+    }
+
     if(type & SLModelResultTypeACC)
     {
-        result[SLModelResultTypeACC] = getACC(Y, X*Beta);
+        result[SLModelResultTypeACC] = SLModelUtility::getACC(Y, X*Beta);
     }
     
     if(type & SLModelResultTypeAUC)
     {
-        result[SLModelResultTypeAUC] = getAUC(Y, X*Beta);
+        result[SLModelResultTypeAUC] = SLModelUtility::getAUC(Y, X*Beta);
     }
     
     if(type & SLModelResultTypeAIC)
     {
-        result[SLModelResultTypeAIC] = getAIC(Y, X*Beta, X.cols());
+        result[SLModelResultTypeAIC] = SLModelUtility::getAIC(Y, X*Beta, X.cols());
     }
     
     if(type & SLModelResultTypeBIC)
     {
-        result[SLModelResultTypeBIC] = getBIC(Y, X*Beta, X.cols());
+        result[SLModelResultTypeBIC] = SLModelUtility::getBIC(Y, X*Beta, X.cols());
     }
 
     if(type & SLModelResultTypeCOV)
     {
-        result[SLModelResultTypeCOV] = getCOV(Y, X*Beta);
+        result[SLModelResultTypeCOV] = SLModelUtility::getCOV(Y, X*Beta);
     }
     return result;
 }

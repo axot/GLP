@@ -102,6 +102,16 @@ public:
         return cv.getResultHistory();
     }
     
+    M& getModel()
+    {
+        return model.getModel();
+    }
+    
+    G& getGraphMining()
+    {
+        return graphMining.getGraphMining();
+    }
+    
 private:
     SLModel<M> model;
     SLGraphMining<G> graphMining;

@@ -74,8 +74,8 @@ SLGraphMiningResult SLGspan::search(VectorXd residual, SLGRAPHMININGTASKTYPE tas
     
     rule_cache.clear();
     
-    tau     = 0.0f;
-    wbias   = 0.0f;
+    tau   = 0.0f;
+    wbias = 0.0f;
 
     size_t l = transaction.size();
     y.resize(l);
@@ -146,10 +146,6 @@ SLGraphMiningResult SLGspan::search(VectorXd residual, SLGRAPHMININGTASKTYPE tas
     {
         entireRules.insert(entireRules.end(), rule_cache.begin(), rule_cache.end());
     }
-    else if ( taskType == SLGraphMiningTasktypeClassify )
-    {
-        // TODO:
-    }
     
     SLGraphMiningResult result;
     if ( resultType & SLGraphMiningResultTypeX )
@@ -176,6 +172,82 @@ SLGraphMiningResult SLGspan::search(VectorXd residual, SLGRAPHMININGTASKTYPE tas
     }
     
     return result;
+}
+
+void SLGspan::buildDarts(vector<string> dfs)
+{
+    vector<Rule> rules(dfs.size());
+    for (size_t i = 0; i < dfs.size(); ++i) {
+        rules[i].dfs = dfs[i];
+    }
+    
+    buildDarts(rules);
+}
+
+void SLGspan::buildDarts(vector<Rule> rules)
+{
+    using namespace boost::phoenix;
+    using namespace boost::phoenix::arg_names;
+
+    this->entireRules = rules;
+    
+    vector<string> ary;
+    for (size_t i = 0; i < rules.size(); ++i)
+    {
+        ary.push_back(rules[i].dfs);
+    }
+
+    darts_indices.resize(ary.size());
+    
+    int i = 0;
+    transform(ary.begin(), ary.end(), darts_indices.begin(), boost::phoenix::ref(i)++);
+    sort(darts_indices.begin(), darts_indices.end(), boost::phoenix::ref(ary)[arg1] < boost::phoenix::ref(ary)[arg2]);
+    
+    vector <Darts::DoubleArray::key_type *> arrForBuild(ary.size());
+    for (size_t i = 0; i < arrForBuild.size(); ++i) {
+        arrForBuild[i] = (Darts::DoubleArray::key_type*)ary[darts_indices[i]].c_str();
+    }
+    
+    this->darts = new Darts::DoubleArray();
+    this->darts->build (arrForBuild.size(), &arrForBuild[0], 0, 0, 0);
+}
+
+MatrixXd SLGspan::classify(Graph &g)
+{
+    this->taskType = SLGraphMiningTasktypeClassify;
+    patternMatched.clear ();
+    
+    Projected_map3 root;
+    EdgeList edges;
+    DFS_CODE.clear ();
+    
+    transaction.clear ();
+    transaction.push_back (g);
+    
+    root.clear();
+    initDFSTree(root);
+    
+    // build dfs
+    for (Projected_iterator3 fromlabel = root.begin(); fromlabel != root.end(); ++fromlabel) {
+        for (Projected_iterator2 elabel = fromlabel->second.begin(); elabel != fromlabel->second.end(); ++elabel) {
+            for (Projected_iterator1 tolabel = elabel->second.begin(); tolabel != elabel->second.end(); ++tolabel) {
+                DFS_CODE.push (0, 1, fromlabel->first, elabel->first, tolabel->first);
+                project (tolabel->second);
+                DFS_CODE.pop ();
+            }
+        }
+    }
+    
+    std::sort (patternMatched.begin(), patternMatched.end());
+    patternMatched.erase (std::unique (patternMatched.begin(), patternMatched.end()), patternMatched.end());
+    
+    MatrixXd features(transaction.size(), this->entireRules.size());
+    features.setConstant(0.0f);
+    
+    for (size_t n_rule = 0; n_rule < patternMatched.size(); ++n_rule)
+        features(0, darts_indices[patternMatched[n_rule]] ) = 1.0f;
+    
+    return features;
 }
 
 // Private Methods
@@ -382,11 +454,13 @@ void SLGspan::project(Projected& projected)
         DFS_CODE.write (ostrs);
         
         vector<Rule>::iterator it;
-        it = find(entireRules.begin(), entireRules.end(), ostrs.str());
-        if ( it != entireRules.end() )
-        {
-            size_t index = it - entireRules.begin();
-            patternMatchedResult.push_back(index);
+        
+        Darts::DoubleArray::result_type result =
+            this->darts->exactMatchSearch(ostrs.str().c_str());
+
+        if (result == -2) return;
+        if (result >= 0){
+            patternMatched.push_back(result);
         }
         
         if (maxpat == DFS_CODE.size()) return;
@@ -473,11 +547,13 @@ void SLGspan::project(Projected& projected, tree<TNODE>::iterator& tnode)
         DFS_CODE.write (ostrs);
         
         vector<Rule>::iterator it;
-        it = find(entireRules.begin(), entireRules.end(), ostrs.str());
-        if ( it != entireRules.end() )
-        {
-            size_t index = it - entireRules.begin();
-            patternMatchedResult.push_back(index);
+        
+        Darts::DoubleArray::result_type result =
+        this->darts->exactMatchSearch(ostrs.str().c_str());
+        
+        if (result == -2) return;
+        if (result >= 0){
+            patternMatched.push_back(result);
         }
         
         if (maxpat == DFS_CODE.size()) return;
@@ -608,6 +684,18 @@ void SLGspan::initDFSTree(Projected_map3 &root)
     }
 }
 
+void SLGspan::rebuildDFSTree()
+{
+    root.clear();
+    initDFSTree(root);
+    
+    if (doesUseMemoryBoost)
+    {
+        memoryCache.clear();
+        initMemoryCache(root);
+    }
+}
+
 void SLGspan::initMemoryCache(Projected_map3 &root)
 {
     tree<TNODE>::iterator top = memoryCache.begin();
@@ -634,3 +722,14 @@ void SLGspan::initMemoryCache(Projected_map3 &root)
         }
     }
 }
+
+void SLGspan::setTransaction(vector<Graph> transaction)
+{
+    this->transaction = transaction;
+}
+
+vector<Graph> SLGspan::getTransaction()
+{
+    return this->transaction;
+}
+
