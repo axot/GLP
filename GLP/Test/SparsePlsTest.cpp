@@ -27,6 +27,23 @@
 
 using namespace std;
 
+class ColumnSelectionY : public IColumnSelection<SLSparsePls>
+{
+private:
+    MatrixXd _selectedCol;
+    
+public:
+    virtual MatrixXd getSelectedColumn(MatrixXd* mat = NULL);
+};
+
+MatrixXd ColumnSelectionY::getSelectedColumn(MatrixXd* mat)
+{
+    if (mat == NULL) return _selectedCol;
+    
+    _selectedCol = *mat;
+    return _selectedCol;
+}
+
 int main(int argc, const char *argv[])
 {
     /* b1=1, b2=2, b3=3
@@ -40,9 +57,11 @@ int main(int argc, const char *argv[])
      */
     SLSparsePls spls;
     SLSparsePls::SLSparsePlsParameters param;
-    
+    param.mode    = (SLPlsModeRegression*) new SLPlsModeRegression();
+    param.colMode = (IColumnSelection<SLSparsePls>*) new ColumnSelectionY();
     spls.setParameters(param);
     
+    SLMODELRESULTYPE resultType = SLModelResultTypeQ2 | SLModelResultTypeRSS | SLModelResultTypeBeta | SLModelResultTypeRes;
     MatrixXd X(5,3), Y(5,1);
     X.row(0) << 1,0,0;
     X.row(1) << 0,1,0;
@@ -52,9 +71,11 @@ int main(int argc, const char *argv[])
     
     Y << 1,2,3,3,4;
 
+    MatrixXd res = Y;
     for ( int i = 0; i < X.cols(); ++i)
     {
-        SLModelResult result = spls.train(X.col(i), Y, SLModelResultTypeQ2 | SLModelResultTypeRSS | SLModelResultTypeBeta);
+        param.colMode->getSelectedColumn(&res);
+        SLModelResult result = spls.train(X.col(i), Y, resultType);
         
         cout << "Training: "<< endl;
         cout << "Q2: "      << result[SLModelResultTypeQ2]  << endl;
@@ -71,29 +92,7 @@ int main(int argc, const char *argv[])
     cout << "Classify: "<< endl;
     cout << "Q2: "      << tresult[SLModelResultTypeQ2]  << endl;
     cout << "RSS: "     << tresult[SLModelResultTypeRSS] << '\n' << endl;
-    
-    MatrixXd cvX(7,3), cvY(7,3);
-    cvX << X, tX;
-    cvY.col(0) << Y, tY;
-    cvY.col(1) << 2*cvY.col(0);
-    cvY.col(2) << 2.5*cvY.col(0);
 
-    SLCrossValidation<SLSparsePls>::SLCrossValidationParameters cvParam;
-    cvParam.kFold = 7;
-    cvParam.resultHistorySize = 3;
-    cvParam.modelClone = spls;
-    
-    SLCrossValidation<SLSparsePls> cv;
-    cv.setParameters(cvParam);
-    for ( int i = 0; i < cvX.cols(); ++i)
-    {
-        cout << "\nCross Validation: n: " << i+1 << endl;
-        SLCrossValidationResults results = cv.crossValidation(cvX.col(i),
-                                                              cvY,
-                                                              SLModelResultTypeQ2 | SLModelResultTypeRSS | SLModelResultTypeBeta,
-                                                              SLCrossValidationMethodsUsingAppendedXAsClassifyData);
-        
-        results.showSummary(SLModelResultTypeQ2 | SLModelResultTypeRSS);
-        cout << "Beta:\n" << get<MatrixXd>(results[SLCrossValidationResultTypeTest][0][SLModelResultTypeBeta]) << endl;
-    }
+    MatrixXd q2 = get<MatrixXd>(tresult[SLModelResultTypeQ2]);
+    return fabs(q2(0,0) - 1.0f) < 0.0001 ? 0 : -1;
 }

@@ -18,6 +18,7 @@ release:
 	cd $(RELEASEBUILDIR);				\
 	cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$(PREFIX) ../../../GLP;	\
 	make -j4;					\
+	ctest						\
 	cd -
 
 debug:
@@ -25,6 +26,7 @@ debug:
 	cd $(DEBUGBUILDIR);				\
 	cmake -DCMAKE_BUILD_TYPE=Debug ../../../GLP;	\
 	make -j4;					\
+	ctest						\
 	cd -
 
 gendoc:

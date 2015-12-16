@@ -71,29 +71,4 @@ int main(int argc, const char *argv[])
     cout << "Classify: "<< endl;
     cout << "Q2: "      << tresult[SLModelResultTypeQ2]  << endl;
     cout << "RSS: "     << tresult[SLModelResultTypeRSS] << '\n' << endl;
-    
-    MatrixXd cvX(7,3), cvY(7,3);
-    cvX << X, tX;
-    cvY.col(0) << Y, tY;
-    cvY.col(1) << 2*cvY.col(0);
-    cvY.col(2) << 2.5*cvY.col(0);
-    
-    SLCrossValidation<SLNipals>::SLCrossValidationParameters cvParam;
-    cvParam.kFold = 7;
-    cvParam.resultHistorySize = 3;
-    cvParam.modelClone = nipals;
-    
-    SLCrossValidation<SLNipals> cv;
-    cv.setParameters(cvParam);
-    for ( int i = 0; i < cvX.cols(); ++i)
-    {
-        cout << "\nCross Validation: n: " << i+1 << endl;
-        SLCrossValidationResults results = cv.crossValidation(cvX,
-                                                              cvY,
-                                                              SLModelResultTypeQ2 | SLModelResultTypeRSS | SLModelResultTypeBeta,
-                                                              SLCrossValidationMethodsUsingWholeData);
-        
-        results.showSummary(SLModelResultTypeQ2 | SLModelResultTypeRSS);
-        cout << "Beta:\n" << get<MatrixXd>(results[SLCrossValidationResultTypeTest][0][SLModelResultTypeBeta]) << endl;
-    }
 }
